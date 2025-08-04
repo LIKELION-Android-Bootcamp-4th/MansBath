@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -59,6 +60,7 @@ fun HomeScreen() {
     var inputText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<UiChatMessage>() }
     var currentStep by remember { mutableIntStateOf(0) }
+    var activeConversationTitle by remember { mutableStateOf<String?>(null) }
 
     val chatStarted = messages.isNotEmpty()
     val isReportFinished by remember {
@@ -66,10 +68,18 @@ fun HomeScreen() {
     }
     var followUpStep by remember { mutableIntStateOf(0) }
 
+    fun createNewChat() {
+        messages.clear()
+        currentStep = 0
+        followUpStep = 0
+        activeConversationTitle = null
+    }
+
     fun loadChatHistory(title: String) {
         val history = DummyData.dummyChatHistories[title] ?: return
 
         messages.clear()
+        activeConversationTitle = title
         val mappedMessages = history.mapIndexed { index, historyItem ->
             when (historyItem) {
                 is UserHistory -> {
@@ -78,8 +88,9 @@ fun HomeScreen() {
                 is ModelHistory -> {
                     mapModelToUiMessage(historyItem.message, "history_${title}_model_$index")
                 }
+
                 else -> {
-                    throw IllegalArgumentException("알 수 없는 기록 아이템 형태: $historyItem")
+                    throw IllegalArgumentException("Unknown history item type");
                 }
             }
         }
@@ -91,8 +102,10 @@ fun HomeScreen() {
         scope.launch {
             isLoading = true
             messages.clear()
+            activeConversationTitle = "새로운 질문" // 새 대화의 임시 제목
             val userMessage = UiUserMessage("user_0", null, initialQuestion)
             val assistantMessage = mapModelToUiMessage(DummyData.conversationFlow[0], "asst_0")
+
             val initialMessages = listOf(userMessage, assistantMessage)
             currentStep = 1
             delay(500L)
@@ -120,6 +133,13 @@ fun HomeScreen() {
             drawerState = drawerState,
             drawerContent = {
                 HomeDrawerContent(
+                    /* A02 에 반영
+                    onCloseClick = {
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
+                     */
                     onHistoryItemSelected = { title ->
                         loadChatHistory(title)
                         scope.launch {
@@ -131,7 +151,7 @@ fun HomeScreen() {
         ) {
             Scaffold(
                 topBar = {
-                    TopAppBar(
+                    CenterAlignedTopAppBar(
                         title = { Text("Aspa") },
                         navigationIcon = {
                             IconButton(onClick = {
@@ -141,11 +161,19 @@ fun HomeScreen() {
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menu"
+                                    contentDescription = "메뉴"
                                 )
                             }
                         },
-                        colors = TopAppBarDefaults.topAppBarColors(
+                        actions = {
+                            IconButton(onClick = { createNewChat() }) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "새 질문"
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                             containerColor = MaterialTheme.colorScheme.background
                         )
                     )
@@ -170,7 +198,8 @@ fun HomeScreen() {
                                     messages.add(userMessage)
                                     delay(1000L)
 
-                                    if (currentStep < DummyData.conversationFlow.size) {
+                                    // 새 대화 진행 로직
+                                    if (activeConversationTitle == "새로운 질문" && currentStep < DummyData.conversationFlow.size) {
                                         val assistantMessage = mapModelToUiMessage(
                                             modelMessage = DummyData.conversationFlow[currentStep],
                                             id = "asst_$currentStep"
