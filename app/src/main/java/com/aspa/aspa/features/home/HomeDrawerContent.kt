@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 fun HomeDrawerContent(
     onHistoryItemSelected: (String) -> Unit
 ) {
-    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기
+    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기 CHOICE 새 질문 만들지?
     val questionHistory = remember {
         mutableStateListOf(*DummyData.dummyChatHistories.keys.toTypedArray())
     }
