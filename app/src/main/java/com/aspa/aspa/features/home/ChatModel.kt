@@ -8,6 +8,10 @@ data class ModelMessage(
     val result: Map<String, String>? = null
 )
 
+sealed interface HistoryItem
+data class UserHistory(val message: String) : HistoryItem
+data class ModelHistory(val message: ModelMessage) : HistoryItem
+
 sealed interface UiChatMessage {
     val id: String
     val date: Date?

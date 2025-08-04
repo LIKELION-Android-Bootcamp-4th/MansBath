@@ -7,70 +7,115 @@ object DummyData {
      * 날짜는 피그마에 반영 안해둬서 안찍습니다.
      * 파이어스토어엔 날짜 있슴.
      *
+     * 0804-1429
+     * 더미 구조좀 바꿈 기록 불러와야되서
+     * 1. 새 화면에서 질문 응답 더미 TODO: 파이어스토어 불러오기
+     * 2. 기록 더미
      */
+
     val conversationFlow: List<ModelMessage> = listOf(
-        // Step 1: 질문
+        ModelMessage(
+            message = "안녕하세요! 무엇을 배우고 싶으신가요? 학습 목표와 현재 상태를 파악하기 위해 몇 가지 질문을 드릴게요.\n\n" +
+                    "첫 번째 질문입니다.\n현재 학습 수준은 어느 정도이신가요?",
+            choices = listOf("전혀 모름", "기초 수준", "중급 수준", "고급 수준")
+        ),
+        ModelMessage(
+            message = "알겠습니다. 학습 목적은 무엇인가요?",
+            choices = listOf("취미", "학업", "여행", "취업")
+        ),
+        ModelMessage(
+            message = "마지막 질문입니다. 선호하는 학습 방식이 있나요?",
+            choices = listOf("텍스트 위주", "영상 위주", "실습 위주", "상관 없음")
+        ),
+        ModelMessage(
+            message = "사용자 분석이 완료되었습니다.",
+            result = mapOf(
+                "현재 수준" to "중급 수준",
+                "학습 목적" to "취업",
+                "선호 방식" to "실습 위주",
+                "추천 전략" to "실무 프로젝트 위주의 심화 학습을 추천합니다."
+            )
+        )
+    )
+
+    // 저장된 대화 기록 (사용자 답변 포함)
+    val dummyChatHistories: Map<String, List<HistoryItem>> = mapOf(
+        "일본어를 배우고 싶어" to japaneseConversation,
+        "물리학을 배우고 싶어" to physicsConversation,
+        "심리학을 배우고 싶어" to psychologyConversation
+    )
+
+    // 추가 질문에 대한 응답
+    val followUpResponses: List<ModelMessage> = listOf(
+        ModelMessage(message = "좋은 질문입니다! 해당 내용에 대해서는 로드맵 생성 후 더 자세히 다룰 예정입니다."),
+        ModelMessage(message = "알겠습니다. 그 부분에 대한 정보도 로드맵에 반영하도록 노력하겠습니다."),
+        ModelMessage(message = "죄송합니다, 지금은 추가 질문에 답변하기 어렵습니다. 먼저 로드맵을 생성해 주세요.")
+    )
+}
+
+// 각 대화 내용에 UserHistory 추가 (이전과 동일)
+private val japaneseConversation: List<HistoryItem> = listOf(
+    UserHistory(message = "일본어를 배우고 싶어"),
+    ModelHistory(
         ModelMessage(
             message = "안녕하세요! 일본어 학습의 첫걸음을 함께하게 되어 기쁩니다. 😊\n" +
                     "효과적인 학습 계획을 세우기 위해, 먼저 당신의 학습 목표와 현재 상태를 파악하는 것이 중요해요.\n\n" +
                     "첫 번째 질문입니다.\n현재 일본어 실력은 어느 정도이신가요?",
-            choices = listOf(
-                "일본어를 전혀 몰라요",
-                "기초적인 수준이에요 (히라가나, 가타카나)",
-                "간단한 문장을 만들 수 있어요",
-                "어느 정도 학습 경험이 있어요 (예: JLPT N5 수준)"
-            )
-        ),
-        // Step 2: 질문
+            choices = listOf("...", "...", "...", "어느 정도 학습 경험이 있어요 (예: JLPT N5 수준)")
+        )),
+    UserHistory(message = "어느 정도 학습 경험이 있어요 (예: JLPT N5 수준)"),
+    ModelHistory(
         ModelMessage(
             message = "네, 알겠습니다. 어느 정도 학습 경험이 있으시군요!\n" +
                     "그렇다면 다음 질문에 답변해 주세요.\n\n" +
                     "일본어를 배우려는 주목적은 무엇인가요?",
-            choices = listOf(
-                "일본 여행에서 자유롭게 소통하고 싶어요",
-                "애니메이션, 드라마, 음악 등 일본 문화를 더 깊게 즐기고 싶어요",
-                "일본 유학이나 워킹홀리데이를 준비하고 있어요",
-                "JLPT와 같은 공인 시험에서 좋은 성적을 얻고 싶어요"
-            )
-        ),
-        // Step 3: 질문
+            choices = listOf("...", "...", "...", "JLPT와 같은 공인 시험에서 좋은 성적을 얻고 싶어요")
+        )),
+    UserHistory(message = "JLPT와 같은 공인 시험에서 좋은 성적을 얻고 싶어요"),
+    ModelHistory(
         ModelMessage(
             message = "목표가 아주 명확하시군요!\n" +
                     "JLPT 시험 준비를 목표로 하시는군요. 좋습니다.\n\n" +
                     "그렇다면 마지막 질문입니다.\n" +
                     "구체적으로 어떤 레벨을 목표로 공부하고 싶으신가요?",
-            choices = listOf(
-                "JLPT N5~N4: 현재 제 수준에서 차근차근 준비하고 싶어요",
-                "JLPT N3: 어느 정도 자신이 있어서 N3를 목표로 하고 싶어요",
-                "JLPT N2: 고급 어휘/문법도 비즈니스 일본어 수준에 도전해 보고 싶어요",
-                "잘 모르겠어요, 제 수준에 맞는 추천을 받고 싶어요"
-            )
-        ),
-        // Step 4: 분석 결과
+            choices = listOf("...", "JLPT N3: 어느 정도 자신이 있어서 N3를 목표로 하고 싶어요", "...", "...")
+        )),
+    UserHistory(message = "JLPT N3: 어느 정도 자신이 있어서 N3를 목표로 하고 싶어요"),
+    ModelHistory(
         ModelMessage(
             message = "사용자 분석이 완료되었습니다.",
-            result = mapOf(
-                "사용자 프로필" to "현재 일본어 수준: JLPT N5 수준의 학습 경험 보유\n학습 목적: 공인 시험 대비 (JLPT)\n목표 레벨: JLPT N3 취득",
-                "종합 평가" to "사용자는 명확하고 구체적인 학습 목표(JLPT N3 취득)를 설정하고 있어, 학습 동기가 매우 높을 것으로 판단됩니다. 기존 N5 수준의 학습 경험을 바탕으로 하므로, N4 수준의 문법과 어휘를 빠르게 복습하고 N3 수준의 심화 학습으로 넘어가는 전략이 효과적일 것입니다. JLPT N3는 일상적인 주제를 넘어 뉴스 헤드라인이나 안내문 등 좀 더 넓은 범위의 내용을 이해하는 능력을 요구합니다. 따라서 문자/어휘, 문법, 독해, 청해의 균형 잡힌 학습 계획이 필수적입니다.",
-                "학습 방향 제안" to "[핵심 과제] N3 수준에 요구되는 한자와 어휘 암기량을 늘리고, 빠르고 정확한 독해 능력과 자연스러운 속도의 청해 능력을 기르는 것이 중요합니다.",
-                "추천 전략" to "어휘/문법: N4 수준의 핵심 문법을 복습하며 N3 신규 문법과 어휘 학습을 병행합니다.\n독해: 짧은 문장에서 긴 문장으로 점차 난이도를 높여가며, 문맥 파악 능력을 훈련합니다.\n청해: 일상 대화 외 다양한 상황(안내 방송, 뉴스 등)의 듣기 자료를 통해 실전 감각을 익힙니다."
-            )
-        )
+            result = mapOf("사용자 프로필" to "...", "종합 평가" to "...", "학습 방향 제안" to "...", "추천 전략" to "...")
+        ))
+)
 
-    )
-    val followUpResponses: List<ModelMessage> = listOf(
-        // Step after: 그냥 아무 질문 다 이거로 받아쳐. 마지막 결과는 선물로.
-        ModelMessage(message = "좋은 질문입니다! 해당 내용에 대해서는 로드맵 생성 후 더 자세히 다룰 예정입니다."),
-        ModelMessage(message = "알겠습니다. 그 부분에 대한 정보도 로드맵에 반영하도록 노력하겠습니다."),
-        ModelMessage(message = "죄송합니다, 지금은 추가 질문에 답변하기 어렵습니다. 먼저 로드맵을 생성해 주세요."),
+private val physicsConversation: List<HistoryItem> = listOf(
+    UserHistory(message = "물리학을 배우고 싶어"),
+    ModelHistory(
         ModelMessage(
-            message = "사용자 분석이 완료되었습니다.",
+            message = "물리학 학습에 오신 것을 환영합니다! 어떤 분야에 관심이 있으신가요?",
+            choices = listOf("고전 역학", "양자 역학", "전자기학", "상대성 이론")
+        )),
+    UserHistory(message = "양자 역학"),
+    ModelHistory(
+        ModelMessage(
+            message = "양자 역학은 매우 흥미로운 분야죠. 학습이 완료되면 분석 결과를 알려드릴게요."
+        ))
+)
+
+private val psychologyConversation: List<HistoryItem> = listOf(
+    UserHistory(message = "심리학을 배우고 싶어"),
+    ModelHistory(
+        ModelMessage(
+            message = "심리학 학습을 도와드릴게요. 가장 관심 있는 심리학 분야는 무엇인가요?",
+            choices = listOf("인지 심리학", "발달 심리학", "사회 심리학", "임상 심리학")
+        )),
+    UserHistory(message = "사회 심리학"),
+    ModelHistory(
+        ModelMessage(
+            message = "사회 심리학을 선택하셨군요. 분석 결과를 곧 보내드리겠습니다.",
             result = mapOf(
-                "사용자 프로필" to "현재 일본어 수준: JLPT N5 수준의 학습 경험 보유\n학습 목적: 공인 시험 대비 (JLPT)\n목표 레벨: JLPT N3 취득",
-                "종합 평가" to "사용자는 명확하고 구체적인 학습 목표(JLPT N3 취득)를 설정하고 있어, 학습 동기가 매우 높을 것으로 판단됩니다. 기존 N5 수준의 학습 경험을 바탕으로 하므로, N4 수준의 문법과 어휘를 빠르게 복습하고 N3 수준의 심화 학습으로 넘어가는 전략이 효과적일 것입니다. JLPT N3는 일상적인 주제를 넘어 뉴스 헤드라인이나 안내문 등 좀 더 넓은 범위의 내용을 이해하는 능력을 요구합니다. 따라서 문자/어휘, 문법, 독해, 청해의 균형 잡힌 학습 계획이 필수적입니다.",
-                "학습 방향 제안" to "[핵심 과제] N3 수준에 요구되는 한자와 어휘 암기량을 늘리고, 빠르고 정확한 독해 능력과 자연스러운 속도의 청해 능력을 기르는 것이 중요합니다.",
-                "추천 전략" to "어휘/문법: N4 수준의 핵심 문법을 복습하며 N3 신규 문법과 어휘 학습을 병행합니다.\n독해: 짧은 문장에서 긴 문장으로 점차 난이도를 높여가며, 문맥 파악 능력을 훈련합니다.\n청해: 일상 대화 외 다양한 상황(안내 방송, 뉴스 등)의 듣기 자료를 통해 실전 감각을 익힙니다."
+                "선택 분야" to "사회 심리학",
+                "추천 학습" to "동조, 복종, 집단 역학에 대한 기본 이론부터 학습하는 것을 추천합니다."
             )
-        )
-    )
-}
+        ))
+)
