@@ -1,11 +1,13 @@
 package com.aspa.aspa.features.home.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,9 +21,10 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeDrawerContent(
-    onHistoryItemSelected: (String) -> Unit
+    onHistoryItemSelected: (String) -> Unit,
+    onCloseClick: () -> Unit,
 ) {
-    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기
+    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기 CHOICE 새 질문 만들지?
     val questionHistory = remember {
         mutableStateListOf(*DummyData.dummyChatHistories.keys.toTypedArray())
     }
@@ -37,8 +40,12 @@ fun HomeDrawerContent(
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
+                IconButton(onClick = onCloseClick) {
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = "Close Drawer")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = "질문 내역",
                     style = MaterialTheme.typography.titleLarge,
@@ -80,9 +87,10 @@ private fun QuestionHistoryItem(
     var expanded by remember { mutableStateOf(false) }
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
+        border = BorderStroke(1.dp, Color(0xFFF0F0F0)),
+        tonalElevation = 0.dp,
         onClick = onItemClick
     ) {
         Row(
@@ -103,7 +111,7 @@ private fun QuestionHistoryItem(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More Options",
-                        tint = Color.Gray
+                        tint = Color.LightGray
                     )
                 }
                 DropdownMenu(

@@ -133,13 +133,11 @@ fun HomeScreen() {
             drawerState = drawerState,
             drawerContent = {
                 HomeDrawerContent(
-                    /* A02 에 반영
                     onCloseClick = {
                         scope.launch {
                             drawerState.close()
                         }
                     },
-                     */
                     onHistoryItemSelected = { title ->
                         loadChatHistory(title)
                         scope.launch {
