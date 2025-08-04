@@ -3,9 +3,13 @@ package com.aspa.aspa.features.quiz
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -79,9 +83,8 @@ fun SolveQuizScreen() {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     border = BorderStroke(1.dp, Color.Gray),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = Color.White
                     ),
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -97,12 +100,66 @@ fun SolveQuizScreen() {
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
                                     .clickable { selectedOption = option }
+                                    .height(IntrinsicSize.Min)
                             ) {
                                 RadioButton(
                                     selected = selectedOption == option,
                                     onClick = { selectedOption = option }
                                 )
-                                Text(text = option)
+
+                                val optionText = @Composable{
+                                    Text(
+                                        text = option,
+                                        modifier = Modifier
+                                            .padding(horizontal = 6.dp)
+                                    )
+                                }
+
+                                if (selectedOption == option) {
+                                    Card(
+                                        modifier = Modifier
+                                            .padding(start = 4.dp)
+                                            .fillMaxWidth()
+                                            .fillMaxHeight(),
+                                            colors = CardDefaults.cardColors(
+                                            containerColor = Color(0xF0406DFD)
+                                        )
+                                    ) {
+                                        Box(contentAlignment = Alignment.CenterStart,
+                                            modifier = Modifier.fillMaxSize()
+                                        ) {
+                                            optionText()
+                                        }
+
+                                    }
+                                } else {
+                                    optionText()
+                                }
+
+                                /*if(selectedOption == option) {
+                                    Card(
+                                        modifier = Modifier.fillMaxSize(),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = Color(0xF0406DFD)
+                                        ),
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(
+                                                text = option,
+                                                modifier = Modifier
+                                                    .padding(horizontal = 6.dp)
+                                            )
+
+                                        }
+                                    }
+                                }
+                                else {
+                                    Text(text = option, modifier = Modifier.padding(horizontal = 4.dp))
+                                }*/
+
                             }
                         }
                     }
@@ -129,7 +186,7 @@ fun SolveQuizScreen() {
                         enabled = selectedOption.isNotEmpty(),
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Blue
+                            containerColor = Color(0xF0406DFD)
                         )
                     ) {
                         Text("다음")
