@@ -88,11 +88,15 @@ fun UserMessage(text: String) {
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Box(
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = "user Profile",
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .padding(6.dp),
+            tint = Color.Gray
         )
     }
 }
@@ -140,17 +144,17 @@ fun OptionButtonList(
         horizontalAlignment = Alignment.End,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 44.dp),
+            .padding(start = 44.dp), // 아이콘 + 여백 만큼 들여쓰기
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         options.forEachIndexed { index, option ->
             Button(
                 onClick = { onOptionSelected(option) },
                 modifier = Modifier,
-                border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
+                border = BorderStroke(1.dp, Color(0xFFC0C7FF)),
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = Color(0xFFF4F6FF),
                     contentColor = MaterialTheme.colorScheme.primary
                 ),
                 contentPadding = PaddingValues(vertical = 10.dp, horizontal = 16.dp)
