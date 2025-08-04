@@ -1,0 +1,159 @@
+package com.aspa.aspa.features.study.StudyDetail
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.aspa.aspa.ui.theme.Blue
+import com.aspa.aspa.ui.theme.Gray
+import com.aspa.aspa.ui.theme.Gray10
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StudyDetailScreen() {
+    val expandedIndex = remember { mutableStateOf(-1) }
+
+    val dummyContentList = listOf(
+        "React Hook 기본 개념" to listOf(
+            "Hook이란 무엇인가?",
+            "기존 클래스형 상태 관리와 비교",
+            "useState / useEffect 기초 사용법"
+        ),
+        "실습 중심 가이드" to listOf(
+            "useState 실습 및 상태 갱신",
+            "useEffect 타이밍 이해",
+            "조건부 렌더링 실습"
+        ),
+        "고급 Hook 사용법" to listOf(
+            "커스텀 Hook 만들기",
+            "useReducer와 복잡한 상태 관리",
+            "useRef / useCallback / useMemo"
+        ),
+        "실전 적용 예제" to listOf(
+            "로그인 상태 관리 구현",
+            "API 호출과 로딩 처리",
+            "컴포넌트 구조 최적화"
+        )
+    )
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+
+                    ) {
+                        Text(
+                            text = "React Hook 심화 학습",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Black
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.MenuBook,
+                                contentDescription = "진행률 아이콘",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "진행률 0%",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White
+                )
+            )
+        },
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 12.dp,
+                        bottom = WindowInsets.navigationBars
+                            .asPaddingValues()
+                            .calculateBottomPadding()
+                    ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(35.dp)
+                        .background(Blue, shape = RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = "완료",
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("이 섹션 완료하기", color = Color.White)
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(35.dp)
+                        .border(BorderStroke(1.dp, Gray10), shape = RoundedCornerShape(12.dp))
+                        .background(Color.White, shape = RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("퀴즈 풀기", color = Color.Black)
+                }
+            }
+        },
+        content = { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(Gray)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                dummyContentList.forEachIndexed{index,(title,detail)->
+                    ExpandableContentList(
+                        index = index,
+                        title = title,
+                        detail = detail,
+                        expandedIndex = expandedIndex.value,
+                        onClick = {expandedIndex.value = it}
+                    )
+                }
+            }
+        }
+    )
+}
