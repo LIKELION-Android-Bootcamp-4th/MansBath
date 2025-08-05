@@ -85,6 +85,7 @@ fun HomeScreen() {
                 is UserHistory -> {
                     UiUserMessage("history_${title}_user_$index", null, historyItem.message)
                 }
+
                 is ModelHistory -> {
                     mapModelToUiMessage(historyItem.message, "history_${title}_model_$index")
                 }
@@ -122,7 +123,8 @@ fun HomeScreen() {
 
             val responseIndex = followUpStep % DummyData.followUpResponses.size
             val assistantResponseModel = DummyData.followUpResponses[responseIndex]
-            val assistantMessage = mapModelToUiMessage(assistantResponseModel, "follow_up_${followUpStep}")
+            val assistantMessage =
+                mapModelToUiMessage(assistantResponseModel, "follow_up_${followUpStep}")
             messages.add(assistantMessage)
             followUpStep++
         }
@@ -149,31 +151,13 @@ fun HomeScreen() {
         ) {
             Scaffold(
                 topBar = {
-                    CenterAlignedTopAppBar(
-                        title = { Text("Aspa") },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    drawerState.open()
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "메뉴"
-                                )
-                            }
+                    HomeTopBar(
+                        onMenuClick = {
+                            scope.launch { drawerState.open() }
                         },
-                        actions = {
-                            IconButton(onClick = { createNewChat() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "새 질문"
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background
-                        )
+                        onNewChatClick = {
+                            createNewChat()
+                        }
                     )
                 }
             ) { innerPadding ->
@@ -184,7 +168,12 @@ fun HomeScreen() {
                         .background(MaterialTheme.colorScheme.background)
                 ) {
                     if (isLoading) {
-                        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             CircularProgressIndicator()
                         }
                     } else if (chatStarted) {
@@ -192,7 +181,8 @@ fun HomeScreen() {
                             messages = messages,
                             onOptionSelected = { selectedOption ->
                                 scope.launch {
-                                    val userMessage = UiUserMessage("user_${messages.size}", null, selectedOption)
+                                    val userMessage =
+                                        UiUserMessage("user_${messages.size}", null, selectedOption)
                                     messages.add(userMessage)
                                     delay(1000L)
 
