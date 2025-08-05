@@ -14,8 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.aspa.aspa.features.home.HomeScreen
-import com.aspa.aspa.features.study.StudyScreen
-
 import com.aspa.aspa.ui.theme.AspaTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +21,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             AspaTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -32,7 +29,6 @@ class MainActivity : ComponentActivity() {
                     HomeScreen()
                 }
             }
-
         }
     }
 }
