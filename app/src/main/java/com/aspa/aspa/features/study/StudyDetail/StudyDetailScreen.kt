@@ -4,6 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +33,7 @@ import com.aspa.aspa.ui.theme.Gray10
 @Composable
 fun StudyDetailScreen() {
     val expandedIndex = remember { mutableStateOf(-1) }
+    val listState = rememberLazyListState()
 
     val dummyContentList = listOf(
         "React Hook 기본 개념" to listOf(
@@ -139,20 +143,21 @@ fun StudyDetailScreen() {
             }
         },
         content = { padding ->
-            Column(
+            LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .background(Gray)
-                    .verticalScroll(rememberScrollState())
+                    .background(Gray),
+                contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                dummyContentList.forEachIndexed{index,(title,detail)->
+                itemsIndexed(dummyContentList) { index, (title, detail) ->
                     ExpandableContentList(
                         index = index,
                         title = title,
                         detail = detail,
                         expandedIndex = expandedIndex.value,
-                        onClick = {expandedIndex.value = it}
+                        onClick = { expandedIndex.value = it }
                     )
                 }
             }

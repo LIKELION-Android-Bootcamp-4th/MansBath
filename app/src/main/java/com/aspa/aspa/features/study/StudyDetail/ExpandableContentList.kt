@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,15 +81,26 @@ fun ExpandableContentList(
                     )
                 }
 
+
                 if(expandedIndex == index){
                     Spacer(modifier = Modifier.padding(top = 8.dp))
-                    detail.forEach{item ->
-                        Text(
-                            text = "$item",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Gray10)
+                    ){
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            detail.forEach { item ->
+
+                                Text(
+                                    text = "$item",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
