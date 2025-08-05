@@ -30,7 +30,7 @@ import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
 
 @Composable
-fun ContentList(number : Int, title : String,description : List<String>){
+fun ContentCard(number : Int, title : String,description : List<String>){
     Card(
         modifier = Modifier
             .fillMaxWidth()

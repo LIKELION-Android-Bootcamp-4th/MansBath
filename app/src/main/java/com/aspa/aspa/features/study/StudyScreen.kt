@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -40,6 +41,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aspa.aspa.R
+import com.aspa.aspa.model.Study
+import com.aspa.aspa.model.StudyDetail
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
@@ -50,28 +53,49 @@ import com.aspa.aspa.ui.theme.Gray10
 @Preview(showBackground = true)
 fun StudyScreen (){
 
-    val contentList = listOf(
-        Triple(1, "기본 개념 이해", listOf(
-            "핵심 개념과 용어 정의",
-            "기본 원리와 작동 방식",
-            "실제 사용 사례와 예시"
-        )),
-        Triple(2, "실습 가이드", listOf(
-            "단계별 실습 진행",
-            "코드 예제와 설명",
-            "일반적인 실수와 예외 방법"
-        )),
-        Triple(3, "심화 학습", listOf(
-            "고급 기능과 활용법",
-            "성능 최적화 방법",
-            "베스트 프랙티스"
-        )),
-        Triple(4, "실전 프로젝트", listOf(
-            "실제 프로젝트 구현",
-            "프레임워크 가이드",
-            "프로젝트 작성 팁"
-        ))
+    val dummyStudyList = listOf(
+        Study(
+            title = "실습 가이드",
+            description = "이 섹션에서는 단계별 실습과 코드 작성 방법을 다룹니다.",
+            duration = "45분",
+            status = false,
+            items = listOf(
+                StudyDetail(
+                    title = "단계별 실습 진행",
+                    subtitle = listOf(
+                        "개요: 실습을 통해 내용을 직접 적용해 봅니다.",
+                        "포인트: 각 단계별로 코드를 작성해보며 익힙니다.",
+                        "상세 내용: 버튼 생성, 상태 변경 등 단계별 설명 포함.",
+                        "예제: 간단한 카운터 앱 실습."
+                    ),
+                    content = ""
+                ),
+                StudyDetail(
+                    title = "코드 예제와 설명",
+                    subtitle = listOf(
+                        "개요: 핵심 개념과 연결되는 예제를 작성합니다.",
+                        "포인트: 개념 ↔ 코드 연결 이해.",
+                        "상세 내용: 버튼 클릭 → State 변경 → UI 갱신 흐름 설명.",
+                        "예제: State hoisting 예제 코드 포함."
+                    ),
+                    content = ""
+                ),
+                StudyDetail(
+                    title = "일반적인 실수와 예외 방법",
+                    subtitle = listOf(
+                        "개요: 초보자들이 자주 겪는 실수 정리.",
+                        "포인트: 코드 예외 및 해결 팁 제공.",
+                        "상세 내용: 재조합 이슈, remember 누락, 상태 초기화 등",
+                        "예제: 잘못된 코드 → 수정 예제 비교"
+                    ),
+                    content = ""
+                )
+            )
+        ),
     )
+    val contentList = dummyStudyList.first().items
+
+
     Scaffold (
         topBar = {
             TopAppBar(
@@ -133,18 +157,16 @@ fun StudyScreen (){
                 Spacer(modifier = Modifier.height(10.dp))
 
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(contentList) { (number, title, description) ->
-                        ContentList(
-                            number = number,
-                            title = title,
-                            description = description
+                    itemsIndexed(contentList) { index, detail ->
+                        ContentCard(
+                            number = index + 1,
+                            title = detail.title,
+                            description = detail.subtitle
                         )
                     }
                 }
-
                 Spacer(Modifier.height(10.dp))
 
                 Box(
