@@ -56,7 +56,7 @@ export async function saveConversation(
   const dataToSave: Partial<QuestionData> = {
     history: updatedHistory,
     lastUpdatedAt: FieldValue.serverTimestamp(),
-    lastMessage: aiResponse.message,
+    lastMessage: aiResponse.message || "",
   };
 
   if (history.length === 0) {
