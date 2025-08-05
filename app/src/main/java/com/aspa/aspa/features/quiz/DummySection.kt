@@ -11,8 +11,8 @@ class DummySection {
             Roadmap(
                 title = "React 완전 정복",
                 description = "React 기초부터!",
-                completedSection = 2,
-                allSection = 6,
+                completedSection = 1,
+                allSection = 2,
                 sections = listOf(
                     Section(
                         title = "JavaScript 기초",
@@ -50,7 +50,7 @@ class DummySection {
                 title = "React 완전 정복",
                 description = "React 기초부터!",
                 completedSection = 0,
-                allSection = 6,
+                allSection = 2,
                 sections = listOf(
                     Section(
                         title = "JavaScript 기초",
@@ -85,8 +85,8 @@ class DummySection {
             Roadmap(
                 title = "React 완전 정복",
                 description = "React 기초부터!",
-                completedSection = 6,
-                allSection = 6,
+                completedSection = 2,
+                allSection = 2,
                 sections = listOf(
                     Section(
                         title = "JavaScript 기초",
