@@ -21,8 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,8 +39,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aspa.aspa.R
+<<<<<<< Updated upstream
 import com.aspa.aspa.model.Study
 import com.aspa.aspa.model.StudyDetail
+=======
+import com.aspa.aspa.features.study.component.ContentCard
+import com.aspa.aspa.features.study.component.StatusTag
+import com.aspa.aspa.features.study.component.TimeTag
+>>>>>>> Stashed changes
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
@@ -155,6 +159,47 @@ fun StudyScreen (){
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
+<<<<<<< Updated upstream
+=======
+                ContentCard(
+                    number = 1,
+                    title = "기본 개념 이해",
+                    description = listOf(
+                        "핵심 개념과 용어 정의",
+                        "기본 원리와 작동 방식",
+                        "실제 사용 사례와 예시"
+                    )
+                )
+                ContentCard(
+                    number = 2,
+                    title = "실습 가이드",
+                    description = listOf(
+                        "단계별 실습 진행",
+                        "코드 예제와 설명",
+                        "일반적인 실수와 예외 방법"
+                    )
+                )
+
+                ContentCard(
+                    number = 3,
+                    title = "심화 학습",
+                    description = listOf(
+                        "고급 기능과 활용법",
+                        "성능 최적화 방법",
+                        "베스트 프랙티스"
+                    )
+                )
+
+                ContentCard(
+                    number = 4,
+                    title = "실전 프로젝트",
+                    description = listOf(
+                        "실제 프로젝트 구현",
+                        "프레임워크 가이드",
+                        "프로젝트 작성 팁"
+                    )
+                )
+>>>>>>> Stashed changes
 
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp)

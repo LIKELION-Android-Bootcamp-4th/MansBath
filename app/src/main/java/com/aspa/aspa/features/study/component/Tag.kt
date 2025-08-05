@@ -1,4 +1,4 @@
-package com.aspa.aspa.features.study
+package com.aspa.aspa.features.study.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row

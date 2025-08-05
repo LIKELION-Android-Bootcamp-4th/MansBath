@@ -1,4 +1,4 @@
-package com.aspa.aspa.features.study
+package com.aspa.aspa.features.study.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,9 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.aspa.aspa.ui.theme.Blue
-import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
 
 @Composable
