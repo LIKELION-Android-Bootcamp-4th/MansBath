@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Lightbulb
@@ -28,6 +31,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,7 +40,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun QuizResultScreen() {
-    val totalQuestions = 3
 
     val answers = listOf(
         Triple(
@@ -54,6 +58,16 @@ fun QuizResultScreen() {
             "useEffect의 의존성 배열에 빈 배열을 넣는 컴포넌트가 마운트될 때만 실행됩니다."
         )
     )
+
+    val resultDummy = QuizResultDummy.dummyQuizResult1
+    var count = 0
+    resultDummy.forEach {
+        if(it.answer == it.chosen) count++
+    }
+    val correctQuestions = count
+    val totalQuestions = resultDummy.size
+    val score = (correctQuestions.toFloat() / totalQuestions.toFloat() * 100).toInt()
+
 
     Column(
         modifier = Modifier
@@ -91,8 +105,8 @@ fun QuizResultScreen() {
                     tint = Color(0xFFFFCF00),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("100점", style = MaterialTheme.typography.headlineMedium)
-                Text("$totalQuestions/$totalQuestions 문제 정답")
+                Text("${score}점", style = MaterialTheme.typography.headlineMedium)
+                Text("$correctQuestions/$totalQuestions 문제 정답")
             }
         }
 
@@ -101,61 +115,86 @@ fun QuizResultScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        answers.forEachIndexed { index, (question, answer, explanation) ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color(0xFF4CAF50),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("${index + 1}. $question", fontWeight = FontWeight.Bold)
-                    }
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+        ) {
+            items(resultDummy.size) { index ->
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("당신의 답: ", fontWeight = FontWeight.SemiBold)
-                        Text(
-                            text = answer,
-                            color =  Color(0xFF4CAF50),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                val questionIcon = if(resultDummy[index].chosen == resultDummy[index].answer) {
+                    listOf(Icons.Default.CheckCircle, Color(0xFF4CAF50))
+                } else {
+                    listOf(Icons.Default.Cancel, Color.Red)
+                }
 
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Card(
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFECEEF2)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            verticalAlignment = Alignment.Top,
-                        ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                imageVector = Icons.Default.Lightbulb,
-                                tint = Color(0xFFFFCF00),
+                                imageVector = questionIcon[0] as ImageVector,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                                tint = questionIcon[1] as Color,
+                                modifier = Modifier.size(20.dp)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = explanation)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("${index + 1}. ${resultDummy[index].question}", fontWeight = FontWeight.Bold)
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("당신의 답: ", fontWeight = FontWeight.SemiBold)
+                            Text(
+                                text = resultDummy[index].chosen,
+                                color = questionIcon[1] as Color,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        if(resultDummy[index].chosen != resultDummy[index].answer) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("정답: ", fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    text = resultDummy[index].answer,
+                                    color =  Color(0xFF4CAF50),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Card(
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFECEEF2)
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.Top,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lightbulb,
+                                    tint = Color(0xFFFFCF00),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(text = resultDummy[index].description)
+                            }
                         }
                     }
                 }
