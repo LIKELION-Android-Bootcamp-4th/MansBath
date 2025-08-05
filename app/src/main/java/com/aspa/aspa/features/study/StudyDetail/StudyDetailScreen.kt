@@ -32,31 +32,10 @@ import com.aspa.aspa.ui.theme.Gray10
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudyDetailScreen() {
-    val expandedIndex = remember { mutableStateOf(-1) }
+    val expandedIndex = remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-    val dummyContentList = listOf(
-        "React Hook 기본 개념" to listOf(
-            "Hook이란 무엇인가?",
-            "기존 클래스형 상태 관리와 비교",
-            "useState / useEffect 기초 사용법"
-        ),
-        "실습 중심 가이드" to listOf(
-            "useState 실습 및 상태 갱신",
-            "useEffect 타이밍 이해",
-            "조건부 렌더링 실습"
-        ),
-        "고급 Hook 사용법" to listOf(
-            "커스텀 Hook 만들기",
-            "useReducer와 복잡한 상태 관리",
-            "useRef / useCallback / useMemo"
-        ),
-        "실전 적용 예제" to listOf(
-            "로그인 상태 관리 구현",
-            "API 호출과 로딩 처리",
-            "컴포넌트 구조 최적화"
-        )
-    )
+
 
     Scaffold(
         topBar = {
@@ -151,15 +130,21 @@ fun StudyDetailScreen() {
                     .background(Gray),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                itemsIndexed(dummyContentList) { index, (title, detail) ->
-                    ExpandableContentList(
-                        index = index,
-                        title = title,
-                        detail = detail,
-                        expandedIndex = expandedIndex.value,
-                        onClick = { expandedIndex.value = it }
-                    )
+                dummyContentList.forEachIndexed { sectionIndex, detail ->
+                    itemsIndexed(detail.subtitle) { subIndex, subTitle ->
+                        val key = "$sectionIndex-$subIndex"
+                        ExpandableContentCard(
+                            index = subIndex,
+                            title = subTitle,
+                            content = detail.content.getOrNull(subIndex) ?: "",
+                            expanded = expandedIndex.value == key,
+                            onClick = {
+                                expandedIndex.value = if (expandedIndex.value == key) "" else key
+                            }
+                        )
+                    }
                 }
+
             }
         }
     )
