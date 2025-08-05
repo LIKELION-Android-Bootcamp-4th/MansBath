@@ -23,10 +23,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -179,51 +181,53 @@ fun QuizListCard(
                     )
                 }
             }
+
+
+            if (expandedIndex == index) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFFF3F3F5))
+                        .padding(horizontal = 6.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    section.forEach {
+                        val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            border = BorderStroke(1.dp, Color.Black.copy(0.1f)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Circle,
+                                    contentDescription = null,
+                                    tint = tintColor,
+                                    modifier = Modifier.size(width = 10.dp, height = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = it.title,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
         }
     )
 
-
-    if (expandedIndex == index) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFECEEF2))
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            section.forEach {
-                val tintColor = if (it.status == true) Color.Green else Color(0xFFD8D8D8)
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = null,
-                            tint = tintColor,
-                            modifier = Modifier.size(width = 10.dp, height = 10.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = it.title,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-    } else {
-        Spacer(modifier = Modifier.height(12.dp))
-    }
+    Spacer(modifier = Modifier.height(12.dp))
 }
