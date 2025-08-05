@@ -76,7 +76,7 @@ fun QuizResultScreen() {
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
-            border = BorderStroke(1.dp, Color.Gray),
+            border = BorderStroke(1.dp, Color(0xFF000000).copy(0.1f)),
         ) {
             Column(
                 modifier = Modifier
