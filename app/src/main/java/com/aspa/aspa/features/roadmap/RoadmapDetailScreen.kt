@@ -45,14 +45,6 @@ fun RoadmapDetailScreen() {
                     .background(Color.White)
                     .padding(top = 12.dp)
             ) {
-                Text(
-                    text = "Aspa",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 16.dp)
