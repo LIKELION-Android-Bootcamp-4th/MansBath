@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
@@ -47,12 +50,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aspa.aspa.model.Section
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizScreen() {
     val expandedIndex = remember { mutableStateOf(-1) }
+    val dummyRoadmapList = DummySection.dummyRoadmapList
 
     Scaffold(
         topBar = {
@@ -73,7 +78,10 @@ fun QuizScreen() {
         },
         content = { padding ->
             Column(
-                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 8.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 8.dp)
             ) {
                 Text(
                     modifier = Modifier.padding(vertical = 4.dp),
@@ -89,49 +97,64 @@ fun QuizScreen() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                QuizListCard(
-                    1,
-                    "React 완전 정복",
-                    "React 기초부터!",
-                    listOf("JavaScript 기초", "JavaScript 기초"),
-                    expandedIndex.value,
-                    2,
-                    6,
-                    { expandedIndex.value = it }
-                )
+                LazyColumn {
+                   items(dummyRoadmapList.size) { index ->
+                        QuizListCard(
+                            index,
+                            dummyRoadmapList[index].title,
+                            dummyRoadmapList[index].description,
+                            dummyRoadmapList[index].sections,
+                            expandedIndex.value,
+                            dummyRoadmapList[index].completedSection,
+                            dummyRoadmapList[index].allSection,
+                            { expandedIndex.value = it }
+                        )
+                    }
+                }
 
-                QuizListCard(
-                    2,
-                    "React 완전 정복",
-                    "React 기초부터!",
-                    listOf("JavaScript 기초", "JavaScript 기초"),
-                    expandedIndex.value,
-                    4,
-                    6,
-                    { expandedIndex.value = it }
-                )
+                /* QuizListCard(
+                     1,
+                     "React 완전 정복",
+                     "React 기초부터!",
+                     listOf("JavaScript 기초", "JavaScript 기초"),
+                     expandedIndex.value,
+                     2,
+                     6,
+                     { expandedIndex.value = it }
+                 )
 
-                QuizListCard(
-                    3,
-                    "React 완전 정복",
-                    "React 기초부터!",
-                    listOf("JavaScript 기초", "JavaScript 기초"),
-                    expandedIndex.value,
-                    0,
-                    6,
-                    { expandedIndex.value = it }
-                )
+                 QuizListCard(
+                     2,
+                     "React 완전 정복",
+                     "React 기초부터!",
+                     listOf("JavaScript 기초", "JavaScript 기초"),
+                     expandedIndex.value,
+                     4,
+                     6,
+                     { expandedIndex.value = it }
+                 )
 
-                QuizListCard(
-                    4,
-                    "React 완전 정복",
-                    "React 기초부터!",
-                    listOf("JavaScript 기초", "JavaScript 기초"),
-                    expandedIndex.value,
-                    6,
-                    6,
-                    { expandedIndex.value = it }
-                )
+                 QuizListCard(
+                     3,
+                     "React 완전 정복",
+                     "React 기초부터!",
+                     listOf("JavaScript 기초", "JavaScript 기초"),
+                     expandedIndex.value,
+                     0,
+                     6,
+                     { expandedIndex.value = it }
+                 )
+
+                 QuizListCard(
+                     4,
+                     "React 완전 정복",
+                     "React 기초부터!",
+                     listOf("JavaScript 기초", "JavaScript 기초"),
+                     expandedIndex.value,
+                     6,
+                     6,
+                     { expandedIndex.value = it }
+                 )*/
 
             }
         }
@@ -143,16 +166,17 @@ fun QuizListCard(
     index: Int,
     title: String,
     description: String,
-    detail: List<String>,
+    section: List<Section>,
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
     onClick: (Int) -> Unit
 ) {
-    val backgroundColor = if(completedSection == allSection) Color(0xFFB9F8CF) else Color.White
+    val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable {
                 onClick(if (expandedIndex == index) -1 else index)
             },
@@ -186,7 +210,7 @@ fun QuizListCard(
                         color = Color.Gray
                     )
 
-                    if(completedSection == allSection) {
+                    if (completedSection == allSection) {
                         Card {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -205,9 +229,10 @@ fun QuizListCard(
                             }
 
                         }
-                    }
-                    else if(completedSection != 0) {
-                        Card {
+                    } else if (completedSection != 0) {
+                        Card(
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
                             Text(
                                 text = "$completedSection/$allSection",
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -218,16 +243,18 @@ fun QuizListCard(
 
                 Box(modifier = Modifier.height(20.dp))
 
-                if(completedSection == allSection || completedSection == 0) {
-                    Row (
+                if (completedSection == allSection || completedSection == 0) {
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row (
+                        Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Card {
+                            Card(
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
                                 Text(
                                     text = "React",
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -241,25 +268,21 @@ fun QuizListCard(
                             )
                         }
 
-                        if(completedSection == 0) {
+                        if (completedSection == 0) {
                             Text(
                                 text = "시작하기",
                                 textDecoration = TextDecoration.Underline
                             )
-                        }
-                        else {
+                        } else {
                             Text(
                                 text = "2025. 8. 1.",
                             )
                         }
-
-
                     }
-                }
-                else {
+                } else {
                     val progress = completedSection.toFloat() / allSection.toFloat()
 
-                    Row (
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -279,10 +302,12 @@ fun QuizListCard(
         }
     )
 
-    if(expandedIndex == index) {
-        Spacer(modifier = Modifier.height(20.dp))
+    if (expandedIndex == index) {
+        Spacer(modifier = Modifier.height(8.dp))
 
-        detail.forEach {
+        section.forEach {
+            val tintColor = if(it.status == true) Color.Green else Color(0xFFD8D8D8)
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 border = BorderStroke(1.dp, Color.Gray),
@@ -297,16 +322,18 @@ fun QuizListCard(
                     Icon(
                         imageVector = Icons.Default.Circle,
                         contentDescription = null,
-                        tint = Color.Green,
+                        tint = tintColor,
                         modifier = Modifier.size(width = 10.dp, height = 10.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "JavaScript 기초",
+                        text = it.title,
                         fontSize = 14.sp
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 
