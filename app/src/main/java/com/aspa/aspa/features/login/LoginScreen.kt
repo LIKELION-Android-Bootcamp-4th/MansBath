@@ -1,8 +1,5 @@
 package com.aspa.aspa.features.login
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,209 +8,151 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aspa.aspa.R
 import com.aspa.aspa.ui.theme.AspaTheme
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.Image
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel(),
-    onLoginSuccess: (com.google.firebase.auth.FirebaseUser) -> Unit = {},
-    onNeedNickname: (com.google.firebase.auth.FirebaseUser) -> Unit = {}
+    onGoogleSignInClick: () -> Unit = {},
+    onKakaoSignInClick: () -> Unit = {},
+    onNaverSignInClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val loginState by viewModel.loginState.collectAsState()
-    
-    // Google Sign-In 설정 (Firebase 설정이 없을 때를 대비한 예외 처리)
-    val gso = remember {
-        try {
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("YOUR_WEB_CLIENT_ID") // Firebase Console에서 가져온 Web Client ID
-                .requestEmail()
-                .build()
-        } catch (e: Exception) {
-            // Firebase 설정이 없을 때 기본 설정
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build()
-        }
-    }
-    
-    val googleSignInClient = remember {
-        try {
-            GoogleSignIn.getClient(context, gso)
-        } catch (e: Exception) {
-            null
-        }
-    }
-    
-    // Google 로그인 결과 처리
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            try {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                viewModel.signInWithGoogle(task)
-            } catch (e: Exception) {
-                // Firebase 설정이 없을 때 처리
-                println("Google 로그인 처리 중 오류: ${e.message}")
-            }
-        }
-    }
-    
-    // 로그인 상태에 따른 처리
-    LaunchedEffect(loginState) {
-        when (loginState) {
-            is LoginState.Success -> {
-                onLoginSuccess((loginState as LoginState.Success).user)
-                viewModel.resetState()
-            }
-            is LoginState.NeedNickname -> {
-                onNeedNickname((loginState as LoginState.NeedNickname).user)
-                viewModel.resetState()
-            }
-            is LoginState.Error -> {
-                println("로그인 실패: ${(loginState as LoginState.Error).message}")
-                viewModel.resetState()
-            }
-            else -> {}
-        }
-    }
-    
     LoginScreenContent(
-        loginState = loginState,
-        onGoogleSignInClick = {
-            try {
-                googleSignInClient?.let { client ->
-                    googleSignInLauncher.launch(client.signInIntent)
-                }
-            } catch (e: Exception) {
-                println("Google 로그인 버튼 클릭 중 오류: ${e.message}")
-            }
-        }
+        onGoogleSignInClick = onGoogleSignInClick,
+        onKakaoSignInClick = onKakaoSignInClick,
+        onNaverSignInClick = onNaverSignInClick,
+        onLoginClick = onLoginClick
     )
 }
 
 @Composable
 private fun LoginScreenContent(
-    loginState: LoginState,
-    onGoogleSignInClick: () -> Unit
+    onGoogleSignInClick: () -> Unit,
+    onKakaoSignInClick: () -> Unit,
+    onNaverSignInClick: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
     ) {
-        // 메인 카드
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(32.dp)
+                .padding(40.dp)
                 .align(Alignment.Center),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(14.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = 4.dp
             )
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(32.dp),
+                    .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 앱 로고
+                // 앱 로고 (그라데이션 원형 배경)
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF6C63FF),
+                                    Color(0xFF4FC3F7)
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.aspalogo),
+                        contentDescription = "Aspa Logo",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // 앱 이름
                 Text(
-                    text = "🧠",
-                    fontSize = 48.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                
-                // 제목
-                Text(
-                    text = "ASPA에 오신 것을 환영합니다",
-                    fontSize = 20.sp,
+                    text = "Aspa",
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
-                
-                // 설명
+
+                // 태그라인
                 Text(
-                    text = "소셜 계정으로 간편하게 로그인하세요",
-                    fontSize = 14.sp,
+                    text = "AI와 함께하는 개인 맞춤 학습",
+                    fontSize = 12.sp,
                     color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 32.dp)
+                    modifier = Modifier.padding(bottom = 20.dp)
                 )
-                
-                // Google 로그인 버튼
+
+                // 소셜 로그인 버튼들
                 SocialLoginButton(
                     icon = R.drawable.ic_google,
                     text = "Google로 계속하기",
                     backgroundColor = Color.White,
                     textColor = Color.Black,
                     borderColor = Color(0xFFE0E0E0),
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    enabled = loginState !is LoginState.Loading,
+                    modifier = Modifier.padding(bottom = 8.dp),
                     onClick = onGoogleSignInClick
                 )
-                
-                // 카카오 로그인 버튼
                 SocialLoginButton(
                     icon = R.drawable.ic_kakao,
                     text = "카카오톡으로 계속하기",
                     backgroundColor = Color(0xFFFEE500),
                     textColor = Color(0xFF191919),
                     borderColor = Color(0xFFFEE500),
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    enabled = false, // 아직 구현되지 않음
-                    onClick = { /* TODO: 카카오 로그인 구현 */ }
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    onClick = onKakaoSignInClick
                 )
-                
-                // 네이버 로그인 버튼
                 SocialLoginButton(
                     icon = R.drawable.ic_naver,
                     text = "네이버로 계속하기",
                     backgroundColor = Color(0xFF03C75A),
                     textColor = Color.White,
                     borderColor = Color(0xFF03C75A),
-                    modifier = Modifier.padding(bottom = 24.dp),
-                    enabled = false, // 아직 구현되지 않음
-                    onClick = { /* TODO: 네이버 로그인 구현 */ }
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    onClick = onNaverSignInClick
                 )
-                
-                // 로딩 상태 표시
-                if (loginState is LoginState.Loading) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CircularProgressIndicator(
-                            color = Color.Black,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "로그인 중...",
-                            color = Color.Gray,
-                            fontSize = 14.sp
-                        )
-                    }
+
+                // 메인 로그인 버튼
+                Button(
+                    onClick = onLoginClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF333333)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "로그인",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
@@ -228,21 +167,18 @@ private fun SocialLoginButton(
     textColor: Color,
     borderColor: Color,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(40.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            disabledContainerColor = backgroundColor.copy(alpha = 0.6f)
+            containerColor = backgroundColor
         ),
         shape = RoundedCornerShape(8.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
-        enabled = enabled
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -251,49 +187,29 @@ private fun SocialLoginButton(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = text,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(16.dp),
                 tint = Color.Unspecified
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = text,
                 color = textColor,
-                fontSize = 16.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun LoginScreenPreview() {
     AspaTheme {
         LoginScreenContent(
-            loginState = LoginState.Idle,
-            onGoogleSignInClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenLoadingPreview() {
-    AspaTheme {
-        LoginScreenContent(
-            loginState = LoginState.Loading,
-            onGoogleSignInClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenErrorPreview() {
-    AspaTheme {
-        LoginScreenContent(
-            loginState = LoginState.Error("로그인에 실패했습니다."),
-            onGoogleSignInClick = {}
+            onGoogleSignInClick = {},
+            onKakaoSignInClick = {},
+            onNaverSignInClick = {},
+            onLoginClick = {}
         )
     }
 }
