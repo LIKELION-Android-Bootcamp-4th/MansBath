@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -61,12 +62,12 @@ fun StudyScreen (){
 
     Scaffold (
         topBar = {
-            TopAppBar(
-                title = { Text("React Hook 완전 정복") },
+            CenterAlignedTopAppBar(
+                title = { Text("React Hook 완전 정복")},
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black,
-                )
+                ),
             )
         },
         content = { padding ->
