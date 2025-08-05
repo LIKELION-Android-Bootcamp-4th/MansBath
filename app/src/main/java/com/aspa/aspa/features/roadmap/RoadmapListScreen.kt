@@ -13,10 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,15 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aspa.aspa.core.constants.enums.BottomTab
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
-import com.aspa.aspa.ui.components.BottomNavigation
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoadmapListScreen() {
-    var selectedTab by remember { mutableStateOf(BottomTab.Home) }
 
     Scaffold(
         topBar = {
@@ -68,12 +61,6 @@ fun RoadmapListScreen() {
                 HorizontalDivider(thickness = 1.dp, color = Color.Black.copy(alpha = 0.1f))
             }
         },
-        bottomBar = {
-            BottomNavigation(
-                selectedItem = selectedTab,
-                onItemSelected = { selectedTab = it }
-            )
-        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
