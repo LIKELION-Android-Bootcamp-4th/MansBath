@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -122,8 +123,9 @@ fun SolveQuizScreen() {
                                             .fillMaxWidth()
                                             .fillMaxHeight(),
                                             colors = CardDefaults.cardColors(
-                                            containerColor = Color(0xFF3497F9)
-                                        )
+                                                containerColor = Color(0xFF3497F9)
+                                            ),
+                                        shape = RoundedCornerShape(8.75.dp)
                                     ) {
                                         Box(contentAlignment = Alignment.CenterStart,
                                             modifier = Modifier.fillMaxSize()
@@ -150,7 +152,8 @@ fun SolveQuizScreen() {
                     Button(
                         onClick = {},
                         colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text("이전")
                     }
@@ -163,7 +166,8 @@ fun SolveQuizScreen() {
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF3497F9)
-                        )
+                        ),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text("다음")
                     }
