@@ -20,12 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aspa.aspa.core.constants.enums.BottomTab
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
-import com.aspa.aspa.model.sampleRoadmaps
 import com.aspa.aspa.ui.components.BottomNavigation
 import com.aspa.aspa.ui.theme.AspaTheme
 
@@ -50,7 +50,12 @@ fun RoadmapListScreen() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text("학습 로드맵", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 16.dp))
+                Text(
+                    "학습 로드맵",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
                 Text(
                     "단계별로 체계적인 학습을 진행하세요",
                     color = Color.Gray,

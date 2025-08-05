@@ -59,7 +59,7 @@ fun RoadmapCard(roadmap: Roadmap) {
                     Box(
                         modifier = Modifier
                             .background(color = Color(0xFFECEEF2), shape = RoundedCornerShape(6.75.dp))
-                            .padding(horizontal = 6.dp,),
+                            .padding(horizontal = 8.dp,),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("${roadmap.completedSection}/${roadmap.allSection}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
