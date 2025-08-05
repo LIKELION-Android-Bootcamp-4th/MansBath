@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aspa.aspa.core.constants.enums.BottomTab
 import com.aspa.aspa.features.roadmap.components.SectionCard
-import com.aspa.aspa.model.sampleRoadmap1
 import com.aspa.aspa.ui.components.BottomNavigation
 import com.aspa.aspa.ui.theme.AspaTheme
 
