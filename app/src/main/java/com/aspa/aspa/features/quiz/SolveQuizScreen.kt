@@ -46,7 +46,7 @@ fun SolveQuizScreen() {
     Scaffold(
         content = { padding->
             Column (
-                modifier = Modifier.padding(padding).padding(8.dp)
+                modifier = Modifier.padding(padding).padding(10.dp)
             ) {
                 Text(
                     text = "← 나가기",
@@ -82,7 +82,7 @@ fun SolveQuizScreen() {
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
+                    border = BorderStroke(1.dp, Color(0xFF000000).copy(0.1f)),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
@@ -122,7 +122,7 @@ fun SolveQuizScreen() {
                                             .fillMaxWidth()
                                             .fillMaxHeight(),
                                             colors = CardDefaults.cardColors(
-                                            containerColor = Color(0xF0406DFD)
+                                            containerColor = Color(0xFF3497F9)
                                         )
                                     ) {
                                         Box(contentAlignment = Alignment.CenterStart,
@@ -135,30 +135,6 @@ fun SolveQuizScreen() {
                                 } else {
                                     optionText()
                                 }
-
-                                /*if(selectedOption == option) {
-                                    Card(
-                                        modifier = Modifier.fillMaxSize(),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = Color(0xF0406DFD)
-                                        ),
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            Text(
-                                                text = option,
-                                                modifier = Modifier
-                                                    .padding(horizontal = 6.dp)
-                                            )
-
-                                        }
-                                    }
-                                }
-                                else {
-                                    Text(text = option, modifier = Modifier.padding(horizontal = 4.dp))
-                                }*/
 
                             }
                         }
@@ -186,7 +162,7 @@ fun SolveQuizScreen() {
                         enabled = selectedOption.isNotEmpty(),
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xF0406DFD)
+                            containerColor = Color(0xFF3497F9)
                         )
                     ) {
                         Text("다음")
