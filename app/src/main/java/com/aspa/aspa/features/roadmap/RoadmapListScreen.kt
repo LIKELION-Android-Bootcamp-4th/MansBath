@@ -1,6 +1,5 @@
 package com.aspa.aspa.features.roadmap
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aspa.aspa.core.constants.enums.BottomTab
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
-import com.aspa.aspa.model.sampleRoadmaps
 import com.aspa.aspa.ui.components.BottomNavigation
 import com.aspa.aspa.ui.theme.AspaTheme
 
