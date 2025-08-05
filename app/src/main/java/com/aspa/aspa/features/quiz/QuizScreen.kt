@@ -18,9 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.SentimentNeutral
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
@@ -51,6 +52,8 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizScreen() {
+    val expandedIndex = remember { mutableStateOf(-1) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -86,273 +89,48 @@ fun QuizScreen() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                        .clickable {
-
-                        },
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = "React 완전 정복",
-                            )
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "React 기초부터!",
-                                    color = Color.Gray
-                                )
-
-                                Card {
-                                    Text(
-                                        text = "2/6",
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Box(modifier = Modifier.height(20.dp))
-
-                            Row (
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("전체 진도")
-
-                                Text("33%")
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            LinearProgressIndicator(
-                                progress = { 0.33f },
-                                modifier = Modifier.fillMaxWidth(),
-
-
-                            )
-
-                        }
-
-                    }
+                QuizListCard(
+                    1,
+                    "React 완전 정복",
+                    "React 기초부터!",
+                    listOf("JavaScript 기초", "JavaScript 기초"),
+                    expandedIndex.value,
+                    2,
+                    6,
+                    { expandedIndex.value = it }
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = null,
-                            tint = Color.Green,
-                            modifier = Modifier.size(width = 10.dp, height = 10.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "JavaScript 기초",
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = null,
-                            tint = Color(0xFFD8D8D8),
-                            modifier = Modifier.size(width = 10.dp, height = 10.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = "JavaScript 기초",
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = "React 완전 정복",
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "React 기초부터!",
-                                    color = Color.Gray
-                                )
-                            }
-
-                            Box(modifier = Modifier.height(20.dp))
-
-                            Row (
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row (
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Card {
-                                        Text(
-                                            text = "React",
-                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(24.dp))
-
-                                    Text(
-                                        "3문제",
-                                        color = Color.Gray
-                                    )
-                                }
-
-
-                                Text(
-                                    text = "시작하기",
-                                    textDecoration = TextDecoration.Underline
-                                )
-
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                        }
-                    }
+                QuizListCard(
+                    2,
+                    "React 완전 정복",
+                    "React 기초부터!",
+                    listOf("JavaScript 기초", "JavaScript 기초"),
+                    expandedIndex.value,
+                    4,
+                    6,
+                    { expandedIndex.value = it }
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                QuizListCard(
+                    3,
+                    "React 완전 정복",
+                    "React 기초부터!",
+                    listOf("JavaScript 기초", "JavaScript 기초"),
+                    expandedIndex.value,
+                    0,
+                    6,
+                    { expandedIndex.value = it }
+                )
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFB9F8CF)
-                    ),
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Default.SentimentNeutral,
-                                    contentDescription = null
-                                )
-
-                                Spacer(modifier = Modifier.width(6.dp))
-
-                                Text(
-                                    text = "React 완전 정복",
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "React 기초부터!",
-                                    color = Color.Gray
-                                )
-
-                                Card {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.EmojiEvents,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(width = 20.dp, height = 20.dp)
-                                        )
-
-                                        Text(
-                                            text = "80점",
-                                            modifier = Modifier.padding(6.dp)
-                                        )
-                                    }
-
-                                }
-                            }
-
-                            Box(modifier = Modifier.height(20.dp))
-
-                            Row (
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row (
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Card {
-                                        Text(
-                                            text = "React",
-                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(24.dp))
-
-                                    Text(
-                                        "3문제",
-                                        color = Color.Gray
-                                    )
-                                }
-                                Text(
-                                    text = "2025. 8. 1.",
-
-                                )
-
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                        }
-                    }
+                QuizListCard(
+                    4,
+                    "React 완전 정복",
+                    "React 기초부터!",
+                    listOf("JavaScript 기초", "JavaScript 기초"),
+                    expandedIndex.value,
+                    6,
+                    6,
+                    { expandedIndex.value = it }
                 )
 
             }
@@ -362,67 +140,177 @@ fun QuizScreen() {
 
 @Composable
 fun QuizListCard(
+    index: Int,
     title: String,
-    subTitle: String,
+    description: String,
     detail: List<String>,
     expandedIndex: Int,
+    completedSection: Int,
+    allSection: Int,
     onClick: (Int) -> Unit
 ) {
+    val backgroundColor = if(completedSection == allSection) Color(0xFFB9F8CF) else Color.White
+
     Card(
         modifier = Modifier.fillMaxWidth()
             .clickable {
-
+                onClick(if (expandedIndex == index) -1 else index)
             },
-        border = BorderStroke(1.dp, Color.Gray),
+        border = BorderStroke(1.dp, Color(0xFF000000).copy(0.1f)),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = backgroundColor
         ),
         content = {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(
-                    text = title,
-                )
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.Description,
+                        contentDescription = null
+                    )
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = title,
+                    )
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "React 기초부터!",
+                        text = description,
                         color = Color.Gray
                     )
 
-                    Card {
-                        Text(
-                            text = "2/6",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
+                    if(completedSection == allSection) {
+                        Card {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EmojiEvents,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(width = 20.dp, height = 20.dp)
+                                )
+
+                                Text(
+                                    text = "80점",
+                                    modifier = Modifier.padding(6.dp)
+                                )
+                            }
+
+                        }
+                    }
+                    else if(completedSection != 0) {
+                        Card {
+                            Text(
+                                text = "$completedSection/$allSection",
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 }
 
                 Box(modifier = Modifier.height(20.dp))
 
-                Row (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("전체 진도")
+                if(completedSection == allSection || completedSection == 0) {
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Card {
+                                Text(
+                                    text = "React",
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(24.dp))
 
-                    Text("33%")
+                            Text(
+                                "3문제",
+                                color = Color.Gray
+                            )
+                        }
+
+                        if(completedSection == 0) {
+                            Text(
+                                text = "시작하기",
+                                textDecoration = TextDecoration.Underline
+                            )
+                        }
+                        else {
+                            Text(
+                                text = "2025. 8. 1.",
+                            )
+                        }
+
+
+                    }
                 }
+                else {
+                    val progress = completedSection.toFloat() / allSection.toFloat()
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("전체 진도")
 
-                LinearProgressIndicator(
-                    progress = { 0.33f },
-                    modifier = Modifier.fillMaxWidth(),
+                        Text("${(progress * 100).toInt()}%")
+                    }
 
-                )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     )
+
+    if(expandedIndex == index) {
+        Spacer(modifier = Modifier.height(20.dp))
+
+        detail.forEach {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, Color.Gray),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+            ) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Circle,
+                        contentDescription = null,
+                        tint = Color.Green,
+                        modifier = Modifier.size(width = 10.dp, height = 10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "JavaScript 기초",
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
 
