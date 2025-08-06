@@ -47,6 +47,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")

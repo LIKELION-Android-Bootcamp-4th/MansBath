@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -167,20 +168,34 @@ fun OptionButtonList(
 
 @Composable
 fun AnalysisReportCard(report: UiAnalysisReport) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = report.title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 24.dp, start = 8.dp)
-        )
-        AnalysisSection(title = "1. 사용자 프로필", content = report.items["사용자 프로필"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "2. 종합 평가", content = report.items["종합 평가"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "3. 학습 방향 제안", content = report.items["학습 방향 제안"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "[추천 전략]", content = report.items["추천 전략"] ?: "")
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
+        ) {
+            Text(
+                text = report.title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(20.dp))
+
+            val reportItems = report.items.toList()
+            Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                reportItems.forEach { (title, content) ->
+                    AnalysisSection(title = title, content = content)
+                }
+            }
+        }
     }
 }
 

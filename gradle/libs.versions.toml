@@ -11,6 +11,11 @@ composeBom = "2024.09.00"
 compose-material = "1.6.0"
 firebaseFirestore = "26.0.0"
 
+retrofit = "3.0.0"
+gson = "2.13.1"
+okhttp = "5.1.0"
+
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +34,10 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

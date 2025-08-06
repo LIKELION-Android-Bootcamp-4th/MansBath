@@ -3,12 +3,12 @@ package com.aspa.aspa.features.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aspa.aspa.data.repository.QuestionRepository
 import com.aspa.aspa.features.home.components.UiAnalysisReport
 import com.aspa.aspa.features.home.components.UiAssistantMessage
 import com.aspa.aspa.features.home.components.UiChatMessage
 import com.aspa.aspa.features.home.components.UiUserMessage
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +35,8 @@ class HomeViewModel : ViewModel() {
 
     private val db = Firebase.firestore
     private val userId = "test-user-for-web"
+    private val questionRepository = QuestionRepository()
+    private val questionsCollection = db.collection("users").document(userId).collection("questions")
 
     init {
         fetchQuestionHistories()
@@ -43,7 +45,7 @@ class HomeViewModel : ViewModel() {
     private fun fetchQuestionHistories() {
         _uiState.update { it.copy(isLoading = true) }
 
-        db.collection("users").document(userId).collection("questions")
+        questionsCollection
             .orderBy("lastUpdatedAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshots, error ->
                 if (error != null) {
@@ -64,7 +66,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun deleteQuestionHistory(questionId: String) {
-        db.collection("users").document(userId).collection("questions")
+        questionsCollection
             .document(questionId)
             .delete()
     }
@@ -82,7 +84,7 @@ class HomeViewModel : ViewModel() {
     fun loadChatHistory(questionId: String) {
         _uiState.update { it.copy(isLoading = true, messages = emptyList()) }
 
-        db.collection("users").document(userId).collection("questions").document(questionId)
+        questionsCollection.document(questionId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null || !snapshot.exists()) {
                     Log.w("Firestore", "Load chat history failed for $questionId", error)
@@ -108,54 +110,38 @@ class HomeViewModel : ViewModel() {
     fun startNewChat(initialQuestion: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, messages = emptyList()) }
-
             val userMessage = UiUserMessage("user_0", null, initialQuestion)
             _uiState.update { it.copy(messages = listOf(userMessage)) }
 
-            val newQuestion = mapOf(
-                "title" to initialQuestion,
-                "history" to listOf(mapOf("role" to "user", "message" to initialQuestion)),
-                "createdAt" to FieldValue.serverTimestamp(),
-                "lastUpdatedAt" to FieldValue.serverTimestamp()
-            )
-
-            db.collection("users").document(userId).collection("questions")
-                .add(newQuestion)
-                .addOnSuccessListener { documentReference ->
-                    loadChatHistory(documentReference.id)
-                }
-                .addOnFailureListener {
+            try {
+                val newQuestionId = questionRepository.sendQuestion(
+                    question = initialQuestion,
+                    questionId = null
+                )
+                if (newQuestionId != null) {
+                    loadChatHistory(newQuestionId)
+                } else {
                     _uiState.update { it.copy(isLoading = false) }
                 }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "startNewChat failed 왜안되는지는 로그로~ 슬프다 슬퍼", e)
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun selectOption(optionText: String) {
-        val currentId = _uiState.value.activeConversationId ?: return
-
-        val userHistory = mapOf(
-            "role" to "user",
-            "message" to optionText,
-            "createdAt" to FieldValue.serverTimestamp()
-        )
-
-        db.collection("users").document(userId)
-            .collection("questions").document(currentId)
-            .update("history", FieldValue.arrayUnion(userHistory))
+        viewModelScope.launch {
+            val currentId = _uiState.value.activeConversationId ?: return@launch
+            questionRepository.sendQuestion(question = optionText, questionId = currentId)
+        }
     }
 
     fun handleFollowUpQuestion(question: String) {
-        val currentId = _uiState.value.activeConversationId ?: return
-
-        val userHistory = mapOf(
-            "role" to "user",
-            "message" to question,
-            "createdAt" to FieldValue.serverTimestamp()
-        )
-
-        db.collection("users").document(userId)
-            .collection("questions").document(currentId)
-            .update("history", FieldValue.arrayUnion(userHistory))
+        viewModelScope.launch {
+            val currentId = _uiState.value.activeConversationId ?: return@launch
+            questionRepository.sendQuestion(question = question, questionId = currentId)
+        }
     }
 
     private fun mapFirestoreHistoryToUiMessages(history: List<Map<String, Any>>, baseId: String): List<UiChatMessage> {
@@ -176,11 +162,17 @@ class HomeViewModel : ViewModel() {
                     val result = modelMessageMap["result"] as? Map<String, String>
 
                     if (result != null) {
+                        // AI 응답 반영 안되서 날아오는 건 전부 일단 스트링으로.
+                        // TODO : Functions 쪽에서 해결 가능한지 확인하기
+                        // 참고서 : https://developer.chrome.com/docs/ai/structured-output-for-prompt-api?hl=ko
+                        val mappedResult = result.mapValues { (_, value) ->
+                            value.toString()
+                        }
                         UiAnalysisReport(
                             id = "${baseId}_report_$index",
                             date = null,
-                            title = "[사용자 분석 결과]",
-                            items = result
+                            title = "[ 사용자 분석 결과 ]",
+                            items = mappedResult
                         )
                     } else {
                         UiAssistantMessage(
