@@ -1,0 +1,15 @@
+{
+  "editor.formatOnSave": false, // formatter 사용 해제
+  "editor.codeActionsOnSave": {  // 파일 저장 시 자동으로 eslint 수정 (명령어 실행)
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.workingDirectories": [  // working directory 명시
+    {
+      "mode": "auto"
+    },
+    {
+      "directory": "./functions"
+    }
+  ],
+  "files.eol": "\n"  // 저장하는 파일들은 모두 LF로 저장
+}
