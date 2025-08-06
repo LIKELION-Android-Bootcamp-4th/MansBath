@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -61,34 +62,30 @@ fun StudyScreen (){
 
     Scaffold (
         topBar = {
-            TopAppBar(
-                title = { Text("React Hook 완전 정복") },
+            CenterAlignedTopAppBar(
+                title = { Text("React Hook 완전 정복")},
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black,
-                )
+                ),
             )
         },
         content = { padding ->
-            Column(
+            Column (
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
                     .background(Gray)
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
 
             ) {
-                Card(
-                    modifier = Modifier
+                Column(
+                    Modifier.background(Color.White)
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = BorderStroke(1.dp, Gray10)
                 ) {
-                    Row (
+                    Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(8.dp)
-                    ){
+                    ) {
                         Image(
                             painter = painterResource(id = R.drawable.book),
                             contentDescription = "북 아이콘",
@@ -98,23 +95,25 @@ fun StudyScreen (){
                         Column(
 
                         ) {
-                            Text("AI 맞춤 학습 콘텐츠",
-                                style = MaterialTheme.typography.titleMedium)
-                            Text("당신의 로드맵에 최적화 된 학습 자료",
+                            Text(
+                                "AI 맞춤 학습 콘텐츠",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                "당신의 로드맵에 최적화 된 학습 자료",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray)
+                                color = Color.Gray
+                            )
                         }
 
                     }
                     Row(
-                       modifier = Modifier.padding(start = 10.dp,bottom = 30.dp)
+                        modifier = Modifier.padding(start = 10.dp, bottom = 30.dp)
                     ) {
                         TimeTag("4-6주")
                         Spacer(Modifier.width(5.dp))
                         StatusTag("진행 예정")
                     }
-
-
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
