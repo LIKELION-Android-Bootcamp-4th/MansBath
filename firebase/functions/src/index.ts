@@ -1,9 +1,10 @@
-import {logger} from "firebase-functions";
-import {onRequest} from "firebase-functions/v2/https";
-import {onDocumentCreated} from "firebase-functions/v2/firestore";
-import {initializeApp} from "firebase-admin/app";
-import {getFirestore} from "firebase-admin/firestore";
-import {Request, Response} from "express";
+import { logger } from "firebase-functions";
+import { onRequest } from "firebase-functions/v2/https";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { Request, Response } from "express";
+import { quizApp } from "./quiz/quiz";
 
 
 initializeApp();
@@ -14,9 +15,9 @@ export const addmessage = onRequest({
   const original = req.query.text;
   const writeResult = await getFirestore()
     .collection("messages")
-    .add({original: original});
+    .add({ original: original });
 
-  res.json({result: `Message with ID: ${writeResult.id} added.`});
+  res.json({ result: `Message with ID: ${writeResult.id} added.` });
 });
 
 
@@ -32,5 +33,7 @@ export const makeuppercase = onDocumentCreated(
 
     const uppercase = original.toUpperCase();
 
-    return event.data?.ref.set({uppercase}, {merge: true});
+    return event.data?.ref.set({ uppercase }, { merge: true });
   });
+
+export const quiz = onRequest({ region: "asia-northeast3" }, quizApp);
