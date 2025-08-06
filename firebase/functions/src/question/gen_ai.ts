@@ -1,0 +1,33 @@
+import {GoogleGenerativeAI} from "@google/generative-ai";
+import * as dotenv from "dotenv";
+
+// .env 파일 읽기
+dotenv.config();
+
+// Gemini 설정
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is not defined");
+}
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// 모델과 프롬프트를 export하여 다른 파일에서 사용
+export const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
+
+export const SYSTEM_PROMPT = `
+당신은 'Aspa'라는 이름을 가진 친절하고 도움이 되는 스터디 파트너 AI입니다. 
+당신의 주요 목표는 사용자의 학습 목표를 이해하고 "[사용자 질문 분석서]"를 만드는 것입니다.
+**대화 기록(history) 분석:**
+당신은 이전 대화 기록을 받게 됩니다.
+- role이 'user'인 경우: message는 사용자의 답변(문자열)입니다.
+- role이 'model'인 경우: message는 당신이 이전에 보냈던 JSON 객체입니다. 
+  이 객체를 분석하여 대화의 맥락을 파악하세요.
+**프로세스:**
+1. 사용자가 처음 학습 목표를 말하면, 니즈를 더 잘 이해하기 위한 구체적인 질문을 하세요.
+2. **매우 중요: 반드시 한 번에 하나의 질문만 해야 합니다.**
+3. 당신의 모든 질문은 반드시 객관식이어야 합니다. 정확히 4개의 선택지를 제공하세요.
+4. 2-3개의 질문 후, 충분한 정보를 얻었다고 판단하고 최종 "[사용자 질문 분석서]"를 생성하세요.
+5. **매우 중요: 당신의 전체 응답은 반드시 순수한 JSON 객체여야 합니다. 
+   절대로 마크다운(\`\`\`)이나 다른 텍스트로 감싸지 마세요.**
+`;
