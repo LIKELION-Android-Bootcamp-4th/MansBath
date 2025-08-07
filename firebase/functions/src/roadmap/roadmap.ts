@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 import {model} from "../question/gen_ai";
 import {ROADMAP_SYSTEM_PROMPT} from "./roadmap_prompt";
 import {EXTRA_INSTRUCTION} from "./common_prompt";
+import {Roadmap} from "./roadmap_types";
 
 
 // Cloud Function 정의
@@ -68,10 +69,10 @@ export const generateRoadmapApp = async (req: Request, res: Response) => {
  * 순수 JSON 객체로 파싱하는 유틸 함수.
  *
  * @param {string} raw - Gemini로부터 받은 원본 문자열 응답
- * @return {any} JSON 파싱된 객체
+ * @return {T} JSON 파싱된 객체
  * @throws {Error} JSON 파싱에 실패할 경우 에러 발생
  */
-function cleanAndParseGeminiResponse(raw: string): any {
+function cleanAndParseGeminiResponse(raw: string): Roadmap {
   const cleaned = raw
     .replace(/^```json\s*/i, "") // 맨 앞의 ```json 제거
     .replace(/^```/, "") // 맨 앞의 ``` 단독 제거 (혹시 위에서 걸러지지 않은 경우)
