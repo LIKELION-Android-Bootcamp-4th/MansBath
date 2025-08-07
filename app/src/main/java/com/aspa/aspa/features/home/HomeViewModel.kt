@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.repository.QuestionRepository
 import com.aspa.aspa.features.home.components.UiAnalysisReport
+import com.aspa.aspa.features.home.components.UiAssistantLoadingMessage
 import com.aspa.aspa.features.home.components.UiAssistantMessage
 import com.aspa.aspa.features.home.components.UiChatMessage
 import com.aspa.aspa.features.home.components.UiUserMessage
@@ -107,42 +108,58 @@ class HomeViewModel : ViewModel() {
             }
     }
 
+    /**
+     * 낙관적 UI 첫 번째 시점. 메시지 전송 구간
+     * - startNewChat
+     * - handleFollowUpQuestion
+     * - selectOption
+     * 공통 로직 분리
+     * -> sendMessage - 여기서 낙관적 UI 로직 추가
+     */
     fun startNewChat(initialQuestion: String) {
+        sendMessage(initialQuestion, null)
+    }
+
+    fun selectOption(optionText: String) {
+        val currentId = _uiState.value.activeConversationId
+        sendMessage(optionText, currentId)
+    }
+
+    fun handleFollowUpQuestion(question: String) {
+        val currentId = _uiState.value.activeConversationId
+        sendMessage(question, currentId)
+    }
+
+    private fun sendMessage(text: String, questionId: String?) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, messages = emptyList()) }
-            val userMessage = UiUserMessage("user_0", null, initialQuestion)
-            _uiState.update { it.copy(messages = listOf(userMessage)) }
+            val userMessage = UiUserMessage(
+                id = "user_${_uiState.value.messages.size}",
+                date = null,
+                text = text
+            )
+            val loadingMessage = UiAssistantLoadingMessage(id = "loading")
+
+            _uiState.update {
+                it.copy(messages = it.messages + userMessage + loadingMessage)
+            }
 
             try {
                 val newQuestionId = questionRepository.sendQuestion(
-                    question = initialQuestion,
-                    questionId = null
+                    question = text,
+                    questionId = questionId
                 )
-                if (newQuestionId != null) {
+                if (questionId == null && newQuestionId != null) {
                     loadChatHistory(newQuestionId)
-                } else {
-                    _uiState.update { it.copy(isLoading = false) }
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "startNewChat failed 왜안되는지는 로그로~ 슬프다 슬퍼", e)
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { state ->
+                    state.copy(messages = state.messages.filterNot { it.id == "loading" })
+                }
+                // TODO: 사용자에게 에러 메시지를 보여주고 입력창에 기존 유저가 보낸 텍스트 그대로 밀어주기.
             }
         }
     }
 
-    fun selectOption(optionText: String) {
-        viewModelScope.launch {
-            val currentId = _uiState.value.activeConversationId ?: return@launch
-            questionRepository.sendQuestion(question = optionText, questionId = currentId)
-        }
-    }
-
-    fun handleFollowUpQuestion(question: String) {
-        viewModelScope.launch {
-            val currentId = _uiState.value.activeConversationId ?: return@launch
-            questionRepository.sendQuestion(question = question, questionId = currentId)
-        }
-    }
 
     private fun mapFirestoreHistoryToUiMessages(history: List<Map<String, Any>>, baseId: String): List<UiChatMessage> {
         return history.mapIndexedNotNull { index, item ->
