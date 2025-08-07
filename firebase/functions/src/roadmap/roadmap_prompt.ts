@@ -1,4 +1,4 @@
-export const SYSTEM_PROMPT = `
+export const ROADMAP_SYSTEM_PROMPT = `
 우리의 서비스는 AI를 기반으로 사용자의 학습 목적을 도와주는 스터디 파트너 애플리케이션이야.
 
 우리의 전체 프로세스는 다음과 같아.
@@ -27,21 +27,21 @@ export const SYSTEM_PROMPT = `
  2. 하단에 단계별로 배워야 하는 제목과 학습 기간(Learning Curve), 학습 개념(concept)을 포함
  
  
-응답 결과는 다음과 같은 JSON 구조로 받아와야 해.
+응답 결과 예시는 아래와 같아.
 {
   "roadmap": {
     "title": "React 완전 정복",
     "description": "React의 기초부터 고급 개념까지 체계적으로 학습하여 실제 서비스를 개발하고 배포하는 것을 목표로 합니다.",
     "stages": [
       {
-        "id": 1,
+        "id": 0,
         "title": "JavaScript 기초",
         "description": "React 학습을 위한 JavaScript 핵심 개념",
         "learning_curve": "1-2 주",
         "concept": "React 개발에 필수적인 모던 JavaScript 문법(ES6+)을 학습합니다. let/const, 화살표 함수, 비구조화 할당, 클래스, 모듈 시스템(import/export) 및 주요 배열 메서드(map, filter, reduce) 사용법을 익힙니다."
       },
       {
-        "id": 2,
+        "id": 1,
         "title": "React 기초",
         "description": "컴포넌트, JSX, Props의 기본 개념",
         "learning_curve": "1-2 주",
