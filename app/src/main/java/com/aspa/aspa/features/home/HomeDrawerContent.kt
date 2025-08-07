@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aspa.aspa.features.home.HomeUiState
+import com.aspa.aspa.features.home.QuestionHistory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +28,8 @@ fun HomeDrawerContent(
     onHistoryItemSelected: (String) -> Unit,
     onCloseClick: () -> Unit,
     onNewChatClick: () -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    onRenameClick: (String, String) -> Unit
 ) {
     ModalDrawerSheet {
         Column(
@@ -74,12 +76,15 @@ fun HomeDrawerContent(
                         key = { it.id }
                     ) { historyItem ->
                         QuestionHistoryItem(
-                            text = historyItem.title,
+                            history = historyItem,
                             onDeleteClick = {
                                 onDeleteClick(historyItem.id)
                             },
                             onItemClick = {
                                 onHistoryItemSelected(historyItem.id)
+                            },
+                            onRenameClick = { newTitle ->
+                                onRenameClick(historyItem.id, newTitle)
                             }
                         )
                     }
@@ -91,11 +96,24 @@ fun HomeDrawerContent(
 
 @Composable
 private fun QuestionHistoryItem(
-    text: String,
+    history: QuestionHistory,
     onDeleteClick: () -> Unit,
+    onRenameClick: (String) -> Unit,
     onItemClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+
+    if (showRenameDialog) {
+        RenameDialog(
+            currentTitle = history.title,
+            onDismiss = { showRenameDialog = false },
+            onConfirm = { newTitle ->
+                onRenameClick(newTitle)
+                showRenameDialog = false
+            }
+        )
+    }
 
     Surface(
         shape = RoundedCornerShape(24.dp),
@@ -112,7 +130,7 @@ private fun QuestionHistoryItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = text,
+                text = history.title,
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
@@ -133,6 +151,13 @@ private fun QuestionHistoryItem(
                         text = { Text("삭제") },
                         onClick = {
                             onDeleteClick()
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("이름 변경") },
+                        onClick = {
+                            showRenameDialog = true
                             expanded = false
                         }
                     )

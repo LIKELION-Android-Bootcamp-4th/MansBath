@@ -72,6 +72,18 @@ class HomeViewModel : ViewModel() {
             .delete()
     }
 
+    fun renameQuestion(questionId: String, newTitle: String) {
+        questionsCollection
+            .document(questionId)
+            .update("title", newTitle)
+            .addOnSuccessListener {
+                Log.d("Firestore", "이름 바뀜")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "에러 발생", e)
+            }
+    }
+
     fun createNewChat() {
         _uiState.update {
             it.copy(

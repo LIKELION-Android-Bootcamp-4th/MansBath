@@ -57,6 +57,9 @@ fun MainScreen(
                 },
                 onDeleteClick = { questionId ->
                     homeViewModel.deleteQuestionHistory(questionId)
+                },
+                onRenameClick = { questionId, newTitle ->
+                    homeViewModel.renameQuestion(questionId, newTitle)
                 }
             )
         }
