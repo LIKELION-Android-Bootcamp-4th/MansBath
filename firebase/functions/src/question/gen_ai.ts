@@ -13,7 +13,7 @@ if (!GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // 모델과 프롬프트를 export하여 다른 파일에서 사용
-export const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
+export const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
 
 export const SYSTEM_PROMPT = `
 당신은 'Aspa'라는 이름을 가진 친절하고 도움이 되는 스터디 파트너 AI입니다. 
