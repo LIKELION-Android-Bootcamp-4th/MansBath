@@ -1,7 +1,8 @@
 import {getFirestore} from "firebase-admin/firestore";
 import {Request, Response} from "express";
 import {model} from "../question/gen_ai";
-import {SYSTEM_PROMPT} from "./prompt";
+import {ROADMAP_SYSTEM_PROMPT} from "./roadmap_prompt";
+import {EXTRA_INSTRUCTION} from "./common_prompt";
 
 
 // Cloud Function 정의
@@ -28,7 +29,15 @@ export const generateRoadmapApp = async (req: Request, res: Response) => {
       return;
     }
 
-    const fullPrompt = `[ 사용자 질문 분석서 ]\n${result}\n\n${SYSTEM_PROMPT}`;
+    const resultString = formatResult(result);
+
+    const fullPrompt = `
+    ${ROADMAP_SYSTEM_PROMPT}
+    [ 사용자 질문 분석서 ] 는 아래와 같아.
+    ${resultString}
+    ${EXTRA_INSTRUCTION}
+    `;
+
     const response = await model.generateContent({
       contents: [{role: "user", parts: [{text: fullPrompt}]}],
     });
@@ -36,14 +45,7 @@ export const generateRoadmapApp = async (req: Request, res: Response) => {
     const aiReply = response.response.text();
 
     // JSON 파싱 시도
-    let parsedRoadmap: any;
-    try {
-      parsedRoadmap = JSON.parse(aiReply);
-    } catch (e) {
-      console.error("AI 응답 JSON 파싱 실패:", e);
-      res.status(500).send("AI 응답을 파싱할 수 없습니다.");
-      return;
-    }
+    const parsedRoadmap = cleanAndParseGeminiResponse(aiReply);
 
     // Firestore에 저장
     const roadmapRef = await getFirestore()
@@ -60,3 +62,46 @@ export const generateRoadmapApp = async (req: Request, res: Response) => {
     res.status(500).send("서버 오류가 발생했습니다.");
   }
 };
+
+/**
+ * Gemini의 응답 문자열에서 ```json 마크다운 블록을 제거하고
+ * 순수 JSON 객체로 파싱하는 유틸 함수.
+ *
+ * @param {string} raw - Gemini로부터 받은 원본 문자열 응답
+ * @return {any} JSON 파싱된 객체
+ * @throws {Error} JSON 파싱에 실패할 경우 에러 발생
+ */
+function cleanAndParseGeminiResponse(raw: string): any {
+  const cleaned = raw
+    .replace(/^```json\s*/i, "") // 맨 앞의 ```json 제거
+    .replace(/^```/, "") // 맨 앞의 ``` 단독 제거 (혹시 위에서 걸러지지 않은 경우)
+    .replace(/```$/, "") // 마지막의 ``` 제거
+    .trim(); // 앞뒤 공백 제거
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    console.error("❌ JSON 파싱 실패:", err);
+    throw new Error("Gemini 응답에서 유효한 JSON을 파싱할 수 없습니다.");
+  }
+}
+
+/**
+ * 객체의 key-value 쌍을 포맷팅된 문자열로 변환합니다.
+ *
+ * 각 항목은 "- key: value" 형식의 줄로 구성되며, 줄바꿈(\n)으로 연결됩니다.
+ *
+ * @param {Record<string, string>} result - 문자열 key와 value를 가지는 객체
+ * @return {string} 포맷팅된 결과 문자열
+ *
+ * @example
+ * formatResult({ name: "Alice", age: "30" });
+ * // 반환값:
+ * // - name: Alice
+ * // - age: 30
+ */
+function formatResult(result: Record<string, string>): string {
+  return Object.entries(result)
+    .map(([key, value]) => `- ${key}: ${value}`)
+    .join("\n");
+}
