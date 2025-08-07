@@ -1,6 +1,6 @@
 import {logger} from "firebase-functions";
 import {model, SYSTEM_PROMPT} from "./gen_ai";
-import {HistoryEntry, AiResponse} from "./types";
+import {HistoryEntry, AiResponse} from "../type/question_types";
 
 /**
  * Gemini에 전달할 대화 기록 배열을 생성합니다.
