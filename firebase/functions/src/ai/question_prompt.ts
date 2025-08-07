@@ -1,21 +1,4 @@
-import {GoogleGenerativeAI} from "@google/generative-ai";
-import * as dotenv from "dotenv";
-
-// .env 파일 읽기
-dotenv.config();
-
-// Gemini 설정
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
-}
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-// 모델과 프롬프트를 export하여 다른 파일에서 사용
-export const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
-
-export const SYSTEM_PROMPT = `
+export const QUESTION_SYSTEM_PROMPT = `
 당신은 'Aspa'라는 이름을 가진 친절하고 도움이 되는 스터디 파트너 AI입니다. 
 당신의 주요 목표는 사용자의 학습 목표를 이해하고 "[사용자 질문 분석서]"를 만드는 것입니다.
 **대화 기록(history) 분석:**

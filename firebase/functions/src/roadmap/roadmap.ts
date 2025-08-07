@@ -1,9 +1,9 @@
 import {getFirestore} from "firebase-admin/firestore";
 import {Request, Response} from "express";
-import {model} from "../question/gen_ai";
-import {ROADMAP_SYSTEM_PROMPT} from "./roadmap_prompt";
-import {EXTRA_INSTRUCTION} from "./common_prompt";
-import {Roadmap} from "./roadmap_types";
+import {model} from "../ai/gen_ai";
+import {ROADMAP_SYSTEM_PROMPT} from "../ai/roadmap_prompt";
+import {EXTRA_INSTRUCTION} from "../ai/common_prompt";
+import {Roadmap} from "../type/roadmap_types";
 
 
 // Cloud Function 정의

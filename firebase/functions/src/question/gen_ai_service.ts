@@ -1,5 +1,6 @@
 import {logger} from "firebase-functions";
-import {model, SYSTEM_PROMPT} from "./gen_ai";
+import {model} from "../ai/gen_ai";
+import {QUESTION_SYSTEM_PROMPT} from "../ai/question_prompt";
 import {HistoryEntry, AiResponse} from "../type/question_types";
 
 /**
@@ -17,7 +18,7 @@ function buildChatHistory(history: HistoryEntry[]) {
 
   // 시스템 프롬프트와 함께 전체 대화 기록 구성
   return [
-    {role: "user" as const, parts: [{text: SYSTEM_PROMPT}]},
+    {role: "user" as const, parts: [{text: QUESTION_SYSTEM_PROMPT}]},
     {role: "model" as const, parts: [{text: "네, 알겠습니다."}]},
     ...geminiHistory,
   ];
