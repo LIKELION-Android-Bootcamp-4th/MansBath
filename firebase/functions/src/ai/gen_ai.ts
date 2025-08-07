@@ -13,4 +13,4 @@ if (!GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // 모델과 프롬프트를 export하여 다른 파일에서 사용
-export const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
+export const model = genAI.getGenerativeModel({model: "gemini-2.5-flash"});
