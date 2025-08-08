@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "aspa-7126b"
-  }
+    "default": "aspa-7126b",
+    "develop": "aspa-7126b"
+  },
+  "targets": {},
+  "etags": {}
 }
