@@ -31,7 +31,7 @@ export async function getAiStudyResponse(): Promise<Study> {
     .replace("{ROADMAP}", roadmapData);
 
   const result = await model.generateContent([prompt], {
-    timeout: 360000, // 응답 시간 360초 설정
+    timeout: 480000, // 응답 시간 480초 설정
   });
 
   const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text;
