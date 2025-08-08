@@ -6,7 +6,7 @@
  * @return {T} JSON 파싱된 객체
  * @throws {Error} JSON 파싱에 실패할 경우 에러 발생
  */
-export function cleanAndParseGeminiResponse<T>(raw: string): T {
+export function cleanAndParseAiResponse<T>(raw: string): T {
   const cleaned = raw
     .replace(/^```json\s*/i, "") // 맨 앞의 ```json 제거
     .replace(/^```/, "") // 맨 앞의 ``` 단독 제거 (혹시 위에서 걸러지지 않은 경우)

@@ -7,12 +7,12 @@
  * @return {string} 포맷팅된 결과 문자열
  *
  * @example
- * formatResult({ name: "Alice", age: "30" });
+ * formatFirestoreMapToString({ name: "Alice", age: "30" });
  * // 반환값:
  * // - name: Alice
  * // - age: 30
  */
-export function formatResultFromFirestore(
+export function formatFirestoreMapToString(
   result: Record<string, string>
 ): string {
   return Object.entries(result)
