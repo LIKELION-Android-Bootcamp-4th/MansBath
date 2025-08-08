@@ -1,6 +1,10 @@
 import {Request, Response} from "express";
 import {getAuth} from "firebase-admin/auth";
+import {FieldValue} from "firebase-admin/firestore";
+import {SNS, KakaoUser} from "../type/auth_types";
 import axios from "axios";
+import admin from "firebase-admin";
+
 /**
  * 카카오 로그인 AccessToken을 활용하여 파이어베이스 로그인을 위한 CustomToken을 발급합니다.
  *
@@ -21,16 +25,34 @@ export async function loginWithKakao(req: Request, res: Response) {
       },
     });
 
-    const kakaoUser = kakaoRes.data;
+    // 2. 사용자 정보를 Firestore에 저장
+    const kakaoUser: KakaoUser = kakaoRes.data;
     const kakaoUid = `kakao:${kakaoUser.id}`; // Firebase UID는 고유해야 합니다.
+    const kakaoAccount = kakaoUser.kakao_account;
+    const email = kakaoAccount.email;
+    const name = kakaoAccount.profile.nickname;
 
-    // 2. Firebase Admin SDK를 사용하여 Custom Token 생성
+    if (!email) {
+      return res.status(500).json({error: "Failed to save user info"});
+    }
+
+    const userRef = admin.firestore().collection("users").doc(kakaoUid);
+
+    await userRef.set({
+      sns: SNS.KAKAO,
+      id: kakaoUid,
+      email: email,
+      name: name,
+      lastLogin: FieldValue.serverTimestamp(),
+    }, {merge: true});
+
+    // 3. Firebase Admin SDK를 사용하여 Custom Token 생성
     const customToken = await getAuth().createCustomToken(kakaoUid);
-
-    // 3. 생성된 Custom Token을 클라이언트에 반환
+    // 4. 생성된 Custom Token을 클라이언트에 반환
     return res.status(200).json({customToken});
   } catch (error) {
     console.error("Error creating custom token:", error);
     return res.status(500).json({error: "Failed to create custom token"});
   }
 }
+// const userRef = getFirestore().collection("users/test-user-for-web/userInfo").doc();
