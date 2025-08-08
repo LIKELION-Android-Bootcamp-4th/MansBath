@@ -11,15 +11,17 @@ export interface Quiz {
 }
 
 export interface ConceptDetail {
-  step: number;
   title: string;
-  learningObjective: string;
-  mainContent: {
-    keyPoints: string[];
-    description: string;
-    details: Array<{
-      title: string;
-      items: string[];
-    }>;
-  };
+  description: string;
+  duration: string;
+  status: boolean;
+  items: [{
+    content: [{
+      details: string;
+      keypoints: string[];
+      overview: string;
+    }]
+    subtitle: string[];
+    title: string;
+  }];
 }

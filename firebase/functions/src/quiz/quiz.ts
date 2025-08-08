@@ -1,11 +1,12 @@
-import { getAuth } from "firebase-admin/auth";
-import express, { Request, Response } from "express";
+import {getAuth} from "firebase-admin/auth";
+import express, {Request, Response} from "express";
 import cors from "cors";
-import { logger } from "firebase-functions";
-import { getQuiz } from "./gen_ai_service";
+import {logger} from "firebase-functions";
+import {getQuiz} from "./gen_ai_service";
+import {getConceptDetail, saveQuiz} from "./firebasse_service";
 
 const app = express();
-app.use(cors({ origin: true }));
+app.use(cors({origin: true}));
 app.use(express.json());
 
 /**
@@ -23,20 +24,16 @@ app.post("/", async (req: Request, res: Response) => {
       logger.log(uid);
     }
 
-    /* const {
-      questionId,
-      question: userQuestion = "일본어를 배우고 싶어.",
-    } = req.body as { questionId?: string; question?: string }; */
+    const quizName = req.body.quizName as string;
 
-    // 2. 데이터 조회 또는 생성 (Firestore Service)
-    /* const {questionRef, history, questionId: newQuestionId} =
-      await getOrCreateQuestion(uid, questionId); */
+    // 2. 개념 상세 데이터 조회 (Firestore Service)
+    const conceptDetail = await getConceptDetail(uid, quizName);
 
     // 3. AI 응답 요청 (Gemini Service)
-    const aiResponse = await getQuiz();
+    const aiResponse = await getQuiz(conceptDetail);
 
-    // 4. 대화 내용 저장 (Firestore Service)
-    // await saveConversation(questionRef, {history, userQuestion, aiResponse});
+    // 4. 퀴즈 내용 저장 (Firestore Service)
+    await saveQuiz(uid, aiResponse);
 
     // 5. 클라이언트에 응답
     const responseToClient = {
@@ -46,7 +43,7 @@ app.post("/", async (req: Request, res: Response) => {
     return res.status(200).json(responseToClient);
   } catch (error) {
     logger.error("API 처리 중 오류 발생:", error);
-    return res.status(500).json({ error: "An internal error occurred." });
+    return res.status(500).json({error: "An internal error occurred."});
   }
 });
 

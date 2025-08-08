@@ -1,66 +1,75 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {GoogleGenerativeAI} from "@google/generative-ai";
 
 // Gemini 설정
-const GEMINI_API_KEY = "AIzaSyBa6lj4fuJYF0PUg5aHcdrW19dNNcjj7L8";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is not defined");
+}
+
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // 모델과 프롬프트를 export하여 다른 파일에서 사용
-export const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+export const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
 
 export const SYSTEM_PROMPT = `
-다음 학습 자료를 바탕으로 5개의 객관식 퀴즈 질문을 한국어로 생성해주세요.
-각 질문은 4개의 보기(1개는 정답, 3개는 오답), 정답, 그리고 간략한 설명을 포함해야 합니다.
-질문, 보기, 정답, 설명은 제공된 텍스트에서 직접 도출되어야 합니다.
-퀴즈는 학습 자료의 다양한 핵심 포인트와 세부 내용을 다루어야 합니다.
-개념, 도구, UI 요소에 초점을 맞춰주세요.
+우리의 서비스는 AI를 기반으로 사용자의 학습 목적을 도와주는 스터디 파트너 애플리케이션이야.
 
-학습 자료:
-  {
-    "conceptDetailFile": {
-      "step": 3,
-      "title": "화면 사이를 자유롭게 이동하기",
-      "learningObjective": "새로운 화면(Activity)을 추가하고, 인텐트(Intent)를 사용하여 화면 간에 이동하는 방법을 학습합니다.",
-      "mainContent": {
-        "keyPoints": [
-          "Activity(액티비티)의 개념 이해",
-          "새로운 Activity와 레이아웃 파일 생성하기",
-          "인텐트(Intent)를 사용하여 다른 Activity 시작하기"
-        ],
-        "description": "대부분의 앱은 여러 화면으로 구성됩니다. 이 단계에서는 앱에 두 번째 화면을 추가하고, 첫 화면의 버튼을 클릭했을 때 새로 만든 두 번째 화면으로 넘어가는 방법을 배웁니다. 안드로이드 앱의 핵심 구성요소인 액티비티와 화면 전환을 담당하는 인텐트의 기본 개념을 익힙니다.",
-        "details": [
-          {
-            "title": "안드로이드의 화면 단위: 액티비티",
-            "items": [
-              "액티비티(Activity)가 앱에서 하나의 화면을 담당하는 컴포넌트임을 이해하기",
-              "Android Studio에서 'New > Activity' 메뉴를 통해 새로운 액티비티 생성하기",
-              "새 액티비티 생성 시 Kotlin 파일(.kt)과 레이아웃 파일(.xml)이 함께 만들어지는 과정 확인하기",
-              "AndroidManifest.xml에 새로운 액티비티가 등록되는 방식 이해하기"
-            ]
-          },
-          {
-            "title": "화면 전환의 열쇠: 인텐트",
-            "items": [
-              "인텐트(Intent)가 다른 컴포넌트(예: 액티비티)를 호출하는 데 사용되는 메시징 객체임을 이해하기",
-              "현재 액티비티에서 대상 액티비티로 향하는 명시적 인텐트(Explicit Intent) 생성하기",
-              "'startActivity()' 함수에 인텐트를 전달하여 새로운 화면 시작하기"
-            ]
-          },
-          {
-            "title": "실습: 화면 전환 기능 구현하기",
-            "items": [
-              "첫 번째 화면의 버튼 클릭 리스너 내부에 인텐트 생성 및 실행 코드 작성하기",
-              "두 번째 화면의 레이아웃 XML 파일에 간단한 텍스트를 추가하여 화면이 전환되었음을 확인하기",
-              "앱을 실행하여 버튼 클릭 시 화면이 성공적으로 넘어가는지 테스트하기"
-            ]
-          }
-        ]
-      }
-    }
-  }
+기능은 다음과 같은 것들이 제공될꺼야.
 
+1. 질문
+- 해당 프로세스에서 사용자의 니즈만 파악
+- 종합적인 평가상태를 응답 결과를 출력
+출력물 : [ 사용자 질문 분석서 ]
 
-출력 형식은 'quizTitle' 키와 'questions' 키를 가진 JSON 객체여야 합니다.
-'questions'는 각 질문 객체가 'question', 'options'(문자열 배열), 'answer',
-'explanation' 키를 가지는 배열입니다.
+2. 로드맵
+- [ 사용자 질문 분석서 ]를 바탕으로 로드맵 제시
+- 사용자의 로드맵 선택지에 따라 [ 로드맵 파일 ] 출력
+출력물 : [ 로드맵 파일 ]
 
+3. 개념
+- [ 로드맵 파일 ]을 바탕으로 단계별 상세 개념 설명
+출력물 : [ 개념 상세 파일 ]
+
+4. 퀴즈
+- [ 개념 상세 파일 ] 을 토대로 퀴즈 및 정답 생성
+
+지금은 4. [ 개념 상세 파일 ]를 바탕으로 퀴즈와 정답을 제공해줘야 해.
+
+너는 다음과 같은 과정을 거쳐야 해.
+ 1. [ 개념 상세 파일 ] 분석
+ 2. 규격에 해당하는 JSON 구조로 정보 제공.
+ 3. 퀴즈는 4지선다형태로 만들어 줘야 하고, 정답도 제공되어야 해.
+ 4. 퀴즈는 10개 이상 제공해야 해.
+
+JSON 구조는 다음과 같아.
+{
+  "quizTitle": "일반 상식 퀴즈",
+  "questions": [
+    {
+      "question": "지구의 대기에서 가장 많은 비율을 차지하는 기체는 무엇일까요?",
+      "options": [
+        "산소",
+        "질소",
+        "이산화탄소",
+        "아르곤"
+      ],
+      "answer": "질소",
+      "explanation": "질소는 지구 대기의 약 78%를 차지하여 가장 풍부한 기체입니다. 산소는 약 21%를 차지합니다."
+    },
+    {
+      "question": "인체에서 가장 큰 기관은 무엇일까요?",
+      "options": [
+        "뇌",
+        "간",
+        "심장",
+        "피부"
+      ],
+      "answer": "피부",
+      "explanation": "피부는 몸 전체를 덮고 있으며, 외부 환경으로부터 우리 몸을 보호하는 가장 큰 기관입니다."
+    },
+    ....
+  ]
+}
+
+[ 개념 상세 파일 ]은 다음과 같아.
 `;
