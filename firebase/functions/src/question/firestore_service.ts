@@ -3,7 +3,7 @@ import {
   FieldValue,
   DocumentReference,
 } from "firebase-admin/firestore";
-import {HistoryEntry, AiResponse, QuestionData} from "./types";
+import {HistoryEntry, AiResponse, QuestionData} from "../type/question_types";
 
 /**
  * Firestore에서 질문 기록을 가져오거나 새로 생성합니다.
