@@ -1,3 +1,26 @@
+import {EXTRA_INSTRUCTION} from "./common_prompt";
+
+/**
+ * 로드맵 생성을 위한 전체 프롬프트 문자열을 구성합니다.
+ *
+ * @param {string} userQuestionReport - 사용자 질문 분석서 내용 (포매팅된 문자열)
+ * @return {string} 완성된 프롬프트 문자열
+ *
+ * @description
+ * ROADMAP_SYSTEM_PROMPT, 사용자 질문 분석서, EXTRA_INSTRUCTION을
+ * 하나의 문자열로 조합하여 AI 모델에 전달할 수 있는 프롬프트를 생성합니다.
+ * 앞뒤 불필요한 공백과 개행은 제거됩니다.
+ */
+export function buildRoadmapPrompt(userQuestionReport: string): string {
+  return `
+${ROADMAP_SYSTEM_PROMPT}
+[ 사용자 질문 분석서 ] 는 아래와 같아.
+${userQuestionReport}
+${EXTRA_INSTRUCTION}
+`.trim();
+}
+
+
 export const ROADMAP_SYSTEM_PROMPT = `
 우리의 서비스는 AI를 기반으로 사용자의 학습 목적을 도와주는 스터디 파트너 애플리케이션이야.
 
