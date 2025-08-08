@@ -7,7 +7,7 @@ import {Roadmap} from "../type/roadmap_types";
 
 
 // Cloud Function 정의
-export const generateRoadmapApp = async (req: Request, res: Response) => {
+export const generateRoadmap = async (req: Request, res: Response) => {
   try {
     const {uid, questionId} = req.body;
 
