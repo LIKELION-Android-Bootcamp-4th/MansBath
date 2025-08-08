@@ -1,14 +1,16 @@
 import {logger} from "firebase-functions";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
-import express, {Request, Response} from "express";
-import cors from "cors";
+import {Request, Response} from "express";
+import {SNS} from "../type/auth_types";
 
-const app = express();
-app.use(cors({origin: true}));
-app.use(express.json());
-
-app.post("/", async (req: Request, res: Response) => {
+/**
+ * Verifies a Google ID token and stores the user info in Firestore.
+ *
+ * @param {Request} req Express request containing the Google ID token in `body.token`
+ * @param {Response} res Express response object
+ */
+export async function loginWithGoogle(req: Request, res: Response) {
   const idToken = req.body.token as string;
 
   if (!idToken) {
@@ -21,6 +23,7 @@ app.post("/", async (req: Request, res: Response) => {
 
     const userRef = getFirestore().collection("users").doc(uid);
     await userRef.set({
+      sns: SNS.GOOGLE,
       uid,
       email,
       name,
@@ -28,15 +31,14 @@ app.post("/", async (req: Request, res: Response) => {
     }, {merge: true});
 
     logger.info(`User verified and data saved: ${uid}`);
+
     return res.status(200).json({
       status: "success",
-      uid: uid,
-      message: "User authenticated successfully.",
+      uid,
+      message: "Google User authenticated successfully.",
     });
   } catch (error) {
     logger.error("Error verifying token:", error);
     return res.status(401).json({error: "Unauthorized: Invalid token."});
   }
-});
-
-export const authApp = app;
+}

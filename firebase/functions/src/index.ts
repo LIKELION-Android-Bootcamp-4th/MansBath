@@ -1,7 +1,7 @@
 import {onRequest} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
 
-import {authApp} from "./auth";
+import {authApp} from "./auth/auth";
 import {questionApp} from "./question/question";
 import {generateRoadmapApp} from "./roadmap/roadmap";
 
