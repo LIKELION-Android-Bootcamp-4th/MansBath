@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -25,14 +24,20 @@ import com.aspa.aspa.features.roadmap.RoadmapListScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import kotlinx.coroutines.launch
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavHostController = rememberNavController(),
+    nickname: String,
+    onLogout: () -> Unit,
     homeViewModel: HomeViewModel = viewModel()
 ) {
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(key1 = Unit) {
+        homeViewModel.initialize()
+    }
+
+    val innerNavController: NavHostController = rememberNavController()
+
+    val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -79,13 +84,13 @@ fun MainScreen(
                 if (currentRoute in listOf("home", "quiz", "roadmap", "mypage")) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
-                        onTabSelected = { route -> navController.navigate(route) }
+                        onTabSelected = { route -> innerNavController.navigate(route) }
                     )
                 }
             }
         ) { innerPadding ->
             NavHost(
-                navController = navController,
+                navController = innerNavController,
                 startDestination = "home",
                 modifier = Modifier.padding(innerPadding)
             ) {
@@ -118,7 +123,12 @@ fun MainScreen(
                 }
                 composable("quiz") { QuizScreen() }
                 composable("roadmap") { RoadmapListScreen() }
-                composable("mypage") { MypageScreen() }
+                composable("mypage") {
+                    MypageScreen(
+                        nickname = nickname,
+                        onLogout = onLogout
+                    )
+                }
             }
         }
     }

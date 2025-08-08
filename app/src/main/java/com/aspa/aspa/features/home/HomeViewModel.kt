@@ -9,7 +9,9 @@ import com.aspa.aspa.features.home.components.UiAssistantLoadingMessage
 import com.aspa.aspa.features.home.components.UiAssistantMessage
 import com.aspa.aspa.features.home.components.UiChatMessage
 import com.aspa.aspa.features.home.components.UiUserMessage
+import com.aspa.aspa.model.Auth
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,15 +37,28 @@ class HomeViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private val db = Firebase.firestore
-    private val userId = "test-user-for-web"
     private val questionRepository = QuestionRepository()
-    private val questionsCollection = db.collection("users").document(userId).collection("questions")
+    private lateinit var questionsCollection: CollectionReference
 
-    init {
+    fun initialize() {
+        val uid = Auth.uid
+
+        if (uid == null) {
+            Log.w("HomeViewModel", "UID가 null이므로 초기화할 수 없습니다.")
+            return
+        }
+
+        if (this::questionsCollection.isInitialized && questionsCollection.parent?.id == uid) {
+            return
+        }
+
+        questionsCollection = db.collection("users").document(uid).collection("questions")
         fetchQuestionHistories()
     }
 
     private fun fetchQuestionHistories() {
+        if (!this::questionsCollection.isInitialized) return
+
         _uiState.update { it.copy(isLoading = true) }
 
         questionsCollection
@@ -67,12 +82,12 @@ class HomeViewModel : ViewModel() {
     }
 
     fun deleteQuestionHistory(questionId: String) {
-        questionsCollection
-            .document(questionId)
-            .delete()
+        if (!this::questionsCollection.isInitialized) return
+        questionsCollection.document(questionId).delete()
     }
 
     fun renameQuestion(questionId: String, newTitle: String) {
+        if (!this::questionsCollection.isInitialized) return
         questionsCollection
             .document(questionId)
             .update("title", newTitle)
@@ -95,6 +110,8 @@ class HomeViewModel : ViewModel() {
     }
 
     fun loadChatHistory(questionId: String) {
+        if (!this::questionsCollection.isInitialized) return
+
         _uiState.update { it.copy(isLoading = true, messages = emptyList()) }
 
         questionsCollection.document(questionId)
@@ -120,14 +137,6 @@ class HomeViewModel : ViewModel() {
             }
     }
 
-    /**
-     * 낙관적 UI 첫 번째 시점. 메시지 전송 구간
-     * - startNewChat
-     * - handleFollowUpQuestion
-     * - selectOption
-     * 공통 로직 분리
-     * -> sendMessage - 여기서 낙관적 UI 로직 추가
-     */
     fun startNewChat(initialQuestion: String) {
         sendMessage(initialQuestion, null)
     }
@@ -143,6 +152,11 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun sendMessage(text: String, questionId: String?) {
+        if (!this::questionsCollection.isInitialized) {
+            Log.e("HomeViewModel", "sendMessage 호출 실패: collection이 초기화되지 않았습니다.")
+            return
+        }
+
         viewModelScope.launch {
             val userMessage = UiUserMessage(
                 id = "user_${_uiState.value.messages.size}",
@@ -167,7 +181,6 @@ class HomeViewModel : ViewModel() {
                 _uiState.update { state ->
                     state.copy(messages = state.messages.filterNot { it.id == "loading" })
                 }
-                // TODO: 사용자에게 에러 메시지를 보여주고 입력창에 기존 유저가 보낸 텍스트 그대로 밀어주기.
             }
         }
     }
@@ -191,9 +204,6 @@ class HomeViewModel : ViewModel() {
                     val result = modelMessageMap["result"] as? Map<String, String>
 
                     if (result != null) {
-                        // AI 응답 반영 안되서 날아오는 건 전부 일단 스트링으로.
-                        // TODO : Functions 쪽에서 해결 가능한지 확인하기
-                        // 참고서 : https://developer.chrome.com/docs/ai/structured-output-for-prompt-api?hl=ko
                         val mappedResult = result.mapValues { (_, value) ->
                             value.toString()
                         }
