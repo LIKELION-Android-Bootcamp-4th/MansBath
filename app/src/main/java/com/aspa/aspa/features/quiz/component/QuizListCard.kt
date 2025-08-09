@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.aspa.aspa.model.Section
+import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
 import kotlin.collections.forEach
 
 @Composable
@@ -45,7 +47,8 @@ fun QuizListCard(
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    navController: NavController
 ) {
     val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
@@ -153,7 +156,10 @@ fun QuizListCard(
                         if (completedSection == 0) {
                             Text(
                                 text = "시작하기",
-                                textDecoration = TextDecoration.Underline
+                                textDecoration = TextDecoration.Underline,
+                                /*modifier = Modifier.clickable {
+                                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                                }*/
                             )
                         } else {
                             Text(
@@ -197,7 +203,15 @@ fun QuizListCard(
                         val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .clickable{
+                                    if(it.status == true) {
+                                        navController.navigate(QuizScreenRoute.QuizResult.route)
+                                    }
+                                    else {
+                                        navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                                    }
+                                },
                             border = BorderStroke(1.dp, Color.Black.copy(0.1f)),
                             colors = CardDefaults.cardColors(
                                 containerColor = Color.White

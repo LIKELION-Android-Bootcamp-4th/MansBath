@@ -38,10 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
 
 
 @Composable
-fun SolveQuizScreen() {
+fun SolveQuizScreen(navController: NavController) {
     var selectedOption by remember { mutableStateOf("useState") }
 
     Scaffold(
@@ -52,7 +55,9 @@ fun SolveQuizScreen() {
                 Text(
                     text = "← 나가기",
                     modifier = Modifier
-                        .clickable {  }
+                        .clickable {
+                            navController.popBackStack()
+                        }
                         .padding(bottom = 16.dp)
                 )
 
@@ -161,7 +166,9 @@ fun SolveQuizScreen() {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Button(
-                        onClick = {},
+                        onClick = {
+                            navController.navigate(QuizScreenRoute.QuizResult.route)
+                        },
                         enabled = selectedOption.isNotEmpty(),
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
@@ -182,5 +189,6 @@ fun SolveQuizScreen() {
 @Preview
 @Composable
 fun SolveQuizScreenPreview() {
-    SolveQuizScreen()
+    val navController = rememberNavController()
+    SolveQuizScreen(navController = navController)
 }

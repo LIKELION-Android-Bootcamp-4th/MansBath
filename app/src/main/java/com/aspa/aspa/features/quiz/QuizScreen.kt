@@ -23,12 +23,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
+import com.aspa.aspa.ui.components.QuizNav.QuizNav
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizScreen() {
+fun QuizScreen(navController: NavController) {
     val expandedIndex = remember { mutableStateOf(-1) }
     val dummyRoadmapList = DummySection.dummyRoadmapList
 
@@ -81,7 +84,8 @@ fun QuizScreen() {
                             expandedIndex.value,
                             dummyRoadmapList[index].completedSection,
                             dummyRoadmapList[index].allSection,
-                            { expandedIndex.value = it }
+                            { expandedIndex.value = it },
+                            navController
                         )
                     }
                 }
@@ -96,5 +100,6 @@ fun QuizScreen() {
 @Preview(showBackground = true)
 @Composable
 fun QuizScreenPreview() {
-    QuizScreen()
+    val navController = rememberNavController()
+    QuizScreen(navController = navController)
 }
