@@ -2,16 +2,6 @@ package com.aspa.aspa.features.home.components
 
 import java.util.Date
 
-data class ModelMessage(
-    val message: String = "",
-    val choices: List<String>? = null,
-    val result: Map<String, String>? = null
-)
-
-sealed interface HistoryItem
-data class UserHistory(val message: String) : HistoryItem
-data class ModelHistory(val message: ModelMessage) : HistoryItem
-
 sealed interface UiChatMessage {
     val id: String
     val date: Date?
@@ -35,4 +25,9 @@ data class UiAnalysisReport(
     override val date: Date?,
     val title: String,
     val items: Map<String, String>
+) : UiChatMessage
+
+data class UiAssistantLoadingMessage(
+    override val id: String = "loading",
+    override val date: Date? = null
 ) : UiChatMessage
