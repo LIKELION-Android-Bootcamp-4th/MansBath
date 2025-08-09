@@ -58,4 +58,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.compose.material.icons.extended)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    implementation("com.kakao.sdk:v2-user:2.21.0")
 }
