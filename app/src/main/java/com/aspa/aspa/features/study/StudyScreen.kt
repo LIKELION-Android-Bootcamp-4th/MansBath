@@ -128,7 +128,8 @@ fun StudyScreen (){
                     }
                     item { Spacer(Modifier.height(10.dp)) }
 
-                    item {                     Box(
+                    item {
+                        Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .size(30.dp)
