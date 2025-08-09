@@ -1,5 +1,7 @@
 package com.aspa.aspa
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,15 +15,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.common.util.Utility
+import com.kakao.sdk.user.UserApiClient
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,10 +40,12 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    val context = LocalContext.current
                     Box(modifier = Modifier.height(20.dp))
                     Button(
                         onClick = {
-                            handleKakaoLogin()
+                            Log.d("KakaoLogin", Utility.getKeyHash(context))
+                            handleKakaoLogin(context)
                         }
                     ) { Text("Kakao Login!") }
                 }
@@ -43,34 +55,88 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private fun handleKakaoLogin() {
-    // 카카오 로그인 함수
-    UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
+private fun handleKakaoLogin(context: Context) {
+    // 카카오 계정 로그인 공통 callback
+    val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
-            Log.e("KakaoLogin", "카카오 로그인 실패", error)
+            Log.e("KakaoLogin", "카카오 계정 로그인 실패", error)
         } else if (token != null) {
-            Log.i("KakaoLogin", "카카오 로그인 성공: ${token.accessToken}")
+            Log.i("KakaoLogin", "카카오 계정 로그인 성공: ${token.accessToken}")
 
             // 카카오 ID 토큰을 사용하여 Firebase에 인증
-            firebaseAuthWithKakao(token.accessToken)
+            firebaseAuthWithKakao(token.accessToken, context as Activity)
         }
+    }
+    // 카카오 로그인 함수: 카카오톡이 설치되어 있으면 카카오톡, 아니면 계정으로 로그인
+    if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+            if (error != null) {
+                Log.e("KakaoLogin", "카카오톡으로 로그인 실패", error)
+
+                // 디바이스 권한 요청 화면에서 로그인 취소시 카카오계정 로그인 시도 X
+                if(error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    return@loginWithKakaoTalk
+                }
+
+                // 카카오톡에 연결된 계정이 없는 경우 카카오계정으로 로그인 시도
+                UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+            } else if (token != null) {
+                Log.i("KakaoLogin", "카카오톡으로 로그인 성공: ${token.accessToken}")
+
+                // 카카오 ID 토큰을 사용하여 Firebase에 인증
+                firebaseAuthWithKakao(token.accessToken, context as Activity)
+            }
+        }
+    } else {
+        UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
     }
 }
 
-private fun firebaseAuthWithKakao(kakaoAccessToken: String) {
+private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
     val auth = Firebase.auth
 
     // Firebase Console에서 OpenID Connect 제공업체 ID로 설정했던 값
     val provider = OAuthProvider.newBuilder("oidc.kakao")
         .addCustomParameter("access_token", kakaoAccessToken)
-        .setScopes(listOf("openid", "profile", "email")) // 필요한 스코프를 추가
+        .setScopes(listOf("openid", "profile_nickname", "account_email")) // -필요한 스코프를 추가
         .build()
 
-    auth.startActivityForSignInWithProvider(this, provider)
+    auth.startActivityForSignInWithProvider(context, provider)
         .addOnSuccessListener { authResult ->
             // Firebase 인증 성공
-            Log.d("FirebaseAuth", "Firebase 로그인 성공: ${authResult.user?.uid}")
-            // TODO: 로그인 성공 후 다음 화면으로 이동 등의 로직 구현
+            Log.d("FirebaseAuth", "Firebase 로그인 성공")
+
+            val user = authResult.user
+            val db = Firebase.firestore
+            Log.d("FirebaseAuth", "User UID: ${user?.uid}")
+
+            // 추가 정보 확인
+            val additionalUserInfo = authResult.additionalUserInfo
+            if (additionalUserInfo != null) {
+                val profile = additionalUserInfo.profile
+                val userProfile = hashMapOf(
+                    "uid" to user?.uid,
+                    "email" to profile?.get("email") as? String,
+                    "name" to profile?.get("nickname") as? String,
+                    "sns" to "kakao",
+                    "lastLogin" to FieldValue.serverTimestamp()
+                )
+                if (user != null) {
+                    db.collection("users")
+                        .document(user.uid)
+                        .set(userProfile)
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Firestore", "Firestore에 프로필 저장 실패: ", e)
+                        }
+                }
+            }
+            else {
+               Log.e("Firestore", "프로필 추가 정보가 없습니다.")
+            }
+
         }
         .addOnFailureListener { e ->
             // Firebase 인증 실패
