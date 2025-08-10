@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,17 @@ plugins {
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 }
+
+
+// local.properties 로드
+val props = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) } // CHANGED
+}
+
+val ncid  = props.getProperty("NAVER_CLIENT_ID")
+val ncsec = props.getProperty("NAVER_CLIENT_SECRET")
+
 
 android {
     namespace = "com.aspa.aspa"
@@ -19,6 +32,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"$ncid\"")
+        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"$ncsec\"")
     }
 
     buildTypes {
@@ -39,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -73,4 +90,7 @@ dependencies {
     // See https://firebase.google.com/docs/android/setup#available-libraries
     implementation("com.google.firebase:firebase-auth")
 //    implementation("com.google.firebase:firebase-firestore")
+
+    // naver login sdk // oauth2.0 based
+    implementation("com.navercorp.nid:oauth:5.10.0")
 }
