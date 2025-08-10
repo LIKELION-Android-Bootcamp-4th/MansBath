@@ -36,12 +36,12 @@
 
                 <data
                     android:host="oauth"
-                    android:scheme="kakao${kakaoNativeAppKey}" />
+                    android:scheme="kakao${kakaoNativeAppKeyforManifest}" />
             </intent-filter>
         </activity>
         <meta-data
             android:name="com.example.sdk.API_KEY"
-            android:value="${kakaoNativeAppKey}"/>
+            android:value="${kakaoNativeAppKeyforManifest}"/>
     </application>
 
 
