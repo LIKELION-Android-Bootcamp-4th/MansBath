@@ -19,6 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.functions
 import com.navercorp.nid.NaverIdLoginSDK
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +69,8 @@ fun rememberNaverLoginLauncher(): ActivityResultLauncher<Intent> {
 
             Log.d("NAVER_LOGIN", "✅ 로그인 성공")
             Log.d("NAVER_LOGIN", "AccessToken: $accessToken")
+
+            sendAccessTokenToFunctions(accessToken)
         } else {
             val code = NaverIdLoginSDK.getLastErrorCode().code
             val desc = NaverIdLoginSDK.getLastErrorDescription()
@@ -75,4 +80,35 @@ fun rememberNaverLoginLauncher(): ActivityResultLauncher<Intent> {
             Log.e("NAVER_LOGIN", "Error Desc: $desc")
         }
     }
+}
+
+fun sendAccessTokenToFunctions(accessToken: String?) {
+    if (!accessToken.isNullOrEmpty()) {
+        val functions = Firebase.functions("asia-northeast3")
+
+        val data = hashMapOf(
+            "accessToken" to accessToken
+        )
+
+        functions
+            .getHttpsCallable("loginWithNaver")
+            .call(data)
+
+            .addOnSuccessListener { result ->
+                val customToken = result.data as String
+                FirebaseAuth.getInstance().signInWithCustomToken(customToken)
+                    .addOnSuccessListener {
+                        Log.d("NAVER_LOGIN", "✅ Firebase 세션 로그인 성공")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("NAVER_LOGIN", "❌ Firebase 세션 로그인 실패", e)
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("NAVER_LOGIN", "❌ Functions 호출 실패", e)
+            }
+    } else {
+        Log.e("NAVER_LOGIN", "❌ Access Token이 없습니다.")
+    }
+
 }

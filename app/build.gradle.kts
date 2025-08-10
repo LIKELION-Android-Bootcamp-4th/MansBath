@@ -89,6 +89,7 @@ dependencies {
 
     // See https://firebase.google.com/docs/android/setup#available-libraries
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-functions-ktx:21.2.1")
 //    implementation("com.google.firebase:firebase-firestore")
 
     // naver login sdk // oauth2.0 based
