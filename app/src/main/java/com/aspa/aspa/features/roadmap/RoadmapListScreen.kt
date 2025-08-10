@@ -24,14 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.aspa.aspa.core.constants.enums.BottomTab
+import com.aspa.aspa.features.quiz.QuizScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
+import com.aspa.aspa.features.roadmap.components.RoadmapDialog
+import com.aspa.aspa.features.study.StudyScreen
 import com.aspa.aspa.ui.components.BottomNavigation
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoadmapListScreen() {
+fun RoadmapListScreen(navController: NavController) {
     var selectedTab by remember { mutableStateOf(BottomTab.Home) }
 
     Scaffold(
@@ -83,7 +92,9 @@ fun RoadmapListScreen() {
 
             LazyColumn {
                 items(sampleRoadmaps.size) { index ->
-                    RoadmapCard(sampleRoadmaps[index])
+                    RoadmapCard(sampleRoadmaps[index]) {
+                        navController.navigate("roadmapDetail/${sampleRoadmaps[index].title}")  // todo: title -> id
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
@@ -94,7 +105,45 @@ fun RoadmapListScreen() {
 @Preview(showBackground = true)
 @Composable
 fun RoadmapListScreenPreview() {
+    val nav = rememberNavController()
     AspaTheme {
-        RoadmapListScreen()
+        RoadmapListScreen(nav)
+    }
+}
+
+@Composable
+fun AppNavHost() {
+    val navController = rememberNavController() // NavHostController 생성
+
+    NavHost(
+        navController = navController,
+        startDestination = "roadmap"
+    ) {
+        composable("roadmap") {
+            RoadmapListScreen(navController)
+        }
+        composable(
+            route = "roadmap/detail/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val roadmapId = backStackEntry.arguments?.getString("id") ?: ""
+            RoadmapDetailScreen(roadmapId, navController)
+        }
+        composable(
+            route = "roadmap/dialog/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val sectionId = backStackEntry.arguments?.getString("id") ?: ""
+            RoadmapDialog(
+                sectionId = sectionId,
+                navController = navController,
+            )
+        }
+        composable("study") {
+            StudyScreen()
+        }
+        composable("quiz") {
+            QuizScreen()
+        }
     }
 }

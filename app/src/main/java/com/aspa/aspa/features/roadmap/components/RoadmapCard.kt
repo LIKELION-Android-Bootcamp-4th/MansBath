@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.aspa.aspa.model.Roadmap
 
 @Composable
-fun RoadmapCard(roadmap: Roadmap) {
+fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
     val isCompleted = roadmap.completedSection == roadmap.allSection
     val progress = roadmap.completedSection.toFloat() / roadmap.allSection
 
@@ -45,7 +45,8 @@ fun RoadmapCard(roadmap: Roadmap) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        border = border
+        border = border,
+        onClick = onClick,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
