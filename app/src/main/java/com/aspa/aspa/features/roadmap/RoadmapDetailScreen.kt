@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.core.constants.enums.BottomTab
 import com.aspa.aspa.features.roadmap.components.SectionCard
 import com.aspa.aspa.ui.components.BottomNavigation
@@ -38,7 +40,7 @@ import com.aspa.aspa.ui.theme.AspaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoadmapDetailScreen() {
+fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
     var selectedTab by remember { mutableStateOf(BottomTab.Home) }
 
     var roadmap = sampleRoadmap1  // dummy
@@ -140,7 +142,10 @@ fun RoadmapDetailScreen() {
         ) {
             LazyColumn {
                 items(roadmap.sections.size) { index ->
-                    SectionCard(roadmap.sections[index])
+                    SectionCard(roadmap.sections[index]) {
+                        val id = roadmap.sections[index].title // todo: title -> id
+                        navController.navigate("roadmap/dialog/${id}")
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
@@ -151,7 +156,8 @@ fun RoadmapDetailScreen() {
 @Preview(showBackground = true)
 @Composable
 fun RoadmapDetailScreenPreview() {
+    val nav = rememberNavController()
     AspaTheme {
-        RoadmapDetailScreen()
+        RoadmapDetailScreen("roadmapId", nav)
     }
 }
