@@ -38,18 +38,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.roadmap.sampleRoadmap1
 import com.aspa.aspa.model.Section
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @Composable
 fun RoadmapDialog(
-    section: Section,
-    onStartStudy: () -> Unit,
-    onStartQuiz: () -> Unit,
-    onDismiss: () -> Unit
+    sectionId: String,
+    navController: NavController,
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+    var section = sampleRoadmap1.sections[0]  // dummy  // todo: find section using sectionId
+
+    Dialog(onDismissRequest = {navController.popBackStack()}) {
         Surface(
             shape = RoundedCornerShape(8.75.dp),
             color = Color.White,
@@ -80,7 +82,7 @@ fun RoadmapDialog(
                         contentAlignment = Alignment.TopEnd
                     ) {
                         IconButton(
-                            onClick = onDismiss,
+                            onClick = {navController.popBackStack()},
                             modifier = Modifier
                                 .size(12.dp) // 충분한 터치 영역 확보
                                 .padding(0.dp)
@@ -170,7 +172,7 @@ fun RoadmapDialog(
                 // 버튼
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        onClick = onStartStudy,
+                        onClick = { navController.navigate("study") },
                         modifier = Modifier
                             .weight(1f),
                         colors = ButtonDefaults.buttonColors(
@@ -185,7 +187,7 @@ fun RoadmapDialog(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     OutlinedButton(
-                        onClick = onStartQuiz,
+                        onClick = { navController.navigate("quiz") },
                         modifier = Modifier
                             .weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -207,13 +209,12 @@ fun RoadmapDialog(
 @Preview(showBackground = true)
 @Composable
 fun RoadmapDialogPreview() {
+    val navController = rememberNavController()
     AspaTheme {
         Scaffold {
             RoadmapDialog(
-                section = sampleRoadmap1.sections[3],
-                onStartStudy = {},
-                onStartQuiz = {},
-                onDismiss = {}
+                sectionId = "",
+                navController = navController
             )
         }
     }
