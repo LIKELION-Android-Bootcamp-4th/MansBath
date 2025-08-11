@@ -222,15 +222,15 @@ fun AppNavigation() {
 
         composable("login") {
             LoginScreen(
-                onGoogleSignInClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                },
-                onKakaoSignInClick = { /* TODO: Kakao 로그인  */ },
-                onNaverSignInClick = { /* TODO: Naver 로그인  */ },
-                onLoginClick = {
-                    Auth.uid = "test-user-for-web"
-                    navController.navigate("nickname")
-                }
+//                onGoogleSignInClick = {
+//                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+//                },
+//                onKakaoSignInClick = { /* TODO: Kakao 로그인  */ },
+//                onNaverSignInClick = { /* TODO: Naver 로그인  */ },
+//                onLoginClick = {
+//                    Auth.uid = "test-user-for-web"
+//                    navController.navigate("nickname")
+//                }
             )
         }
 
