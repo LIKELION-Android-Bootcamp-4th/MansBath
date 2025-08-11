@@ -188,7 +188,7 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
             .call(data)
 
             .addOnSuccessListener { result ->
-                val customToken = result.data as String
+                val customToken = result.getData() as String
                 FirebaseAuth.getInstance().signInWithCustomToken(customToken)
                     .addOnSuccessListener {
                         Log.d("NAVER_LOGIN", "✅ Firebase 세션 로그인 성공")
