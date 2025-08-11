@@ -7,7 +7,6 @@ app.use(cors({origin: true}));
 app.use(express.json());
 
 app.post("/google", loginWithGoogle);
-// app.post("/kakao", loginWithKakao);
 // app.post("/naver", loginWithNaver);
 
 /**
