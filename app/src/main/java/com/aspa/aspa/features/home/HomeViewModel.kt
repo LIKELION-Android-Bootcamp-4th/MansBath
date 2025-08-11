@@ -98,7 +98,6 @@ class HomeViewModel : ViewModel() {
                 Log.w("Firestore", "에러 발생", e)
             }
     }
-
     fun createNewChat() {
         _uiState.update {
             it.copy(
