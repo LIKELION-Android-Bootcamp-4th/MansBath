@@ -1,14 +1,12 @@
 import express from "express";
 import cors from "cors";
 import {loginWithGoogle} from "./google";
-import {loginWithKakao} from "./kakao";
 
 const app = express();
 app.use(cors({origin: true}));
 app.use(express.json());
 
 app.post("/google", loginWithGoogle);
-app.post("/kakao", loginWithKakao);
 // app.post("/naver", loginWithNaver);
 
 /**

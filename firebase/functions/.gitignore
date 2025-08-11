@@ -11,6 +11,3 @@ node_modules/
 
 # api-key file
 .env
-
-# Local Account key
-src/aspaAccountkey.json 
