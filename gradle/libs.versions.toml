@@ -12,6 +12,7 @@ firebaseBom = "33.7.0"
 googleServices = "4.4.2"
 navigationCompose = "2.8.1"
 compose-material = "1.6.0"
+compose-navigation = "2.9.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 google-signin = { group = "com.google.android.gms", name = "play-services-auth", version = "21.2.0" }
 
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

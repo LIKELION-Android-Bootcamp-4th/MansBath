@@ -1,0 +1,5 @@
+# firebase 폴더 하위만 LF 고정
+firebase/** text eol=lf
+
+# 나머지 파일은 Git 기본 처리
+* text=auto
