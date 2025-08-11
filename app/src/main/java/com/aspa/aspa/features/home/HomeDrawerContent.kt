@@ -24,7 +24,6 @@ fun HomeDrawerContent(
     onHistoryItemSelected: (String) -> Unit,
     onCloseClick: () -> Unit,
 ) {
-    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기 CHOICE 새 질문 만들지?
     val questionHistory = remember {
         mutableStateListOf(*DummyData.dummyChatHistories.keys.toTypedArray())
     }
@@ -38,22 +37,20 @@ fun HomeDrawerContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(start = 4.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 IconButton(onClick = onCloseClick) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Close Drawer")
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "질문 내역",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            Divider()
 
             LazyColumn(
                 modifier = Modifier.padding(16.dp),
