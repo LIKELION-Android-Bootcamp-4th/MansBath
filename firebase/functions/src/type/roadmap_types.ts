@@ -11,3 +11,8 @@ export interface Stage {
   learning_curve: string;
   concept: string;
 }
+
+export interface RoadmapBody {
+    uid: string;
+  questionId: string;
+}

@@ -9,7 +9,8 @@ import {formatError} from "./Study/formetError";
 
 import {authApp} from "./auth/auth";
 import {questionApp} from "./question/question";
-import {generateRoadmapApp} from "./roadmap/roadmap";
+import {quizApp} from "./quiz/quiz";
+import {generateRoadmap} from "./roadmap/roadmap";
 
 initializeApp();
 
@@ -65,4 +66,5 @@ export const addStudy = onRequest(
 
 export const auth = onRequest({region: "asia-northeast3"}, authApp);
 export const question = onRequest({region: "asia-northeast3"}, questionApp);
-export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmapApp);
+export const quiz = onRequest({region: "asia-northeast3"}, quizApp);
+export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmap);
