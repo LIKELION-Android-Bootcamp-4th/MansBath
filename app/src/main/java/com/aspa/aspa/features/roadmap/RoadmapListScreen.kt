@@ -82,7 +82,9 @@ fun AppNavHost() {
             StudyScreen()
         }
         composable("quiz") {
-            QuizScreen()
+            QuizScreen(
+                navController = navController
+            )
         }
     }
 }
