@@ -36,6 +36,10 @@ import androidx.compose.ui.unit.sp
 import com.aspa.aspa.R
 import com.aspa.aspa.ui.theme.AspaTheme
 
+
+/**
+ * UI/L01 훔쳐옴.
+ */
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit = {},
@@ -164,7 +168,7 @@ private fun LoginScreenContent(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "로그인",
+                        text = "test-user-for-web",
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
