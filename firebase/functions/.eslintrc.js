@@ -29,5 +29,14 @@ module.exports = {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
     "indent": ["error", 2],
+    "max-len": [
+      "warn",
+      {
+        code: 80,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true, // <- 요거 꼭 있어야 함
+        ignoreComments: true,
+      },
+    ],
   },
 };
