@@ -10,10 +10,9 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 firebaseBom = "33.7.0"
 googleServices = "4.4.2"
-navigationCompose = "2.8.1"
 compose-material = "1.6.0"
+navigationCompose = "2.9.3"
 firebaseFirestore = "26.0.0"
-
 retrofit = "3.0.0"
 gson = "2.13.1"
 okhttp = "5.1.0"
@@ -21,7 +20,6 @@ firebaseAuth = "24.0.1"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
-
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +42,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 google-signin = { group = "com.google.android.gms", name = "play-services-auth", version = "21.2.0" }
 
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material" }
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
