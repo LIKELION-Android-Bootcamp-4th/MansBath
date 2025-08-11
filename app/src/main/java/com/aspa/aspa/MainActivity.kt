@@ -14,8 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.aspa.aspa.features.home.HomeScreen
+import com.aspa.aspa.features.login.LoginScreen
+import com.aspa.aspa.features.login.LoginScreenRoute
 import com.aspa.aspa.ui.theme.AspaTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +30,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //HomeScreen()
+                    LoginScreenRoute(
+                        onSuccess = { /* TODO: 다음 화면으로 이동 */ }
+                    )
                 }
             }
         }

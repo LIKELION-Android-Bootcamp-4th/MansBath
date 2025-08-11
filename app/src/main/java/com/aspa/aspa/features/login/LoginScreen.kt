@@ -1,5 +1,8 @@
 package com.aspa.aspa.features.login
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,23 +26,31 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aspa.aspa.R
 import com.aspa.aspa.ui.theme.AspaTheme
+import kotlinx.coroutines.launch
 
 
 /**
  * UI/L01 훔쳐옴.
  */
+
+
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit = {},
@@ -231,5 +242,30 @@ fun LoginScreenPreview() {
             onNaverSignInClick = {},
             onLoginClick = {}
         )
+    }
+}
+@Composable
+fun LoginScreenRoute(
+    onSuccess: () -> Unit = {},
+    viewModel: LoginViewModel = hiltViewModel()
+) {
+    val state by viewModel.loginState.collectAsStateWithLifecycle()
+        val activity = LocalActivity.current
+    LoginScreen(
+        onGoogleSignInClick = {
+            Log.d("클릭됨", "클릭됨")
+            activity?.let {
+                viewModel.signInWithGoogleCredential(it)
+            }
+        },
+        onKakaoSignInClick = {},
+        onNaverSignInClick = {},
+        onLoginClick = {}
+    )
+
+    when (state) {
+        is LoginState.Success -> onSuccess()
+        is LoginState.Error -> { /* TODO: 스낵바/토스트 */ }
+        LoginState.Loading, LoginState.Idle -> Unit
     }
 }
