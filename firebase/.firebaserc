@@ -1,6 +1,7 @@
 {
   "projects": {
     "default": "aspa-7126b",
+    "dev": "aspa-7126b",
     "develop": "aspa-7126b"
   },
   "targets": {},
