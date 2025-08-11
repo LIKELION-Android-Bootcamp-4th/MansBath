@@ -31,7 +31,7 @@ import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
-import com.aspa.aspa.features.mypage.MypageScreen
+import com.aspa.aspa.features.mypage.MyPageScreen
 import com.aspa.aspa.features.quiz.QuizScreen
 import com.aspa.aspa.features.roadmap.RoadmapListScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
@@ -147,7 +147,7 @@ fun MainScreen(
                 }
 
                 composable("mypage") {
-                    MypageScreen()
+                    MyPageScreen()
                 }
             }
         }

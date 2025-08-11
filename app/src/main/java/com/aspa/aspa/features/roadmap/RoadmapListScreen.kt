@@ -67,7 +67,10 @@ fun AppNavHost() {
         startDestination = "roadmap"
     ) {
         composable("roadmap") {
-            RoadmapListScreen(navController)
+            RoadmapListScreen(
+                navController,
+                "questionId"  // todo: question id
+            )
         }
         composable(
             route = "roadmap/detail/{id}",
