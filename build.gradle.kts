@@ -3,5 +3,7 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false //컴파일러 시 kotlin 성능 개선을 위해 사용
     id("com.google.gms.google-services") version "4.4.1" apply false
 }
