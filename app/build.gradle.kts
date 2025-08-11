@@ -1,3 +1,9 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val myProperties = Properties()
+myProperties.load(FileInputStream(rootProject.file("local.properties")))
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +25,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", myProperties.getProperty("kakaoNativeAppKey"))
+        manifestPlaceholders["kakaoNativeAppKeyforManifest"] = myProperties.getProperty("kakaoNativeAppKeyforManifest")
     }
 
     buildTypes {
@@ -39,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -79,4 +89,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.compose.material.icons.extended)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.kakao.sdk:v2-all:2.21.6")
+
 }
