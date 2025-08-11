@@ -36,10 +36,14 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.Navigator
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
 
 
 @Composable
-fun QuizResultScreen() {
+fun QuizResultScreen(navController: NavController) {
 
     val answers = listOf(
         Triple(
@@ -78,7 +82,9 @@ fun QuizResultScreen() {
         Text(
             text = "← 퀴즈 목록",
             modifier = Modifier
-                .clickable { }
+                .clickable {
+                    navController.navigate(QuizScreenRoute.Quiz.route)
+                }
                 .padding(bottom = 16.dp)
         )
 
@@ -208,7 +214,10 @@ fun QuizResultScreen() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedButton(
-                onClick = {},
+                onClick = {
+                    //TODO: 새로운 퀴즈 풀기 기능
+
+                },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -218,7 +227,11 @@ fun QuizResultScreen() {
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(
-                onClick = {},
+                onClick = {
+                    //TODO: 다시 풀기 기능
+
+                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -231,5 +244,6 @@ fun QuizResultScreen() {
 @Preview(showBackground = true)
 @Composable
 fun QuizResultScreenReview() {
-    QuizResultScreen()
+    val navController = rememberNavController()
+    QuizResultScreen(navController = navController)
 }
