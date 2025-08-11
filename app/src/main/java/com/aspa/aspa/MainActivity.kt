@@ -117,33 +117,49 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
             val userUid = "kakao:${user?.uid}"
             Log.d("FirebaseAuth", userUid)
 
-            // 추가 정보 확인
-            val additionalUserInfo = authResult.additionalUserInfo
-            if (additionalUserInfo != null) {
-                val profile = additionalUserInfo.profile
-                val userProfile = hashMapOf(
-                    "uid" to userUid,
-                    "email" to profile?.get("email") as? String,
-                    "name" to profile?.get("nickname") as? String,
-                    "sns" to "kakao",
-                    "lastLogin" to FieldValue.serverTimestamp()
-                )
-                if (user != null) {
-                    db.collection("users")
-                        .document(userUid)
-                        .set(userProfile)
-                        .addOnSuccessListener {
-                            Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+            val userDoc = db.collection("users").document(userUid)
+            userDoc.get()
+                .addOnSuccessListener { document ->
+                    if(document.exists()) {
+                        userDoc.update("lastLogin",FieldValue.serverTimestamp())
+                            .addOnSuccessListener {
+                                Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "최근 로그인 정보 갱신 실패", e)
+                            }
+                    }
+                    else {
+                        // 추가 정보 확인
+                        val additionalUserInfo = authResult.additionalUserInfo
+                        if (additionalUserInfo != null) {
+                            val profile = additionalUserInfo.profile
+                            val userProfile = hashMapOf(
+                                "uid" to userUid,
+                                "email" to profile?.get("email") as? String,
+                                "name" to profile?.get("nickname") as? String,
+                                "sns" to "kakao",
+                                "lastLogin" to FieldValue.serverTimestamp()
+                            )
+                            if (user != null) {
+                                userDoc
+                                    .set(userProfile)
+                                    .addOnSuccessListener {
+                                        Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Firestore", "Firestore에 프로필 저장 실패: ", e)
+                                    }
+                            }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("Firestore", "Firestore에 프로필 저장 실패: ", e)
+                        else {
+                            Log.e("Firestore", "프로필 추가 정보가 없습니다.")
                         }
+                    }
                 }
-            }
-            else {
-               Log.e("Firestore", "프로필 추가 정보가 없습니다.")
-            }
-
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "문서 읽기 실패", e)
+                }
         }
         .addOnFailureListener { e ->
             // Firebase 인증 실패
