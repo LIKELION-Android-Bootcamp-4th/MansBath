@@ -18,7 +18,7 @@ import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
-import com.aspa.aspa.features.mypage.MypageScreen
+import com.aspa.aspa.features.mypage.MyPageScreen
 import com.aspa.aspa.features.quiz.QuizScreen
 import com.aspa.aspa.features.roadmap.RoadmapListScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
@@ -27,8 +27,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    nickname: String,
-    onLogout: () -> Unit,
     homeViewModel: HomeViewModel = viewModel()
 ) {
     LaunchedEffect(key1 = Unit) {
@@ -124,10 +122,7 @@ fun MainScreen(
                 composable("quiz") { QuizScreen() }
                 composable("roadmap") { RoadmapListScreen() }
                 composable("mypage") {
-                    MypageScreen(
-                        nickname = nickname,
-                        onLogout = onLogout
-                    )
+                    MyPageScreen()
                 }
             }
         }
