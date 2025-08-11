@@ -53,15 +53,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun initNaverLoginSDK(activity: Activity) {
-
-    NaverIdLoginSDK.initialize(
-        context = activity.applicationContext,
-        clientId = BuildConfig.NAVER_CLIENT_ID,
-        clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
-        clientName = BuildConfig.APPLICATION_ID
-    )
-}
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 private fun handleKakaoLogin(context: Context) {
     // 카카오 계정 로그인 공통 callback
@@ -169,6 +162,19 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
         }
 }
 
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+fun initNaverLoginSDK(activity: Activity) {
+
+    NaverIdLoginSDK.initialize(
+        context = activity.applicationContext,
+        clientId = BuildConfig.NAVER_CLIENT_ID,
+        clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
+        clientName = BuildConfig.APPLICATION_ID
+    )
+}
+
 @Composable
 fun rememberNaverLoginLauncher(): ActivityResultLauncher<Intent> {
 
@@ -222,6 +228,9 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
         Log.e("NAVER_LOGIN", "❌ Access Token이 없습니다.")
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 @Composable
 fun AppNavigation() {
