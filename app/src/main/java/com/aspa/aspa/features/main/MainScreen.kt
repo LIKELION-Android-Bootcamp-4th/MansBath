@@ -1,13 +1,11 @@
 package com.aspa.aspa.features.main
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,6 +13,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
+import com.aspa.aspa.features.home.HomeScreenState
+import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
@@ -26,23 +26,37 @@ import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import kotlinx.coroutines.launch
 
 @Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController = rememberNavController()) {
+fun MainScreen(
+    navController: NavHostController = rememberNavController(),
+    homeViewModel: HomeViewModel = viewModel()
+) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    var homeScreenActions by remember { mutableStateOf(HomeScreenActions()) }
+    val uiState by homeViewModel.uiState.collectAsState()
+    var inputText by remember { mutableStateOf("") }
+    val chatStarted = uiState.messages.isNotEmpty()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             HomeDrawerContent(
+                uiState = uiState,
                 onCloseClick = { scope.launch { drawerState.close() } },
-                onHistoryItemSelected = { title ->
-                    homeScreenActions.loadChatHistory(title)
+                onHistoryItemSelected = { questionId ->
+                    homeViewModel.loadChatHistory(questionId)
                     scope.launch { drawerState.close() }
+                },
+                onNewChatClick = {
+                    homeViewModel.createNewChat()
+                    scope.launch { drawerState.close() }
+                },
+                onDeleteClick = { questionId ->
+                    homeViewModel.deleteQuestionHistory(questionId)
                 }
             )
         }
@@ -52,7 +66,7 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
                 when (currentRoute) {
                     "home" -> HomeTopBar(
                         onMenuClick = { scope.launch { drawerState.open() } },
-                        onNewChatClick = { homeScreenActions.createNewChat() }
+                        onNewChatClick = { homeViewModel.createNewChat() }
                     )
                     "roadmap" -> RoadmapTopBar()
                     else -> DefaultTopBar()
@@ -74,9 +88,29 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
             ) {
                 composable("home") {
                     HomeScreen(
-                        onActionsReady = { actions ->
-                            homeScreenActions = actions
-                        }
+                        state = HomeScreenState(
+                            uiState = uiState,
+                            inputText = inputText
+                        ),
+                        actions = HomeScreenActions(
+                            onInputTextChanged = { newText -> inputText = newText },
+                            onSendClicked = {
+                                if (inputText.isNotBlank()) {
+                                    if (!chatStarted) {
+                                        homeViewModel.startNewChat(inputText)
+                                    } else {
+                                        homeViewModel.handleFollowUpQuestion(inputText)
+                                    }
+                                    inputText = ""
+                                }
+                            },
+                            onOptionSelected = { selectedOption ->
+                                homeViewModel.selectOption(selectedOption)
+                            },
+                            onRoadmapCreateClicked = {
+                                // TODO: 로드맵 생성 로직 연결
+                            }
+                        )
                     )
                 }
                 composable("quiz") { QuizScreen() }

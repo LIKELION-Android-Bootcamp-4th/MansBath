@@ -4,89 +4,88 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aspa.aspa.ui.theme.AspaTheme
+import com.aspa.aspa.features.home.components.ChatContent
+import com.aspa.aspa.features.home.components.InitialContent
+import com.aspa.aspa.features.home.components.UserInput
 
+data class HomeScreenState(
+    val uiState: HomeUiState,
+    val inputText: String
+)
+
+data class HomeScreenActions(
+    val onInputTextChanged: (String) -> Unit,
+    val onSendClicked: () -> Unit,
+    val onOptionSelected: (String) -> Unit,
+    val onRoadmapCreateClicked: () -> Unit
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToMypage: () -> Unit = {}
+    state: HomeScreenState,
+    actions: HomeScreenActions
 ) {
-    HomeScreenContent(
-        onNavigateToMypage = onNavigateToMypage
-    )
-}
+    val chatStarted = state.uiState.messages.isNotEmpty()
 
-@Composable
-private fun HomeScreenContent(
-    onNavigateToMypage: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
-    ) {
+    /**
+     * 돌고돌아 원점. 스캐폴드 + 로드맵 생성 버튼 FAB.(튜닝의 최종 목적지~)
+     */
+    Scaffold(
+        bottomBar = {
+            UserInput(
+                text = state.inputText,
+                onTextChanged = actions.onInputTextChanged,
+                onSendClicked = actions.onSendClicked
+            )
+        },
+        floatingActionButton = {
+            if (state.uiState.isReportFinished) {
+                FloatingActionButton(
+                    onClick = actions.onRoadmapCreateClicked,
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Text(
+                        text = "로드맵 생성",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp)
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            // 앱 로고
-            Text(
-                text = "🧠",
-                fontSize = 64.sp,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-            
-            // 제목
-            Text(
-                text = "ASPA 홈",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            // 설명
-            Text(
-                text = "환영합니다!",
-                fontSize = 18.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 48.dp)
-            )
-            
-            // 마이페이지 버튼
-            Button(
-                onClick = onNavigateToMypage,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF0F0F0)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "마이페이지",
-                    color = Color(0xFF666666),
-                    fontSize = 14.sp
+            if (state.uiState.isLoading && !chatStarted) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (chatStarted) {
+                ChatContent(
+                    messages = state.uiState.messages,
+                    onOptionSelected = actions.onOptionSelected,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            } else {
+                InitialContent(
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    AspaTheme {
-        HomeScreenContent(
-            onNavigateToMypage = {}
-        )
     }
 }
