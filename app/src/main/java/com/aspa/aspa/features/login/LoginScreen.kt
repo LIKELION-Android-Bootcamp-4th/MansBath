@@ -1,235 +1,128 @@
 package com.aspa.aspa.features.login
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.aspa.aspa.R
-import com.aspa.aspa.ui.theme.AspaTheme
-
-
-/**
- * UI/L01 훔쳐옴.
- */
-@Composable
-fun LoginScreen(
-    onGoogleSignInClick: () -> Unit = {},
-    onKakaoSignInClick: () -> Unit = {},
-    onNaverSignInClick: () -> Unit = {},
-    onLoginClick: () -> Unit = {}
-) {
-    LoginScreenContent(
-        onGoogleSignInClick = onGoogleSignInClick,
-        onKakaoSignInClick = onKakaoSignInClick,
-        onNaverSignInClick = onNaverSignInClick,
-        onLoginClick = onLoginClick
-    )
-}
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.features.home.HomeScreen
+import com.aspa.aspa.features.login.components.SocialButton
 
 @Composable
-private fun LoginScreenContent(
-    onGoogleSignInClick: () -> Unit,
-    onKakaoSignInClick: () -> Unit,
-    onNaverSignInClick: () -> Unit,
-    onLoginClick: () -> Unit
-) {
+fun LoginScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(Color(0xFFD4D4D4)), // 배경 회색
+        contentAlignment = Alignment.Center
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(40.dp)
-                .align(Alignment.Center),
-            shape = RoundedCornerShape(14.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            )
+            shape = RoundedCornerShape(12.75.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
         ) {
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(24.dp)
             ) {
-                // 앱 로고 (그라데이션 원형 배경)
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color(0xFF6C63FF),
-                                    Color(0xFF4FC3F7)
-                                )
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.aspalogo),
-                        contentDescription = "Aspa Logo",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // 앱 이름
+                // 제목
                 Text(
                     text = "Aspa",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
 
-                // 태그라인
+                // 부제
                 Text(
                     text = "AI와 함께하는 개인 맞춤 학습",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
                 )
 
-                // 소셜 로그인 버튼들
-                SocialLoginButton(
-                    icon = R.drawable.ic_google,
-                    text = "Google로 계속하기",
-                    backgroundColor = Color.White,
-                    textColor = Color.Black,
-                    borderColor = Color(0xFFE0E0E0),
-                    modifier = Modifier.padding(bottom = 8.dp),
-                    onClick = onGoogleSignInClick
-                )
-                SocialLoginButton(
-                    icon = R.drawable.ic_kakao,
-                    text = "카카오톡으로 계속하기",
-                    backgroundColor = Color(0xFFFEE500),
-                    textColor = Color(0xFF191919),
-                    borderColor = Color(0xFFFEE500),
-                    modifier = Modifier.padding(bottom = 8.dp),
-                    onClick = onKakaoSignInClick
-                )
-                SocialLoginButton(
-                    icon = R.drawable.ic_naver,
-                    text = "네이버로 계속하기",
-                    backgroundColor = Color(0xFF03C75A),
-                    textColor = Color.White,
-                    borderColor = Color(0xFF03C75A),
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    onClick = onNaverSignInClick
-                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // 메인 로그인 버튼
+                SocialButton("Google로 계속하기") {}
+
+                SocialButton("카카오톡으로 계속하기") {}
+
+                SocialButton("네이버로 계속하기") {}
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Button(
-                    onClick = onLoginClick,
+                    onClick = {
+                        if (/* todo */ false) {  // 회원가입 시
+                            navController.navigate("nickname")
+                        } else {  // 로그인 시
+                            navController.navigate("home")
+                        }
+                    },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp),
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF333333)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "test-user-for-web",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                        containerColor = Color.Black,
+                        contentColor = Color.White
                     )
+                ) {
+                    Text("로그인")
                 }
             }
         }
     }
 }
 
-@Composable
-private fun SocialLoginButton(
-    icon: Int,
-    text: String,
-    backgroundColor: Color,
-    textColor: Color,
-    borderColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(40.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor
-        ),
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, borderColor)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = text,
-                modifier = Modifier.size(16.dp),
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                color = textColor,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
-}
+//@Composable
+//fun AppNavHost() {
+//    val navController = rememberNavController()
+//
+//    NavHost(
+//        navController = navController,
+//        startDestination = "login"
+//    ) {
+//        composable("login") {
+//            LoginScreen(navController)
+//        }
+//        composable("home") {
+//            HomeScreen(
+//                state = TODO(),
+//                actions = TODO()
+//            )
+//        }
+//    }
+//}
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    AspaTheme {
-        LoginScreenContent(
-            onGoogleSignInClick = {},
-            onKakaoSignInClick = {},
-            onNaverSignInClick = {},
-            onLoginClick = {}
-        )
-    }
+private fun LoginScreenPreview() {
+    val nav = rememberNavController()
+    LoginScreen(navController = nav)
 }
