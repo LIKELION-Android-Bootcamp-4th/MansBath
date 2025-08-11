@@ -119,7 +119,7 @@ fun MainScreen(
                         )
                     )
                 }
-                composable("quiz") { QuizScreen() }
+                composable("quiz") { QuizScreen(innerNavController) }
                 composable("roadmap") { RoadmapListScreen() }
                 composable("mypage") {
                     MyPageScreen()
