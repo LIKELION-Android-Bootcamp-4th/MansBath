@@ -6,42 +6,15 @@ import {getFirestore} from "firebase-admin/firestore";
 import {Request, Response} from "express";
 import {getAiStudyResponse} from "./Study/get_ai_response";
 import {formatError} from "./Study/formetError";
-
 import {authApp} from "./auth/auth";
 import {questionApp} from "./question/question";
 import {quizApp} from "./quiz/quiz";
 import {generateRoadmap} from "./roadmap/roadmap";
+import {loginWithNaver} from "./auth/naver";
 
+
+// Firebase Admin SDK 초기화
 initializeApp();
-
-
-export const addmessage = onRequest({
-  region: "asia-northeast3",
-}, async (req: Request, res: Response) => {
-  const original = req.query.text;
-  const writeResult = await getFirestore()
-    .collection("messages")
-    .add({original: original});
-
-  res.json({result: `Message with ID: ${writeResult.id} added.`});
-});
-
-
-export const makeuppercase = onDocumentCreated(
-  {
-    region: "asia-northeast3",
-    document: "/messages/{documentId}",
-  },
-  (event) => {
-    const original = event.data?.data().original;
-
-    logger.log("Uppercasing", event.params.documentId, original);
-
-    const uppercase = original.toUpperCase();
-
-    return event.data?.ref.set({uppercase}, {merge: true});
-  });
-
 
 export const addStudy = onRequest(
   {
@@ -64,7 +37,12 @@ export const addStudy = onRequest(
   }
 );
 
+// =================================================================
+// ✨ 분리된 함수 내보내기
+// =================================================================
 export const auth = onRequest({region: "asia-northeast3"}, authApp);
 export const question = onRequest({region: "asia-northeast3"}, questionApp);
 export const quiz = onRequest({region: "asia-northeast3"}, quizApp);
 export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmap);
+
+export {loginWithNaver};

@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.aspa.aspa.model.Section
 
 @Composable
-fun SectionCard(section: Section) {
+fun SectionCard(section: Section, onClick: () -> Unit) {
 
     val backgroundColor = if (section.status) Color(0xFFF0FDF4) else Color.White
     val border = if (section.status) BorderStroke(1.dp, Color(0xFFB9F8CF)) else BorderStroke(
@@ -44,7 +44,8 @@ fun SectionCard(section: Section) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        border = border
+        border = border,
+        onClick = onClick,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
