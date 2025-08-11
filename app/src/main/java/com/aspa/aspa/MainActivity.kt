@@ -7,16 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,7 +28,6 @@ import com.google.firebase.firestore.firestore
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 
 class MainActivity : ComponentActivity() {
@@ -46,21 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AspaTheme {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    val context = LocalContext.current
-                    Box(modifier = Modifier.height(20.dp))
-                    Button(
-                        onClick = {
-                            Log.d("KakaoLogin", Utility.getKeyHash(context))
-                            handleKakaoLogin(context)
-                        }
-                    ) { Text("Kakao Login!") }
-                }
-
-            }
+            AspaTheme { }
         }
     }
 }
@@ -199,15 +175,7 @@ fun AppNavigation() {
 
         composable("main/{nickname}") { backStackEntry ->
             val nickname = backStackEntry.arguments?.getString("nickname") ?: "사용자"
-            MainScreen(
-                nickname = nickname,
-                onLogout = {
-                    Auth.uid = null
-                    navController.navigate("login") {
-                        popUpTo(0)
-                    }
-                }
-            )
+            MainScreen()
         }
     }
 }
