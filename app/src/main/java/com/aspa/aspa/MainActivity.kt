@@ -222,6 +222,7 @@ fun AppNavigation() {
 
         composable("login") {
             LoginScreen(
+                navController,
 //                onGoogleSignInClick = {
 //                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
 //                },
