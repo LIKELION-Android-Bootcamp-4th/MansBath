@@ -17,10 +17,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
 import com.aspa.aspa.features.home.HomeScreenState
@@ -85,13 +87,12 @@ fun MainScreen(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-
-                    "roadmap" -> RoadmapTopBar()
+                    "roadmap/{questionId}" -> RoadmapTopBar()
                     else -> DefaultTopBar()
                 }
             },
             bottomBar = {
-                if (currentRoute in listOf("home", "quiz", "roadmap", "mypage")) {
+                if (currentRoute in listOf("home", "quiz", "mypage") || currentRoute?.startsWith("roadmap") == true) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
                         onTabSelected = { route -> innerNavController.navigate(route) }
@@ -126,17 +127,25 @@ fun MainScreen(
                                 homeViewModel.selectOption(selectedOption)
                             },
                             onRoadmapCreateClicked = {
-                                // TODO: 로드맵 생성 로직 연결
+                                uiState.activeConversationId?.let { questionId ->
+                                    innerNavController.navigate("roadmap/$questionId")
+                                }
                             }
                         )
                     )
                 }
                 composable("quiz") { QuizScreen(innerNavController) }
-                composable("roadmap") {
+                composable(
+                    route = "roadmap/{questionId}",
+                    arguments = listOf(navArgument("questionId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val questionId = backStackEntry.arguments?.getString("questionId")
                     RoadmapListScreen(
-                        navController = innerNavController
+                        innerNavController,
+                        questionId = questionId,
                     )
                 }
+
                 composable("mypage") {
                     MyPageScreen()
                 }

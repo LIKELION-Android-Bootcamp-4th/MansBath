@@ -46,7 +46,9 @@ class MainActivity : ComponentActivity() {
         initNaverLoginSDK(this)
 
         setContent {
-            AspaTheme { }
+            AspaTheme {
+                AppNavigation()
+            }
         }
     }
 }

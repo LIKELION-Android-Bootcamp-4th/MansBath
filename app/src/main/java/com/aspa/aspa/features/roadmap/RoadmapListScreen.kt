@@ -24,7 +24,10 @@ import com.aspa.aspa.ui.theme.AspaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoadmapListScreen(navController: NavController) {
+fun RoadmapListScreen(
+    navController: NavController,
+    questionId: String?
+) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -45,10 +48,15 @@ fun RoadmapListScreen(navController: NavController) {
 @Composable
 fun RoadmapListScreenPreview() {
     val nav = rememberNavController()
+
     AspaTheme {
-        RoadmapListScreen(nav)
+        /**
+         * wYN1b3dA0kGffMXCcv73 : 일본어를 배우고 싶어
+         */
+        RoadmapListScreen(questionId = "wYN1b3dA0kGffMXCcv73", navController = nav)
     }
 }
+
 
 @Composable
 fun AppNavHost() {
@@ -59,7 +67,10 @@ fun AppNavHost() {
         startDestination = "roadmap"
     ) {
         composable("roadmap") {
-            RoadmapListScreen(navController)
+            RoadmapListScreen(
+                navController,
+                "questionId"  // todo: question id
+            )
         }
         composable(
             route = "roadmap/detail/{id}",
