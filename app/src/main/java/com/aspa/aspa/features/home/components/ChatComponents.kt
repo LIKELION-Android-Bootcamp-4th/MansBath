@@ -1,5 +1,11 @@
 package com.aspa.aspa.features.home.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,14 +19,21 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.aspa.aspa.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,6 +76,7 @@ fun ChatContent(
                     }
                 }
                 is UiAnalysisReport -> AnalysisReportCard(report = message)
+                is UiAssistantLoadingMessage -> AssistantLoadingBubble()
                 else -> {}
             }
         }
@@ -167,20 +181,34 @@ fun OptionButtonList(
 
 @Composable
 fun AnalysisReportCard(report: UiAnalysisReport) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = report.title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 24.dp, start = 8.dp)
-        )
-        AnalysisSection(title = "1. 사용자 프로필", content = report.items["사용자 프로필"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "2. 종합 평가", content = report.items["종합 평가"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "3. 학습 방향 제안", content = report.items["학습 방향 제안"] ?: "")
-        Spacer(modifier = Modifier.height(20.dp))
-        AnalysisSection(title = "[추천 전략]", content = report.items["추천 전략"] ?: "")
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
+        ) {
+            Text(
+                text = report.title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(20.dp))
+
+            val reportItems = report.items.toList()
+            Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                reportItems.forEach { (title, content) ->
+                    AnalysisSection(title = title, content = content)
+                }
+            }
+        }
     }
 }
 
@@ -201,4 +229,61 @@ private fun AnalysisSection(title: String, content: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+}
+
+/**
+ * 낙관적 UI 추가
+ * - 로딩 메시지
+ * - 타이핑 효과 Lottie
+ */
+@Composable
+fun AssistantLoadingBubble() {
+    val infiniteTransition = rememberInfiniteTransition(label = "loading_bubble_transition")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "loading_alpha"
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = "Assistant Profile",
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .padding(6.dp),
+            tint = Color.Gray
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = alpha),
+            modifier = Modifier.width(120.dp)
+        ) {
+            TypingIndicator()
+        }
+    }
+}
+
+@Composable
+fun TypingIndicator() {
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.typing_indicator)
+    )
+
+    LottieAnimation(
+        composition = composition,
+        // 무한 반복
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier.size(60.dp)
+    )
 }

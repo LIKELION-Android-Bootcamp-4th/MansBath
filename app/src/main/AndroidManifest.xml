@@ -22,7 +22,6 @@
             android:theme="@style/Theme.Aspa">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,6 +42,4 @@
             android:name="com.example.sdk.API_KEY"
             android:value="${kakaoNativeAppKeyforManifest}"/>
     </application>
-
-
 </manifest>
