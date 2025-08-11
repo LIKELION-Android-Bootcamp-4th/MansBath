@@ -1,9 +1,10 @@
 import {onRequest} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
 
-import {authApp} from "./auth";
+import {authApp} from "./auth/auth";
 import {questionApp} from "./question/question";
 import {quizApp} from "./quiz/quiz";
+import {generateRoadmap} from "./roadmap/roadmap";
 
 // Firebase Admin SDK 초기화
 initializeApp();
@@ -14,3 +15,4 @@ initializeApp();
 export const auth = onRequest({region: "asia-northeast3"}, authApp);
 export const question = onRequest({region: "asia-northeast3"}, questionApp);
 export const quiz = onRequest({region: "asia-northeast3"}, quizApp);
+export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmap);
