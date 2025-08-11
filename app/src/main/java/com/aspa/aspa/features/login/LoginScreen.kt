@@ -23,11 +23,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.login.components.SocialButton
 
-@Preview
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +78,13 @@ fun LoginScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { },
+                    onClick = {
+                        if (/* todo */ false) {  // 회원가입 시
+                            navController.navigate("nickname")
+                        } else {  // 로그인 시
+                            navController.navigate("home")
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
@@ -88,4 +98,31 @@ fun LoginScreen() {
             }
         }
     }
+}
+
+//@Composable
+//fun AppNavHost() {
+//    val navController = rememberNavController()
+//
+//    NavHost(
+//        navController = navController,
+//        startDestination = "login"
+//    ) {
+//        composable("login") {
+//            LoginScreen(navController)
+//        }
+//        composable("home") {
+//            HomeScreen(
+//                state = TODO(),
+//                actions = TODO()
+//            )
+//        }
+//    }
+//}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginScreenPreview() {
+    val nav = rememberNavController()
+    LoginScreen(navController = nav)
 }
