@@ -108,14 +108,15 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
 
             val user = authResult.user
             val db = Firebase.firestore
-            Log.d("FirebaseAuth", "User UID: ${user?.uid}")
+            val userUid = "kakao:${user?.uid}"
+            Log.d("FirebaseAuth", userUid)
 
             // 추가 정보 확인
             val additionalUserInfo = authResult.additionalUserInfo
             if (additionalUserInfo != null) {
                 val profile = additionalUserInfo.profile
                 val userProfile = hashMapOf(
-                    "uid" to user?.uid,
+                    "uid" to userUid,
                     "email" to profile?.get("email") as? String,
                     "name" to profile?.get("nickname") as? String,
                     "sns" to "kakao",
@@ -123,7 +124,7 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
                 )
                 if (user != null) {
                     db.collection("users")
-                        .document(user.uid)
+                        .document(userUid)
                         .set(userProfile)
                         .addOnSuccessListener {
                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
