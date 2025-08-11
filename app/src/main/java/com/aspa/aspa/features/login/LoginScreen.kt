@@ -100,22 +100,25 @@ fun LoginScreen(navController: NavHostController) {
     }
 }
 
-@Composable
-fun AppNavHost() {
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController,
-        startDestination = "login"
-    ) {
-        composable("login") {
-            LoginScreen(navController)
-        }
-        composable("home") {
-            HomeScreen()
-        }
-    }
-}
+//@Composable
+//fun AppNavHost() {
+//    val navController = rememberNavController()
+//
+//    NavHost(
+//        navController = navController,
+//        startDestination = "login"
+//    ) {
+//        composable("login") {
+//            LoginScreen(navController)
+//        }
+//        composable("home") {
+//            HomeScreen(
+//                state = TODO(),
+//                actions = TODO()
+//            )
+//        }
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
