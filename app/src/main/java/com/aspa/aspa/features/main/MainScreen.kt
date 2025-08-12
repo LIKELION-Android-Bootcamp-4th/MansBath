@@ -1,15 +1,28 @@
 package com.aspa.aspa.features.main
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
 import com.aspa.aspa.features.home.HomeScreenState
@@ -74,12 +87,12 @@ fun MainScreen(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-                    "roadmap" -> RoadmapTopBar()
+                    "roadmap/{questionId}" -> RoadmapTopBar()
                     else -> DefaultTopBar()
                 }
             },
             bottomBar = {
-                if (currentRoute in listOf("home", "quiz", "roadmap", "mypage")) {
+                if (currentRoute in listOf("home", "quiz", "mypage") || currentRoute?.startsWith("roadmap") == true) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
                         onTabSelected = { route -> innerNavController.navigate(route) }
@@ -114,13 +127,25 @@ fun MainScreen(
                                 homeViewModel.selectOption(selectedOption)
                             },
                             onRoadmapCreateClicked = {
-                                // TODO: 로드맵 생성 로직 연결
+                                uiState.activeConversationId?.let { questionId ->
+                                    innerNavController.navigate("roadmap/$questionId")
+                                }
                             }
                         )
                     )
                 }
                 composable("quiz") { QuizScreen(innerNavController) }
-                composable("roadmap") { RoadmapListScreen() }
+                composable(
+                    route = "roadmap/{questionId}",
+                    arguments = listOf(navArgument("questionId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val questionId = backStackEntry.arguments?.getString("questionId")
+                    RoadmapListScreen(
+                        innerNavController,
+                        questionId = questionId,
+                    )
+                }
+
                 composable("mypage") {
                     MyPageScreen()
                 }

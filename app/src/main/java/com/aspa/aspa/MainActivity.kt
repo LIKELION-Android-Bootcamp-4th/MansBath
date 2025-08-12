@@ -1,5 +1,6 @@
 package com.aspa.aspa
 
+
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -19,8 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
-import com.aspa.aspa.features.login.google.googleSignInHandler
-import com.aspa.aspa.features.login.google.rememberGoogleSignInClient
 import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
@@ -36,7 +35,9 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,20 +47,15 @@ class MainActivity : ComponentActivity() {
         initNaverLoginSDK(this)
 
         setContent {
-            AspaTheme { }
+            AspaTheme {
+                AppNavigation()
+            }
         }
     }
 }
 
-fun initNaverLoginSDK(activity: Activity) {
-
-    NaverIdLoginSDK.initialize(
-        context = activity.applicationContext,
-        clientId = BuildConfig.NAVER_CLIENT_ID,
-        clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
-        clientName = BuildConfig.APPLICATION_ID
-    )
-}
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 private fun handleKakaoLogin(context: Context) {
     // 카카오 계정 로그인 공통 callback
@@ -117,38 +113,67 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
             val userUid = "kakao:${user?.uid}"
             Log.d("FirebaseAuth", userUid)
 
-            // 추가 정보 확인
-            val additionalUserInfo = authResult.additionalUserInfo
-            if (additionalUserInfo != null) {
-                val profile = additionalUserInfo.profile
-                val userProfile = hashMapOf(
-                    "uid" to userUid,
-                    "email" to profile?.get("email") as? String,
-                    "name" to profile?.get("nickname") as? String,
-                    "sns" to "kakao",
-                    "lastLogin" to FieldValue.serverTimestamp()
-                )
-                if (user != null) {
-                    db.collection("users")
-                        .document(userUid)
-                        .set(userProfile)
-                        .addOnSuccessListener {
-                            Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+            val userDoc = db.collection("users").document(userUid)
+            userDoc.get()
+                .addOnSuccessListener { document ->
+                    if(document.exists()) {
+                        userDoc.update("lastLogin",FieldValue.serverTimestamp())
+                            .addOnSuccessListener {
+                                Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "최근 로그인 정보 갱신 실패", e)
+                            }
+                    }
+                    else {
+                        // 추가 정보 확인
+                        val additionalUserInfo = authResult.additionalUserInfo
+                        if (additionalUserInfo != null) {
+                            val profile = additionalUserInfo.profile
+                            val userProfile = hashMapOf(
+                                "uid" to userUid,
+                                "email" to profile?.get("email") as? String,
+                                "name" to profile?.get("nickname") as? String,
+                                "sns" to "kakao",
+                                "lastLogin" to FieldValue.serverTimestamp()
+                            )
+                            if (user != null) {
+                                userDoc
+                                    .set(userProfile)
+                                    .addOnSuccessListener {
+                                        Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Firestore", "Firestore에 프로필 저장 실패: ", e)
+                                    }
+                            }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("Firestore", "Firestore에 프로필 저장 실패: ", e)
+                        else {
+                            Log.e("Firestore", "프로필 추가 정보가 없습니다.")
                         }
+                    }
                 }
-            }
-            else {
-               Log.e("Firestore", "프로필 추가 정보가 없습니다.")
-            }
-
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "문서 읽기 실패", e)
+                }
         }
         .addOnFailureListener { e ->
             // Firebase 인증 실패
             Log.e("FirebaseAuth", "Firebase 로그인 실패", e)
         }
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+fun initNaverLoginSDK(activity: Activity) {
+
+    NaverIdLoginSDK.initialize(
+        context = activity.applicationContext,
+        clientId = BuildConfig.NAVER_CLIENT_ID,
+        clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
+        clientName = BuildConfig.APPLICATION_ID
+    )
 }
 
 @Composable
@@ -205,32 +230,36 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
     }
 }
 
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = viewModel()
 
 
-    val googleSignInClient = rememberGoogleSignInClient()
-
-    val googleSignInLauncher = googleSignInHandler(
-        viewModel = loginViewModel,
-        navController = navController
-    )
+//    val googleSignInClient = rememberGoogleSignInClient()
+//
+//    val googleSignInLauncher = googleSignInHandler(
+//        viewModel = loginViewModel,
+//        navController = navController
+//    )
 
     NavHost(navController = navController, startDestination = "login") {
 
         composable("login") {
             LoginScreen(
-                onGoogleSignInClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                },
-                onKakaoSignInClick = { /* TODO: Kakao 로그인  */ },
-                onNaverSignInClick = { /* TODO: Naver 로그인  */ },
-                onLoginClick = {
-                    Auth.uid = "test-user-for-web"
-                    navController.navigate("nickname")
-                }
+                navController,
+//                onGoogleSignInClick = {
+//                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+//                },
+//                onKakaoSignInClick = { /* TODO: Kakao 로그인  */ },
+//                onNaverSignInClick = { /* TODO: Naver 로그인  */ },
+//                onLoginClick = {
+//                    Auth.uid = "test-user-for-web"
+//                    navController.navigate("nickname")
+//                }
             )
         }
 
