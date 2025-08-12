@@ -24,14 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
 
-@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudyDetailScreen() {
+fun StudyDetailScreen(navController: NavController) {
     val expandedIndex = remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
