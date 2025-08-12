@@ -11,8 +11,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+
     alias(libs.plugins.google.services) // CHANGED: plugins alias로 통일
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" // CHANGED: Kotlin(2.0.21)과 맞춤
+
 }
 
 android {
@@ -116,4 +122,9 @@ dependencies {
 
     // 아이콘
     implementation(libs.compose.material.icons.extended)
+
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 }
+

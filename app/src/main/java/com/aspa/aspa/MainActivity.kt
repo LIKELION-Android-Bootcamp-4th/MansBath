@@ -1,5 +1,6 @@
 package com.aspa.aspa
 
+
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -19,8 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
-import com.aspa.aspa.features.login.google.googleSignInHandler
-import com.aspa.aspa.features.login.google.rememberGoogleSignInClient
 import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
@@ -36,7 +35,9 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -238,12 +239,12 @@ fun AppNavigation() {
     val loginViewModel: LoginViewModel = viewModel()
 
 
-    val googleSignInClient = rememberGoogleSignInClient()
-
-    val googleSignInLauncher = googleSignInHandler(
-        viewModel = loginViewModel,
-        navController = navController
-    )
+//    val googleSignInClient = rememberGoogleSignInClient()
+//
+//    val googleSignInLauncher = googleSignInHandler(
+//        viewModel = loginViewModel,
+//        navController = navController
+//    )
 
     NavHost(navController = navController, startDestination = "login") {
 
