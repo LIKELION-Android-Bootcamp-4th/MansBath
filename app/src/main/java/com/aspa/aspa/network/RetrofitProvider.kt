@@ -1,6 +1,5 @@
 package com.aspa.aspa.network
 
-import com.aspa.aspa.data.remote.service.QuestionApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

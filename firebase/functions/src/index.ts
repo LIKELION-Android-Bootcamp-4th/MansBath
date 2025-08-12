@@ -7,7 +7,7 @@ import {Request, Response} from "express";
 import {getAiStudyResponse} from "./Study/get_ai_response";
 import {formatError} from "./Study/formetError";
 import {authApp} from "./auth/auth";
-import {questionApp} from "./question/question";
+import {question} from "./question/question";
 import {quizApp} from "./quiz/quiz";
 import {generateRoadmap} from "./roadmap/roadmap";
 import {loginWithNaver} from "./auth/naver";
@@ -41,8 +41,7 @@ export const addStudy = onRequest(
 // ✨ 분리된 함수 내보내기
 // =================================================================
 export const auth = onRequest({region: "asia-northeast3"}, authApp);
-export const question = onRequest({region: "asia-northeast3"}, questionApp);
-export const quiz = onRequest({region: "asia-northeast3"}, quizApp);
 export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmap);
+export const quiz = onRequest({region: "asia-northeast3"}, quizApp);
 
-export {loginWithNaver};
+export {loginWithNaver, question};
