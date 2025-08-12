@@ -81,7 +81,6 @@ class HomeViewModel : ViewModel() {
         if (!this::questionsCollection.isInitialized) return
         questionsCollection.document(questionId).update("title", newTitle)
     }
-
     fun createNewChat() {
         _uiState.update {
             it.copy(messages = emptyList(), activeConversationId = null, isReportFinished = false)
