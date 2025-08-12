@@ -11,8 +11,8 @@ export const makeQuiz = onCall(
   async (request) => {
     try {
     // 1. 사용자 인증
-      const uid = request.auth?.uid ?? "test-user-for-web"; // 기본 UID (테스트용)
-
+      const uid = "test-user-for-web"; // 기본 UID (테스트용)
+      // request.auth?.uid ??
       const quizName = request.data.quizName as string;
       if (!quizName) {
         throw new HttpsError(
