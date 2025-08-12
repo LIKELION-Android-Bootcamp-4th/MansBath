@@ -7,7 +7,7 @@ import com.google.firebase.functions.HttpsCallableResult
 import kotlinx.coroutines.tasks.await
 
 class QuestionRemoteDataSource {
-    private val functions = Firebase.functions
+    private val functions = Firebase.functions("asia-northeast3")
 
     suspend fun sendQuestion(question: String, questionId: String?): QuestionResponseDto? {
         val data = hashMapOf(
