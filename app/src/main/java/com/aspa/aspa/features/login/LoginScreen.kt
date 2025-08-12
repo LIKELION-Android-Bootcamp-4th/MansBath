@@ -24,14 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.login.components.SocialButton
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    onLoginClick: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -82,7 +82,7 @@ fun LoginScreen(navController: NavHostController) {
                         if (/* todo */ false) {  // 회원가입 시
                             navController.navigate("nickname")
                         } else {  // 로그인 시
-                            navController.navigate("home")
+                            onLoginClick
                         }
                     },
                     modifier = Modifier
@@ -124,5 +124,5 @@ fun LoginScreen(navController: NavHostController) {
 @Composable
 private fun LoginScreenPreview() {
     val nav = rememberNavController()
-    LoginScreen(navController = nav)
+    LoginScreen(navController = nav, onLoginClick = {})
 }
