@@ -21,6 +21,7 @@ import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
+import com.aspa.aspa.features.study.StudyScreen
 import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                AppNavigation()
+                StudyScreen()
             }
         }
     }

@@ -130,20 +130,20 @@ fun StudyDetailScreen() {
                     .background(Gray),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                dummyContentList.forEachIndexed { sectionIndex, detail ->
-                    itemsIndexed(detail.subtitle) { subIndex, subTitle ->
-                        val key = "$sectionIndex-$subIndex"
-                        ExpandableContentCard(
-                            index = subIndex,
-                            title = subTitle,
-                            content = detail.content.getOrNull(subIndex) ?: "",
-                            expanded = expandedIndex.value == key,
-                            onClick = {
-                                expandedIndex.value = if (expandedIndex.value == key) "" else key
-                            }
-                        )
-                    }
-                }
+//                dummyContentList.forEachIndexed { sectionIndex, detail ->
+//                    itemsIndexed(detail.subtitle) { subIndex, subTitle ->
+//                        val key = "$sectionIndex-$subIndex"
+//                        ExpandableContentCard(
+//                            index = subIndex,
+//                            title = subTitle,
+//                            content = detail.content.getOrNull(subIndex) ?: "",
+//                            expanded = expandedIndex.value == key,
+//                            onClick = {
+//                                expandedIndex.value = if (expandedIndex.value == key) "" else key
+//                            }
+//                        )
+//                    }
+//                }
 
             }
         }
