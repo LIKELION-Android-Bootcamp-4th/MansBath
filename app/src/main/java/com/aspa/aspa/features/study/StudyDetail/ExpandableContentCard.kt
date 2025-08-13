@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.aspa.aspa.model.ContentDetail
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
@@ -37,7 +39,7 @@ import com.aspa.aspa.ui.theme.Gray20
 fun ExpandableContentCard(
     index: Int,
     title: String,
-    content: String,
+    content: ContentDetail,
     expanded: Boolean,
     onClick: () -> Unit
 ) {
@@ -76,7 +78,7 @@ fun ExpandableContentCard(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Box(
+            Column (
                 modifier =  Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -86,18 +88,63 @@ fun ExpandableContentCard(
                         color = Color.Black.copy(alpha = 0.1f),
                     ),
 
-                contentAlignment = Alignment.TopStart
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
 
                 if (expanded) {
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                     Text(
-                        text = content,
+                        text = "학습개요",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                    )
+                    Text(
+                        text = content.overview,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.DarkGray,
                         modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 20.dp)
+                            .padding(horizontal = 20.dp)
                     )
+                    if (content.keyPoints.isNotEmpty()) {
+                    Text(
+                        text = "핵심 포인트",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ) { content.keyPoints.forEach{ point ->
+                        Row{
+                            Text("•  ", style = MaterialTheme.typography.bodySmall, color = Blue)
+                            Text(point, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Spacer(modifier = Modifier.height(height = 5.dp))
+                    }
+                    }
+                    }
+                    Text(
+                        text = "핵심 내용",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                    )
+                    Text(
+                        text = content.details,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.DarkGray,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 }
 
             }

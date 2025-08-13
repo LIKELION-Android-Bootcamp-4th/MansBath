@@ -1,10 +1,10 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {logger} from "firebase-functions";
 import {
   getOrCreateQuestion,
   saveConversation,
 } from "./firestore_service";
-import { getAiResponse } from "./gen_ai_service";
+import {getAiResponse} from "./gen_ai_service";
 
 /**
  * @summary 사용자 질문을 처리하고 AI 응답을 반환하는 메인 API 엔드포인트.
@@ -24,12 +24,12 @@ export const question = onCall(async (request) => {
       throw new HttpsError("invalid-argument", "The 'question' field is required.");
     }
 
-    const { questionRef, history, questionId: newQuestionId } =
+    const {questionRef, history, questionId: newQuestionId} =
       await getOrCreateQuestion(uid, questionId);
 
     const aiResponse = await getAiResponse(history, userQuestion);
 
-    await saveConversation(questionRef, { history, userQuestion, aiResponse });
+    await saveConversation(questionRef, {history, userQuestion, aiResponse});
 
     return {
       ...aiResponse,
