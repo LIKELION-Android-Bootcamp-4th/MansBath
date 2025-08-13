@@ -24,17 +24,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.aspa.aspa.features.state.UiState
+import com.aspa.aspa.model.Study
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
 
-@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudyDetailScreen() {
-    val expandedIndex = remember { mutableStateOf("") }
+fun StudyDetailScreen(
+    uiState: UiState<Study>,
+    onRetry: () -> Unit
+) {
     val listState = rememberLazyListState()
-
+    val study = (uiState as? UiState.Success<Study>)?.data
+    val sections = study?.items ?: emptyList()
+    val expanded = remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
 
     Scaffold(
@@ -47,7 +53,7 @@ fun StudyDetailScreen() {
 
                     ) {
                         Text(
-                            text = "React Hook 심화 학습",
+                            text = study?.title.orEmpty(),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Black
                         )
@@ -122,30 +128,56 @@ fun StudyDetailScreen() {
             }
         },
         content = { padding ->
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .background(Gray),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-//                dummyContentList.forEachIndexed { sectionIndex, detail ->
-//                    itemsIndexed(detail.subtitle) { subIndex, subTitle ->
-//                        val key = "$sectionIndex-$subIndex"
-//                        ExpandableContentCard(
-//                            index = subIndex,
-//                            title = subTitle,
-//                            content = detail.content.getOrNull(subIndex) ?: "",
-//                            expanded = expandedIndex.value == key,
-//                            onClick = {
-//                                expandedIndex.value = if (expandedIndex.value == key) "" else key
-//                            }
-//                        )
-//                    }
-//                }
+            when (uiState) {
+                UiState.Loading -> {
+                    Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is UiState.Failure -> {
+                    Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(uiState.message ?: "오류가 발생했어요.")
+                            Spacer(Modifier.height(12.dp))
+                            Button(onClick = onRetry) { Text("다시 시도") }
+                        }
+                    }
+                }
+                UiState.Idle, is UiState.Success -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .padding(padding)
+                            .fillMaxSize()
+                            .background(Gray),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        sections.forEachIndexed { sIdx, sec ->
+                            val count = minOf(sec.subtitle.size, sec.content.size)
 
+                            items(count, key = { subIdx -> "row-$sIdx-$subIdx" }) { subIdx ->
+                                val title = sec.subtitle[subIdx]
+                                val detail = sec.content[subIdx]
+                                val isExpanded = expanded.value == Pair(sIdx, subIdx)
+
+                                ExpandableContentCard(
+                                    index = subIdx + 1,
+                                    title = title,
+                                    content = detail,
+                                    expanded = isExpanded,
+                                    onClick = {
+                                        expanded.value = if (isExpanded) null else Pair(sIdx, subIdx)
+                                    }
+                                )
+                                Spacer(Modifier.height(10.dp))
+                            }
+
+                            item { Spacer(Modifier.height(6.dp)) } // 섹션 간 간격
+                        }
+                    }
+                }
             }
         }
     )
 }
+

@@ -3,6 +3,7 @@ package com.aspa.aspa.features.study
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,15 +61,17 @@ import com.aspa.aspa.ui.theme.Gray10
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun StudyScreen (viewModel: StudyViewModel = hiltViewModel()){
-    val state by viewModel.uiState.collectAsState()
-
+fun StudyScreen (
+    uiState: UiState<Study>,
+    onClickItem: () -> Unit,
+    onRefresh: () -> Unit
+){
 
     LaunchedEffect(Unit) {
-        viewModel.fetchStudy()
+        onRefresh()
     }
 
-    val study : Study? = (state as? UiState.Success<Study>)?.data
+    val study : Study? = (uiState as? UiState.Success<Study>)?.data
     val contentList = study?.items ?: emptyList()
 
 
@@ -147,7 +150,8 @@ fun StudyScreen (viewModel: StudyViewModel = hiltViewModel()){
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .size(30.dp)
-                                .background(Blue, shape = CircleShape),
+                                .background(Blue, shape = CircleShape)
+                                .clickable { onClickItem() },
                             contentAlignment = Alignment.Center
                         ) {
                             Row(

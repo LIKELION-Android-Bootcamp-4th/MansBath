@@ -1,9 +1,12 @@
 package com.aspa.aspa.di
 
+import com.aspa.aspa.data.remote.StudyFireStoreDataSource
 import com.aspa.aspa.data.repository.GoogleRepositoryImpl
 import com.aspa.aspa.data.repository.AuthRepository
+import com.aspa.aspa.data.repository.StudyFireStoreRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
