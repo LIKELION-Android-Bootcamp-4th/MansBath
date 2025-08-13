@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
+import com.aspa.aspa.features.login.navigation.LoginDestinations
 
 @Composable
 fun LoginScreen(
@@ -79,11 +80,12 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        if (/* todo */ false) {  // 회원가입 시
-                            navController.navigate("nickname")
-                        } else {  // 로그인 시
-                            onLoginClick
-                        }
+//                        if (/* todo */ false) {  // 회원가입 시
+//                            navController.navigate("nickname")
+//                        } else {  // 로그인 시
+//                            onLoginClick
+//                        }
+                        navController.navigate(LoginDestinations.NICKNAME)
                     },
                     modifier = Modifier
                         .fillMaxWidth(),

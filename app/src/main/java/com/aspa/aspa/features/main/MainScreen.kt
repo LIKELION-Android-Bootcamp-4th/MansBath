@@ -22,12 +22,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
+import com.aspa.aspa.features.home.navigation.homeGraph
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
 import com.aspa.aspa.features.main.navigation.BottomTab
 import com.aspa.aspa.features.main.navigation.mainGraph
+import com.aspa.aspa.features.mypage.navigation.mypageGraph
+import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
+import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +106,11 @@ fun MainScreen(
                 startDestination = BottomTab.Home.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                mainGraph(innerNavController)
+//                mainGraph(innerNavController)
+                homeGraph(navController = innerNavController, homeViewModel = HomeViewModel())
+                roadmapGraph(navController = innerNavController)
+                quizGraph(navController = innerNavController)
+                mypageGraph(navController = innerNavController)
             }
         }
     }

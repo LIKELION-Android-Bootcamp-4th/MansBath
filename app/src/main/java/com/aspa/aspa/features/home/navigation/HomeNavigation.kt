@@ -12,6 +12,8 @@ import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
 import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.home.HomeViewModel
+import com.aspa.aspa.features.main.navigation.BottomTab
+import com.aspa.aspa.features.main.navigation.MainDestinations
 
 
 fun NavGraphBuilder.homeGraph(

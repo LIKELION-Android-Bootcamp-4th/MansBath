@@ -23,20 +23,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.model.Section
-import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
-import kotlin.collections.forEach
 
 @Composable
 fun QuizListCard(
@@ -206,10 +203,10 @@ fun QuizListCard(
                             modifier = Modifier.fillMaxWidth()
                                 .clickable{
                                     if(it.status == true) {
-                                        navController.navigate(QuizScreenRoute.QuizResult.route)
+                                        navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {
-                                        navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                                        navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },
                             border = BorderStroke(1.dp, Color.Black.copy(0.1f)),
