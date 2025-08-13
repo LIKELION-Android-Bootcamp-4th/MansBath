@@ -2,10 +2,11 @@ package com.aspa.aspa.data.repository
 
 import com.aspa.aspa.data.remote.QuestionRemoteDataSource
 import com.aspa.aspa.data.remote.dto.QuestionResponseDto
+import javax.inject.Inject
 
-class QuestionRepository {
-    private val questionRemoteDataSource = QuestionRemoteDataSource()
-
+class QuestionRepository @Inject constructor(
+    private val questionRemoteDataSource: QuestionRemoteDataSource
+) {
     /**
      * 질문 DTO 처리
      * 추후 onCall 방식 처리 시 기본 골자
