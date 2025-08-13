@@ -1,9 +1,23 @@
+// 0813 11:15 최종
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    // users/{userId} 경로 아래의 모든 문서에 적용
+    match /users/{userId}/{document=**} {
+      // 1. 로그인한 사용자가 자기 자신의 데이터에 접근하는 것을 허용 (기존 규칙)
+      // OR
+      // 2. 접근하려는 데이터가 'test-user-for-web'의 것인 경우 로그인 없이도 허용 (테스트용)
+      allow read, write: if (
+        // 카카오 계정  // 카카오 계정은 파이어베이스 oidc 제공자를 사용하므로 auth.uid 커스텀이 불가능
+        (request.auth != null && userId == "kakao:" + request.auth.uid) 
+        // 구글 계정
+        || (request.auth != null && userId == "google:" + request.auth.uid)
+        // 그 외 소셜 로그인 계정 // naver
+        || (request.auth != null && userId == request.auth.uid)
+        // 테스트 계정
+        || userId == "test-user-for-web"
+      );
     }
   }
 }
