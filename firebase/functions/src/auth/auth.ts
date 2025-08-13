@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.post("/google", loginWithGoogle);
 // app.post("/kakao", loginWithKakao);
-// app.post("/naver", loginWithNaver);
+// app.post("/naver", loginWithNaver);  // onRequest -> onCall 로 구조 변경  // index.ts에서 바로 export
 
 /**
  * 이 앱은 SNS 로그인 요청을 처리하는 엔트리 포인트입니다.
