@@ -5,7 +5,7 @@ import {question} from "./question/question";
 import {generateRoadmap} from "./roadmap/roadmap";
 import {makeQuiz} from "./quiz/quiz";
 import {loginWithNaver} from "./auth/naver";
-
+import {Study} from "./Study/study";
 
 // Firebase Admin SDK 초기화
 initializeApp();
@@ -19,3 +19,6 @@ export {question};
 export {makeQuiz};
 
 export {loginWithNaver};
+export {Study};
+
+
