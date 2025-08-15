@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
@@ -31,10 +33,16 @@ import com.aspa.aspa.ui.components.QuizNav.QuizNav
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizScreen(navController: NavController) {
+fun QuizScreen(
+    navController: NavController,
+    viewModel: QuizViewModel = hiltViewModel()
+) {
     val expandedIndex = remember { mutableStateOf(-1) }
     val dummyRoadmapList = DummySection.dummyRoadmapList
 
+    LaunchedEffect(Unit) {
+        viewModel.getRoadmapForQuiz("test-user-for-web")
+    }
     Scaffold(
         topBar = {
             TopAppBar(

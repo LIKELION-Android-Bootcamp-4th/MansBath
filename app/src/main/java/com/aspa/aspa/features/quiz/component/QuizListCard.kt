@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz.component
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aspa.aspa.model.Section
 import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
+import com.google.firebase.Firebase
+import com.google.firebase.functions.HttpsCallableResult
+import com.google.firebase.functions.functions
 import kotlin.collections.forEach
 
 @Composable
@@ -157,9 +161,25 @@ fun QuizListCard(
                             Text(
                                 text = "시작하기",
                                 textDecoration = TextDecoration.Underline,
-                                /*modifier = Modifier.clickable {
-                                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
-                                }*/
+                                modifier = Modifier.clickable {
+                                    val functions = Firebase.functions("asia-northeast3")
+
+                                    // 로컬 테스트 전용
+                                    functions.useEmulator("10.0.2.2", 5001)
+
+                                    val data = hashMapOf(
+                                        "quizName" to "3주 초단기 JLPT N3 합격 로드맵"
+                                    )
+
+                                    functions.getHttpsCallable("makeQuiz")
+                                        .call(data)
+                                        .addOnSuccessListener { result: HttpsCallableResult ->
+                                            Log.d("makeQuiz", "성공: ${result.getData()}")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e("makeQuiz", "오류 발생", e)
+                                        }
+                                }
                             )
                         } else {
                             Text(
