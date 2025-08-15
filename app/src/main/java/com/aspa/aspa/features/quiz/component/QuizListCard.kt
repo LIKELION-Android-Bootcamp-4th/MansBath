@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aspa.aspa.data.dto.StageDto
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.model.Section
 
@@ -40,7 +41,7 @@ fun QuizListCard(
     index: Int,
     title: String,
     description: String,
-    section: List<Section>,
+    stages: List<StageDto>,
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
@@ -196,13 +197,13 @@ fun QuizListCard(
                 ) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    section.forEach {
-                        val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
+                    stages.forEach {
+                        val tintColor = if (it.isSolved == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
                             modifier = Modifier.fillMaxWidth()
                                 .clickable{
-                                    if(it.status == true) {
+                                    if(it.isSolved == true) {
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {

@@ -19,11 +19,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,14 +38,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 
 
 @Composable
-fun SolveQuizScreen(navController: NavController) {
-    var selectedOption by remember { mutableStateOf("useState") }
+fun SolveQuizScreen(
+    navController: NavController,
+    viewModel: QuizViewModel
+) {
+    var selectedOption by remember { mutableStateOf("") }
+    val quizState by viewModel.quizState.collectAsState()
+    val solvingValue by viewModel.solvingValue.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getQuiz("test-user-for-web", "FoHU41n6Mr4OxTea1X4d")
+    }
 
     Scaffold(
         content = { padding->
@@ -58,134 +71,159 @@ fun SolveQuizScreen(navController: NavController) {
                         .padding(bottom = 16.dp)
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "React 기초 퀴즈",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                    )
+                when(val state = quizState) {
+                    QuizState.Loading -> CircularProgressIndicator()
+                    is QuizState.Success -> {
+                        val solvingNum = solvingValue + 1
+                        val sizeNum = state.quiz.questions.size
 
-                    Text(
-                        text = "1/3",
-                        color = Color.Gray
-                    )
-                }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = state.quiz.quizTitle,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                            )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "${solvingNum}/${sizeNum}",
+                                color = Color.Gray
+                            )
+                        }
 
-                LinearProgressIndicator(
-                    progress = 1f / 3f,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
+                        LinearProgressIndicator(
+                            progress = { solvingNum.toFloat() / sizeNum.toFloat() },
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, Color(0xFF000000).copy(0.1f)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("React에서 컴포넌트의 상태를 관리하기 위해 사용하는 Hook은?")
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            border = BorderStroke(1.dp, Color(0xFF000000).copy(0.1f)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                val solvingQuiz = state.quiz.questions[solvingValue]
 
-                        val options = listOf("useEffect", "useState", "useContext", "useReducer")
-                        options.forEach { option ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .clickable { selectedOption = option }
-                                    .height(IntrinsicSize.Min)
-                            ) {
-                                RadioButton(
-                                    selected = selectedOption == option,
-                                    onClick = { selectedOption = option }
-                                )
+                                Text(solvingQuiz.question)
 
-                                val optionText = @Composable{
-                                    Text(
-                                        text = option,
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                val options = solvingQuiz.options
+                                options.forEach { option ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier
-                                            .padding(horizontal = 6.dp)
-                                    )
-                                }
-
-                                if (selectedOption == option) {
-                                    Card(
-                                        modifier = Modifier
-                                            .padding(start = 4.dp)
                                             .fillMaxWidth()
-                                            .fillMaxHeight(),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = Color(0xFF3497F9)
-                                            ),
-                                        shape = RoundedCornerShape(8.75.dp)
+                                            .padding(vertical = 4.dp)
+                                            .clickable { selectedOption = option }
+                                            .height(IntrinsicSize.Min)
                                     ) {
-                                        Box(contentAlignment = Alignment.CenterStart,
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
+                                        RadioButton(
+                                            selected = selectedOption == option,
+                                            onClick = { selectedOption = option }
+                                        )
+
+                                        val optionText = @Composable{
+                                            Text(
+                                                text = option,
+                                                modifier = Modifier
+                                                    .padding(horizontal = 6.dp)
+                                            )
+                                        }
+
+                                        if (selectedOption == option) {
+                                            Card(
+                                                modifier = Modifier
+                                                    .padding(start = 4.dp)
+                                                    .fillMaxWidth()
+                                                    .fillMaxHeight(),
+                                                colors = CardDefaults.cardColors(
+                                                    containerColor = Color(0xFF3497F9)
+                                                ),
+                                                shape = RoundedCornerShape(8.75.dp)
+                                            ) {
+                                                Box(contentAlignment = Alignment.CenterStart,
+                                                    modifier = Modifier.fillMaxSize()
+                                                ) {
+                                                    optionText()
+                                                }
+
+                                            }
+                                        } else {
                                             optionText()
                                         }
 
                                     }
-                                } else {
-                                    optionText()
                                 }
+                            }
+                        }
 
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Button(
+                                onClick = {
+                                    viewModel.changeSolvingValue(SolvingState.PREVIOUS)
+                                    selectedOption = ""
+                                },
+                                enabled = solvingValue != 0,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("이전")
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Button(
+                                onClick = {
+                                    if(solvingNum == sizeNum) {
+                                        navController.navigate(QuizDestinations.QUIZ_RESULT)
+                                    }
+                                    else {
+                                        viewModel.changeSolvingValue(SolvingState.NEXT)
+                                        viewModel.changeSolvingChosen(solvingValue, selectedOption)
+                                        selectedOption = ""
+                                    }
+                                },
+                                enabled = selectedOption.isNotEmpty(),
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF3497F9)
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                if(solvingNum == sizeNum) {
+                                    Text("제출")
+                                }
+                                else Text("다음")
                             }
                         }
                     }
+
+                    is QuizState.Error -> Text("에러 발생: ${state.error}")
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("이전")
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = {
-                            navController.navigate(QuizDestinations.QUIZ_RESULT)
-                        },
-                        enabled = selectedOption.isNotEmpty(),
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3497F9)
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("다음")
-                    }
-                }
-
             }
-
         }
     )
 }
 
+/*
 @Preview
 @Composable
 fun SolveQuizScreenPreview() {
     val navController = rememberNavController()
     SolveQuizScreen(navController = navController)
-}
+}*/

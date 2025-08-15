@@ -1,11 +1,14 @@
 package com.aspa.aspa.features.roadmap.navigation
 
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.aspa.aspa.features.quiz.QuizScreen
+import com.aspa.aspa.features.quiz.QuizViewModel
 import com.aspa.aspa.features.roadmap.RoadmapDetailScreen
 import com.aspa.aspa.features.roadmap.RoadmapListScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapDialog
@@ -50,7 +53,11 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
         StudyScreen()
     }
 
-    composable(RoadmapDestinations.QUIZ) {
-        QuizScreen(navController = navController)
+    composable(RoadmapDestinations.QUIZ) { backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry("quizGraph")
+        }
+        val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+        QuizScreen(navController, viewModel)
     }
 }

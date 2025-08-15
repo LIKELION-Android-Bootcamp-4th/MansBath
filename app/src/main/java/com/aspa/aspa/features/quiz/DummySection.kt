@@ -22,7 +22,7 @@ class DummySection {
                         status = true,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
@@ -36,7 +36,7 @@ class DummySection {
                         status = false,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
@@ -60,7 +60,7 @@ class DummySection {
                         status = false,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
@@ -74,7 +74,7 @@ class DummySection {
                         status = false,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
@@ -96,7 +96,7 @@ class DummySection {
                         status = true,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
@@ -110,7 +110,7 @@ class DummySection {
                         status = true,
                         quiz = Quiz(
                             question = "TODO()",
-                            choices = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
+                            options = listOf("TODO1()", "answer", "TODO2()", "TODO3()"),
                             answer = "answer",
                             chosen = "answer",
                             description = ""
