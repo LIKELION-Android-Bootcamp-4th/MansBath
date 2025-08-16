@@ -20,7 +20,7 @@ class QuestionRemoteDataSource {
             .call(data)
             .await()
 
-        val resultMap = result.data as? Map<String, Any> ?: return null
+        val resultMap = result.getData() as? Map<String, Any> ?: return null
 
         return QuestionResponseDto(
             questionId = resultMap["questionId"] as String,

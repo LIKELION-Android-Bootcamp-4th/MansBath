@@ -21,6 +21,10 @@ import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
+import com.aspa.aspa.features.roadmap.CreateStudy
+import com.aspa.aspa.features.roadmap.RoadmapDetailScreen
+import com.aspa.aspa.features.roadmap.RoadmapListScreen
+import com.aspa.aspa.features.roadmap.components.RoadmapDialog
 import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
@@ -47,8 +51,9 @@ class MainActivity : ComponentActivity() {
         initNaverLoginSDK(this)
 
         setContent {
+
             AspaTheme {
-                AppNavigation()
+                CreateStudy()
             }
         }
     }
