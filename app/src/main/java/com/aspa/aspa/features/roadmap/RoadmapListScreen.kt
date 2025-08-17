@@ -29,7 +29,7 @@ fun RoadmapListScreen(
         LazyColumn {
             items(sampleRoadmaps.size) { index ->
                 RoadmapCard(sampleRoadmaps[index]) {
-                    navController.navigate("roadmapDetail/${sampleRoadmaps[index].title}")  // todo: title -> id
+                    navController.navigate("roadmap/detail/${sampleRoadmaps[index].title}")  // todo: title -> id
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
