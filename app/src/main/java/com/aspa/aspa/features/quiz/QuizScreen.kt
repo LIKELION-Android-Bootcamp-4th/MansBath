@@ -39,9 +39,9 @@ fun QuizScreen(
     viewModel: QuizViewModel
 ) {
     val expandedIndex = remember { mutableStateOf(-1) }
-    val roadmapListState by viewModel.roadmapListState.collectAsState()
+    val quizListState by viewModel.quizListState.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.getRoadMapForQuiz("test-user-for-web")
+        viewModel.getQuizzes("test-user-for-web")
     }
 
 
@@ -84,42 +84,28 @@ fun QuizScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                when(val state = roadmapListState) {
-                    RoadmapListState.Loading -> CircularProgressIndicator()
-                    is RoadmapListState.Success ->
+                when(val state = quizListState) {
+                    QuizListState.Loading -> CircularProgressIndicator()
+                    is QuizListState.Success ->
                         LazyColumn {
-                            itemsIndexed(state.roadmap) { index, item ->
+                            itemsIndexed(state.quizzes) { index, item ->
                                 QuizListCard(
                                     index = index,
-                                    title = item.roadmap.title,
-                                    description = item.roadmap.description,
-                                    stages = item.roadmap.stages,
+                                    title = item.quiz[0].studyId,
+                                    description = item.quiz[0].studyId,
+                                    quizzes = item.quiz,
                                     expandedIndex = expandedIndex.value,
                                     completedSection = 2,
                                     allSection = 6,
                                     onClick = { expandedIndex.value = it },
                                     navController = navController,
+                                    viewModel = viewModel
                                 )
                             }
                         }
-                    is RoadmapListState.Error -> Text("에러 발생: ${state.error}")
+                    is QuizListState.Error -> Text("에러 발생: ${state.error}")
                 }
 
-                /*LazyColumn {
-                    items(dummyRoadmapList.size) { index ->
-                        QuizListCard(
-                            index,
-                            dummyRoadmapList[index].title,
-                            dummyRoadmapList[index].description,
-                            dummyRoadmapList[index].sections,
-                            expandedIndex.value,
-                            dummyRoadmapList[index].completedSection,
-                            dummyRoadmapList[index].allSection,
-                            { expandedIndex.value = it },
-                            navController
-                        )
-                    }
-                }*/
             }
         }
     )

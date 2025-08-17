@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +51,10 @@ fun QuizResultScreen(
     viewModel: QuizViewModel
 ) {
     val quizState by viewModel.quizState.collectAsState()
-
+    val chosenAnswerList by viewModel.chosenAnswerList.collectAsState()
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .padding(vertical = 8.dp, horizontal = 24.dp)
     ) {
         // 상단 내비게이션
         Text(
@@ -77,6 +77,13 @@ fun QuizResultScreen(
             QuizState.Loading -> CircularProgressIndicator()
             is QuizState.Success -> {
                 val questions =  state.quiz.questions
+                LaunchedEffect(chosenAnswerList) {
+                    if (chosenAnswerList[0] != "") {
+
+                        viewModel.syncChosenToQuestions()
+                    }
+                }
+
                 val correctQuestions = questions.count { it.answer == it.chosen }
                 val totalQuestions = questions.size
                 val score = (correctQuestions.toFloat() / totalQuestions.toFloat() * 100).toInt()
@@ -207,8 +214,15 @@ fun QuizResultScreen(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            //TODO: 새로운 퀴즈 풀기 기능
-
+                            // 기존 퀴즈 데이터 삭제
+                            viewModel.deleteQuiz(
+                                "test-user-for-web",
+                                state.quiz.roadmapId,
+                                state.quiz.quizTitle
+                            )
+                            // 새 퀴즈 요청
+                            viewModel.requestQuiz(state.quiz.studyId)
+                            navController.navigate(QuizDestinations.SOLVE_QUIZ)
                         },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp)
@@ -221,6 +235,7 @@ fun QuizResultScreen(
                     Button(
                         onClick = {
                             //TODO: 다시 풀기 기능
+                            viewModel.solveQuizAgain()
                             navController.navigate(QuizDestinations.SOLVE_QUIZ)
                         },
                         modifier = Modifier.weight(1f),

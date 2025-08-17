@@ -1,6 +1,8 @@
 package com.aspa.aspa.data.repository
 
 import com.aspa.aspa.data.dto.QuizDto
+import com.aspa.aspa.data.dto.QuizDtoAlpha
+import com.aspa.aspa.data.dto.QuizzesDto
 import com.aspa.aspa.data.dto.RoadmapDto
 import com.aspa.aspa.data.dto.RoadmapDtoAlpha
 import com.aspa.aspa.data.remote.QuizRemoteDataSource
@@ -11,30 +13,50 @@ import javax.inject.Inject
 class QuizRepository @Inject constructor(
     private val remoteDataSource: QuizRemoteDataSource
 ) {
-    suspend fun getRoadmapForQuiz(uid: String): Result<List<RoadmapDtoAlpha>> {
+    suspend fun getQuizzes(uid: String): Result<List<QuizzesDto>> {
         return try {
-            val roadmap = remoteDataSource.getRoadmapForQuiz(uid)
-            Result.success(roadmap)
+            val quizzes = remoteDataSource.getQuizzes(uid)
+            Result.success(quizzes)
         }
         catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun getQuiz(uid: String, quizId: String): Result<QuizDto?> {
+    suspend fun getQuiz(uid: String, roadmapId: String, quizTitle: String): Result<QuizDto?> {
         return try {
-            val roadmap = remoteDataSource.getQuiz(uid, quizId)
-            Result.success(roadmap)
+            val quiz = remoteDataSource.getQuiz(uid, roadmapId, quizTitle)
+            Result.success(quiz)
         }
         catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun sendToMakeQuiz(data: String): Result<Boolean> {
+    suspend fun deleteQuiz(uid: String, roadmapId: String, quizTitle: String): Result<Boolean> {
         return try {
-            val data = remoteDataSource.sendToMakeQuiz(data)
-            Result.success(true)
+            val quiz = remoteDataSource.deleteQuiz(uid, roadmapId, quizTitle)
+            Result.success(quiz)
+        }
+        catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateQuizSolveResult(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>): Result<Boolean> {
+        return try {
+            val isSuccess = remoteDataSource.updateQuizSolveResult(uid, roadmapId, quizTitle, chosenList)
+            Result.success(isSuccess)
+        }
+        catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sendToMakeQuiz(studyId: String): Result<QuizDto> {
+        return try {
+            val data = remoteDataSource.sendToMakeQuiz(studyId)
+            Result.success(data)
         }
         catch (e: Exception) {
             Result.failure(e)

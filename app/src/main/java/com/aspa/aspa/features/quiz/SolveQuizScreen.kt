@@ -54,13 +54,13 @@ fun SolveQuizScreen(
     val solvingValue by viewModel.solvingValue.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getQuiz("test-user-for-web", "FoHU41n6Mr4OxTea1X4d")
+        viewModel.solveQuizAgain()
     }
 
     Scaffold(
         content = { padding->
             Column (
-                modifier = Modifier.padding(padding).padding(10.dp)
+                modifier = Modifier.padding(14.dp)
             ) {
                 Text(
                     text = "← 나가기",
@@ -72,7 +72,13 @@ fun SolveQuizScreen(
                 )
 
                 when(val state = quizState) {
-                    QuizState.Loading -> CircularProgressIndicator()
+                    QuizState.Loading -> {
+                        CircularProgressIndicator()
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text("퀴즈를 불러오고 있습니다..")
+                    }
                     is QuizState.Success -> {
                         val solvingNum = solvingValue + 1
                         val sizeNum = state.quiz.questions.size
@@ -190,6 +196,12 @@ fun SolveQuizScreen(
                             Button(
                                 onClick = {
                                     if(solvingNum == sizeNum) {
+                                        viewModel.changeSolvingChosen(solvingValue, selectedOption)
+                                        viewModel.saveSolvedChosen("test-user-for-web",
+                                            state.quiz.roadmapId,
+                                            state.quiz.quizTitle,
+                                            viewModel.chosenAnswerList.value
+                                        )
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {
