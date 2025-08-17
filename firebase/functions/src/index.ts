@@ -1,11 +1,11 @@
-import {onRequest} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
 
 import {question} from "./question/question";
 import {generateRoadmap} from "./roadmap/roadmap";
-import {makeQuiz} from "./quiz/quiz";
-import {loginWithNaver} from "./auth/naver";
 import {Study} from "./Study/study";
+import {makeQuiz} from "./quiz/quiz";
+
+import {loginWithNaver} from "./auth/naver";
 
 // Firebase Admin SDK 초기화
 initializeApp();
@@ -13,12 +13,10 @@ initializeApp();
 // =================================================================
 // ✨ 분리된 함수 내보내기
 // =================================================================
-export const roadmap = onRequest({region: "asia-northeast3"}, generateRoadmap);
 
 export {question};
+export {generateRoadmap};
+export {Study};
 export {makeQuiz};
 
 export {loginWithNaver};
-export {Study};
-
-
