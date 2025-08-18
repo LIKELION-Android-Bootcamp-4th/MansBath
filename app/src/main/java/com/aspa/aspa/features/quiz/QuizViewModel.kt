@@ -3,19 +3,34 @@ package com.aspa.aspa.features.quiz
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aspa.aspa.data.dto.QuizDto
+import com.aspa.aspa.data.dto.QuizDtoAlpha
+import com.aspa.aspa.data.dto.QuizzesDto
+import com.aspa.aspa.data.dto.RoadmapDtoAlpha
 import com.aspa.aspa.data.repository.QuizRepository
-import com.aspa.aspa.model.Quiz
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// UI 상태를 나타내는 클래스 (로딩, 성공, 실패 등)
-sealed interface QuizUiState {
-    data object Loading : QuizUiState
-    data class Success(val quiz: List<Quiz>) : QuizUiState
-    data class Error(val message: String) : QuizUiState
+sealed interface QuizListState {
+    data object Loading : QuizListState
+    data class Success(val quizzes: List<QuizzesDto>) : QuizListState
+    data class Error(val error: String) : QuizListState
+}
+
+sealed interface QuizState {
+    data object Loading : QuizState
+    data class Success(val quiz: QuizDto) : QuizState
+    data class Error(val error: String) : QuizState
+}
+
+enum class SolvingState {
+    NEXT,
+    PREVIOUS
 }
 
 @HiltViewModel
@@ -23,57 +38,146 @@ class QuizViewModel @Inject constructor(
     private val repository: QuizRepository
 ) : ViewModel() {
 
-    // 퀴즈 목록 UI 상태를 관리하는 StateFlow
-    private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
-    val quizUiState: StateFlow<QuizUiState> = _quizUiState
+    private val _quizListState = MutableStateFlow<QuizListState>(QuizListState.Loading)
+    val quizListState: StateFlow<QuizListState> = _quizListState
 
-    fun getQuiz(uid: String, quizId: String) {
-        // ViewModel이 활성화된 동안만 동작하는 코루틴 스코프
+    private val _quizState = MutableStateFlow<QuizState>(QuizState.Loading)
+    val quizState: StateFlow<QuizState> = _quizState
+
+    private val _solvingValue = MutableStateFlow<Int>(0)
+    val solvingValue: StateFlow<Int> = _solvingValue
+
+    private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
+    val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
+
+    fun getQuizzes(uid: String) {
         viewModelScope.launch {
-            _quizUiState.value = QuizUiState.Loading // 로딩 상태로 변경
-
-            repository.getQuiz(uid, quizId)
-                .onSuccess { quizDto ->
-                    // 성공 시 데이터 전달
-                    if(quizDto != null) {
-                        _quizUiState.value = QuizUiState.Success(quizDto.questions)
+            _quizListState.value = QuizListState.Loading
+            repository.getQuizzes(uid)
+                .onSuccess { quizzes ->
+                    Log.d("QuizViewModel", "퀴즈 리스트 불러오기 성공")
+                    _quizListState.value = QuizListState.Success(quizzes)
+                    quizzes.forEach {
+                        Log.d("QuizViewModel", it.toString())
+                        it.quiz.forEach {
+                            Log.d("QuizViewModel", it.quizTitle)
+                        }
                     }
-                    else _quizUiState.value = QuizUiState.Error("퀴즈 값이 없습니다.")
-                }
-                .onFailure { exception ->
-                    _quizUiState.value = QuizUiState.Error(exception.message ?: "알 수 없는 오류") // 실패 시 에러 메시지 전달
-                }
-        }
-    }
 
-    fun getRoadmapForQuiz(uid: String) {
-        viewModelScope.launch {
-            // _quizUiState.value = QuizUiState.Loading // 로딩 상태로 변경
-
-            repository.getRoadmapForQuiz(uid)
-                .onSuccess { roadmap ->
-                    Log.d("QuizViewModel", "데이터 불러오기 성공: $roadmap")
                 }
-                .onFailure { exception ->
-                    Log.e("QuizViewModel", "데이터 불러오기 실패: ", exception)
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 리스트 불러오기 실패", e)
+                    _quizListState.value = QuizListState.Error(e.message ?: "알 수 없는 오륲")
                 }
         }
     }
 
-
-
-    // 퀴즈 생성을 요청하는 함수
-    fun requestMakeQuiz(data: String) {
+    fun getQuiz(uid: String, roadmapId: String, quizTitle: String) {
         viewModelScope.launch {
-            // TODO: 퀴즈 생성 요청에 대한 UI 상태 처리 (예: 로딩 스피너 표시)
+            _quizState.value = QuizState.Loading
+            repository.getQuiz(uid, roadmapId, quizTitle)
+                .onSuccess { quiz ->
+                    Log.d("QuizViewModel", "퀴즈 불러오기 성공")
+                    if (quiz != null) {
+                        _quizState.value = QuizState.Success(quiz)
+                    } else {
+                        _quizState.value = QuizState.Error("요청한 퀴즈 데이터가 잘못되었습니다.")
+                    }
 
-            repository.sendToMakeQuiz(data)
+                }
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 불러오기 실패", e)
+                    _quizState.value = QuizState.Error(e.message ?: "알 수 없는 오륲")
+                }
+        }
+    }
+
+    fun deleteQuiz(uid: String, roadmapId: String, quizTitle: String) {
+        viewModelScope.launch {
+            repository.deleteQuiz(uid, roadmapId, quizTitle)
+                .onSuccess { success ->
+                    if (success) {
+                        Log.d("QuizViewModel", "퀴즈 삭제 성공")
+                    } else {
+                        Log.e("QuizViewModel", "퀴즈 삭제 중 문제 발생..")
+                    }
+
+                }
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 삭제 실패", e)
+                }
+        }
+    }
+
+    fun requestQuiz(studyId: String) {
+        viewModelScope.launch {
+            _quizState.value = QuizState.Loading
+            repository.sendToMakeQuiz(studyId)
+                .onSuccess { quiz ->
+                    Log.d("QuizViewModel", "퀴즈 생성 성공")
+                    if (quiz.quizTitle != "") {
+                        _quizState.value = QuizState.Success(quiz)
+                    } else {
+                        _quizState.value = QuizState.Error("요청한 스터디 데이터가 잘못되었습니다.")
+                    }
+                }
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 생성 실패", e)
+                    _quizState.value = QuizState.Error(e.message ?: "알 수 없는 오륲")
+                }
+        }
+    }
+
+
+    fun changeSolvingValue(state: SolvingState) {
+        when (state) {
+            SolvingState.NEXT -> _solvingValue.update { it + 1 }
+            SolvingState.PREVIOUS -> _solvingValue.update { it - 1 }
+        }
+    }
+
+    fun changeSolvingChosen(index: Int, chosen: String) {
+        _chosenAnswerList.value = _chosenAnswerList.value.toMutableList().also {
+            if (index in it.indices) {
+                it[index] = chosen
+            } else {
+                throw IndexOutOfBoundsException("Index $index is out of bounds for chosenAnswerList")
+            }
+        }
+        /*val newList = _chosenAnswerList.value.mapIndexed { currentIndex, currentItem ->
+            if (currentIndex == index) chosen
+            else currentItem
+        }
+        _chosenAnswerList.value = newList*/
+    }
+
+    fun saveSolvedChosen(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>) {
+        viewModelScope.launch {
+            repository.updateQuizSolveResult(uid, roadmapId, quizTitle, chosenList)
                 .onSuccess {
-                    // TODO: 성공 이벤트 처리 (예: 토스트 메시지, 화면 이동)
+                    Log.d("QuizViewModel", "퀴즈 풀이 데이터 저장 성공")
                 }
-                .onFailure { exception ->
-                    // TODO: 실패 이벤트 처리 (예: 에러 다이얼로그 표시)
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 풀이 데이터 저장 실패", e)
                 }
+        }
+    }
+
+    fun solveQuizAgain() {
+        _solvingValue.value = 0
+        _chosenAnswerList.value = List(10) { "" }
+
+    }
+
+    fun syncChosenToQuestions() {
+        val currentState = _quizState.value
+        if (currentState is QuizState.Success) {
+            val updatedQuestions = currentState.quiz.questions.mapIndexed { i, q ->
+                q.copy(chosen = _chosenAnswerList.value[i])
+            }
+            _quizState.value = currentState.copy(
+                quiz = currentState.quiz.copy(questions = updatedQuestions)
+            )
         }
     }
 }

@@ -27,8 +27,8 @@ import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
 import com.aspa.aspa.features.main.navigation.BottomTab
-import com.aspa.aspa.features.main.navigation.mainGraph
 import com.aspa.aspa.features.mypage.navigation.mypageGraph
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
@@ -84,7 +84,9 @@ fun MainScreen(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-                    "roadmap/{questionId}" -> RoadmapTopBar()  // todo: 하드코딩 제거
+                    "roadmap/{questionId}" -> RoadmapTopBar() // todo: 하드코딩 제거
+                    QuizDestinations.SOLVE_QUIZ -> {}
+                    QuizDestinations.QUIZ_RESULT -> {}
                     else -> DefaultTopBar()
                 }
             },

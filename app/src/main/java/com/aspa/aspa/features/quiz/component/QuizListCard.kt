@@ -33,6 +33,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aspa.aspa.data.dto.QuizDto
+import com.aspa.aspa.data.dto.StageDto
+import com.aspa.aspa.features.quiz.QuizViewModel
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.model.Section
 import com.google.firebase.Firebase
@@ -44,12 +47,13 @@ fun QuizListCard(
     index: Int,
     title: String,
     description: String,
-    section: List<Section>,
+    quizzes: List<QuizDto>,
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
     onClick: (Int) -> Unit,
-    navController: NavController
+    navController: NavController,
+    viewModel: QuizViewModel
 ) {
     val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
@@ -216,16 +220,18 @@ fun QuizListCard(
                 ) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    section.forEach {
+                    quizzes.forEach {
                         val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
                             modifier = Modifier.fillMaxWidth()
                                 .clickable{
                                     if(it.status == true) {
+                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {
+                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
                                         navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },
@@ -246,7 +252,7 @@ fun QuizListCard(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = it.title,
+                                    text = it.quizTitle,
                                     fontSize = 14.sp
                                 )
                             }
