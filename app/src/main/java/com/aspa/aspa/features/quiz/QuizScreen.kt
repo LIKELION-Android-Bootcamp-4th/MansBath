@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
-import com.aspa.aspa.ui.components.QuizNav.QuizNav
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
