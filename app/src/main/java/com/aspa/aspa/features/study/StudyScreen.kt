@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,21 +35,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.aspa.aspa.R
+import com.aspa.aspa.features.state.UiState
 import com.aspa.aspa.model.Study
 import com.aspa.aspa.model.StudyDetail
 
 import com.aspa.aspa.features.study.component.ContentCard
 import com.aspa.aspa.features.study.component.StatusTag
 import com.aspa.aspa.features.study.component.TimeTag
-import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
@@ -57,15 +61,24 @@ import com.aspa.aspa.ui.theme.Gray10
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun StudyScreen (navController: NavController){
+fun StudyScreen (
+    uiState: UiState<Study>,
+    onClickItem: () -> Unit,
+    onRefresh: () -> Unit
+){
 
-    val contentList = dummyStudyList.first().items
+    LaunchedEffect(Unit) {
+        onRefresh()
+    }
+
+    val study : Study? = (uiState as? UiState.Success<Study>)?.data
+    val contentList = study?.items ?: emptyList()
 
 
     Scaffold (
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("React Hook 완전 정복")},
+                title = { Text(study?.title ?:"")},
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black,
@@ -73,7 +86,7 @@ fun StudyScreen (navController: NavController){
             )
         },
         content = { padding ->
-            Column (
+            Column(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
@@ -112,9 +125,11 @@ fun StudyScreen (navController: NavController){
                     Row(
                         modifier = Modifier.padding(start = 10.dp, bottom = 30.dp)
                     ) {
-                        TimeTag("4-6주")
+                        TimeTag(study?.duration ?: "")
                         Spacer(Modifier.width(5.dp))
-                        StatusTag("진행 예정")
+                        if (study != null) {
+                            StatusTag(if (study.status) "진행 완료" else "진행 예정")
+                        }
                     }
                 }
 
@@ -130,28 +145,32 @@ fun StudyScreen (navController: NavController){
                     }
                     item { Spacer(Modifier.height(10.dp)) }
 
-                    item {                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .size(30.dp)
-                            .background(Blue, shape = CircleShape),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Row(
-                            Modifier.padding(horizontal = 10.dp)
-                                .clickable {
-                                    navController.navigate(StudyScreenRoute.StudyDetail.route)
-                                }
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(30.dp)
+                                .background(Blue, shape = CircleShape)
+                                .clickable { onClickItem() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.PlayArrow,
-                                contentDescription = "시계 아이콘",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
-                            )
-                            Text("학습 시작하기", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                            Row(
+                                Modifier.padding(horizontal = 10.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.PlayArrow,
+                                    contentDescription = "시계 아이콘",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.White
+                                )
+                                Text(
+                                    "학습 시작하기",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White
+                                )
+                            }
                         }
-                    } }
+                    }
 
 
                     item {
