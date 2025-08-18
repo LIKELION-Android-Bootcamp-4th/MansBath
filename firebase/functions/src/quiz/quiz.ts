@@ -1,7 +1,7 @@
 import {logger} from "firebase-functions";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {getQuiz} from "./gen_ai_service";
-import {getConceptDetail, saveQuiz} from "./firebasse_service";
+import {getConceptDetail, saveQuiz} from "./firestore_service";
 
 /**
  * @summary Firebase Callable Function: 사용자 질문 처리 및 AI 응답 반환

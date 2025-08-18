@@ -1,6 +1,7 @@
 import {logger} from "firebase-functions";
-import {model, SYSTEM_PROMPT} from "./gen_ai";
-import {ConceptDetail, Quiz} from "./types";
+import {model} from "../ai/gen_ai";
+import {SYSTEM_PROMPT} from "../ai/quiz_prompt";
+import {ConceptDetail, Quiz} from "../type/quiz_types";
 import {FieldValue} from "firebase-admin/firestore";
 import {HttpsError} from "firebase-functions/v2/https";
 
