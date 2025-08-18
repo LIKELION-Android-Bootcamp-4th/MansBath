@@ -57,7 +57,7 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
     }
 
     composable(RoadmapDestinations.STUDY) {
-        StudyScreen()
+//        StudyScreen()  // todo: 스터디 연동
     }
 
     composable(RoadmapDestinations.QUIZ) { backStackEntry ->
