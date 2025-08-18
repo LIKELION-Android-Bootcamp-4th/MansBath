@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -17,18 +18,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aspa.aspa.features.home.HomeUiState
+import com.aspa.aspa.features.home.QuestionHistory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeDrawerContent(
+    uiState: HomeUiState,
     onHistoryItemSelected: (String) -> Unit,
     onCloseClick: () -> Unit,
+    onNewChatClick: () -> Unit,
+    onDeleteClick: (String) -> Unit,
+    onRenameClick: (String, String) -> Unit
 ) {
-    // TODO : 파이어스토어에서 질문 타이들, 질문 ID 불러오기 CHOICE 새 질문 만들지?
-    val questionHistory = remember {
-        mutableStateListOf(*DummyData.dummyChatHistories.keys.toTypedArray())
-    }
-
     ModalDrawerSheet {
         Column(
             modifier = Modifier
@@ -38,9 +40,8 @@ fun HomeDrawerContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onCloseClick) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Close Drawer")
@@ -51,27 +52,42 @@ fun HomeDrawerContent(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                OutlinedButton(onClick = onNewChatClick) {
+                    Icon(Icons.Default.Add, contentDescription = "새 질문", modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("새 질문")
+                }
             }
 
             Divider()
 
-            LazyColumn(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(
-                    items = questionHistory,
-                    key = { it }
-                ) { questionTitle ->
-                    QuestionHistoryItem(
-                        text = questionTitle,
-                        onDeleteClick = {
-                            questionHistory.remove(questionTitle)
-                        },
-                        onItemClick = {
-                            onHistoryItemSelected(questionTitle)
-                        }
-                    )
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = uiState.questionHistories,
+                        key = { it.id }
+                    ) { historyItem ->
+                        QuestionHistoryItem(
+                            history = historyItem,
+                            onDeleteClick = {
+                                onDeleteClick(historyItem.id)
+                            },
+                            onItemClick = {
+                                onHistoryItemSelected(historyItem.id)
+                            },
+                            onRenameClick = { newTitle ->
+                                onRenameClick(historyItem.id, newTitle)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -80,11 +96,24 @@ fun HomeDrawerContent(
 
 @Composable
 private fun QuestionHistoryItem(
-    text: String,
+    history: QuestionHistory,
     onDeleteClick: () -> Unit,
+    onRenameClick: (String) -> Unit,
     onItemClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+
+    if (showRenameDialog) {
+        RenameDialog(
+            currentTitle = history.title,
+            onDismiss = { showRenameDialog = false },
+            onConfirm = { newTitle ->
+                onRenameClick(newTitle)
+                showRenameDialog = false
+            }
+        )
+    }
 
     Surface(
         shape = RoundedCornerShape(24.dp),
@@ -101,7 +130,7 @@ private fun QuestionHistoryItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = text,
+                text = history.title,
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
@@ -121,8 +150,14 @@ private fun QuestionHistoryItem(
                     DropdownMenuItem(
                         text = { Text("삭제") },
                         onClick = {
-                            // TODO : 질문ID 가져와서 파이어스토어 날리기
                             onDeleteClick()
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("이름 변경") },
+                        onClick = {
+                            showRenameDialog = true
                             expanded = false
                         }
                     )
