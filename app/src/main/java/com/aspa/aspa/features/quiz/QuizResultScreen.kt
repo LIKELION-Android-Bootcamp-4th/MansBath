@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -35,16 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import androidx.compose.runtime.getValue
+
 
 @Composable
 fun QuizResultScreen(navController: NavController, viewModel: QuizViewModel = hiltViewModel()) {
@@ -76,7 +74,7 @@ fun QuizResultScreen(navController: NavController, viewModel: QuizViewModel = hi
             text = "← 퀴즈 목록",
             modifier = Modifier
                 .clickable {
-                    navController.navigate(QuizScreenRoute.Quiz.route)
+                    navController.navigate(QuizDestinations.QUIZ)
                 }
                 .padding(bottom = 16.dp)
         )
@@ -244,7 +242,7 @@ fun QuizResultScreen(navController: NavController, viewModel: QuizViewModel = hi
                 onClick = {
                     //TODO: 다시 풀기 기능
 
-                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                    navController.navigate(QuizDestinations.SOLVE_QUIZ)
                 },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(8.dp)
