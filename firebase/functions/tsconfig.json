@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "module": "NodeNext",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
@@ -9,7 +10,6 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "resolveJsonModule": true,
   },
   "compileOnSave": true,
   "include": [

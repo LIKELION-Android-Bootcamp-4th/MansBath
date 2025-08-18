@@ -25,8 +25,6 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFunctions(): FirebaseFunctions {
-        return Firebase.functions("asia-northeast3")
-    }
+    fun provideFunctions(): FirebaseFunctions = Firebase.functions("asia-northeast3")
 
 }

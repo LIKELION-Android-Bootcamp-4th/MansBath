@@ -3,6 +3,7 @@ package com.aspa.aspa.features.study
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.aspa.aspa.R
 import com.aspa.aspa.model.Study
 import com.aspa.aspa.model.StudyDetail
@@ -46,6 +48,7 @@ import com.aspa.aspa.model.StudyDetail
 import com.aspa.aspa.features.study.component.ContentCard
 import com.aspa.aspa.features.study.component.StatusTag
 import com.aspa.aspa.features.study.component.TimeTag
+import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
@@ -54,8 +57,7 @@ import com.aspa.aspa.ui.theme.Gray10
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-@Preview(showBackground = true)
-fun StudyScreen (){
+fun StudyScreen (navController: NavController){
 
     val contentList = dummyStudyList.first().items
 
@@ -137,6 +139,9 @@ fun StudyScreen (){
                     ){
                         Row(
                             Modifier.padding(horizontal = 10.dp)
+                                .clickable {
+                                    navController.navigate(StudyScreenRoute.StudyDetail.route)
+                                }
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.PlayArrow,

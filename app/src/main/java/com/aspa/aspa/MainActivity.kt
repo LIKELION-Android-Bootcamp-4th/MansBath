@@ -1,6 +1,5 @@
 package com.aspa.aspa
 
-
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -21,7 +20,6 @@ import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
-import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -48,7 +46,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                AppNavigation()
+                Auth.uid = "test-user-for-web"
+                MainScreen()
             }
         }
     }
@@ -251,6 +250,7 @@ fun AppNavigation() {
         composable("login") {
             LoginScreen(
                 navController,
+                onLoginClick = {},
 //                onGoogleSignInClick = {
 //                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
 //                },
