@@ -12,7 +12,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import com.aspa.aspa.features.navigation.AppNavHost
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.features.login.LoginScreen
+import com.aspa.aspa.features.login.LoginViewModel
+import com.aspa.aspa.features.login.NicknameScreen
+import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -26,7 +33,9 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                AppNavHost(isSignedIn = false)  // todo: isSignedIn에 토큰 검사 로직 추가
+                AppNavigation()
             }
         }
     }
@@ -221,3 +230,54 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val loginViewModel: LoginViewModel = viewModel()
+
+
+//    val googleSignInClient = rememberGoogleSignInClient()
+//
+//    val googleSignInLauncher = googleSignInHandler(
+//        viewModel = loginViewModel,
+//        navController = navController
+//    )
+
+    NavHost(navController = navController, startDestination = "login") {
+
+        composable("login") {
+            LoginScreen(
+                navController,
+                onLoginClick = {},
+//                onGoogleSignInClick = {
+//                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+//                },
+//                onKakaoSignInClick = { /* TODO: Kakao 로그인  */ },
+//                onNaverSignInClick = { /* TODO: Naver 로그인  */ },
+//                onLoginClick = {
+//                    Auth.uid = "test-user-for-web"
+//                    navController.navigate("nickname")
+//                }
+            )
+        }
+
+        composable("nickname") {
+            NicknameScreen(
+                onNavigateToPrevious = {
+                    navController.popBackStack()
+                },
+                onNavigateToNext = { finalNickname ->
+                    navController.navigate("main/$finalNickname") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("main/{nickname}") { backStackEntry ->
+            val nickname = backStackEntry.arguments?.getString("nickname") ?: "사용자"
+            MainScreen()
+        }
+    }
+}
