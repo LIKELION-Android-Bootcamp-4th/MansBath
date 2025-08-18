@@ -46,7 +46,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                AppNavigation()
+                Auth.uid = "test-user-for-web"
+                MainScreen()
             }
         }
     }

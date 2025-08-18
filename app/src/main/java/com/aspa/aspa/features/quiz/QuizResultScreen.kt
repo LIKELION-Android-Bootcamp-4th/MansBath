@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,31 +37,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
+import androidx.compose.runtime.getValue
 
 
 @Composable
-fun QuizResultScreen(navController: NavController) {
-
-    val answers = listOf(
-        Triple(
-            "React에서 컴포넌트의 상태를 관리하기 위해 사용하는 Hook은?",
-            "useState",
-            "useState는 함수형 컴포넌트에서 상태를 관리하기 위한 기본적인 Hook입니다."
-        ),
-        Triple(
-            "JSX에서 JavaScript 표현식을 사용하려면?",
-            "{ }",
-            "JSX에서는 중괄호 { }를 사용하여 JavaScript 표현식을 작성합니다."
-        ),
-        Triple(
-            "useEffect Hook의 두 번째 인자로 빈 배열 []을 전달하면?",
-            "컴포넌트 마운트 시에만 실행",
-            "useEffect의 의존성 배열에 빈 배열을 넣는 컴포넌트가 마운트될 때만 실행됩니다."
-        )
-    )
+fun QuizResultScreen(navController: NavController, viewModel: QuizViewModel = hiltViewModel()) {
 
     val resultDummy = QuizResultDummy.dummyQuizResult1
     var count = 0
@@ -68,6 +55,13 @@ fun QuizResultScreen(navController: NavController) {
     val correctQuestions = count
     val totalQuestions = resultDummy.size
     val score = (correctQuestions.toFloat() / totalQuestions.toFloat() * 100).toInt()
+
+    // ViewModel의 UI 상태를 수집(collect)하여 Composable에 반영
+    val uiState by viewModel.quizUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getQuiz("test-user-for-web", "X9l70qASQJBr2GeeY15a")
+    }
 
 
     Column(
@@ -84,6 +78,27 @@ fun QuizResultScreen(navController: NavController) {
                 }
                 .padding(bottom = 16.dp)
         )
+
+        when (uiState) {
+            is QuizUiState.Loading -> {
+                // 로딩 중일 때 UI (예: ProgressBar)
+                // CircularProgressIndicator()
+            }
+            is QuizUiState.Success -> {
+                // 성공했을 때 UI (예: LazyColumn으로 퀴즈 목록 표시)
+                val quiz = (uiState as QuizUiState.Success).quiz
+                quiz.forEach {
+                    Text(it.question)
+                    Text(it.description)
+                }
+
+            }
+            is QuizUiState.Error -> {
+                // 에러가 발생했을 때 UI
+                val message = (uiState as QuizUiState.Error).message
+                Text(text = "오류 발생: $message")
+            }
+        }
 
         // 점수 박스
         Card(
