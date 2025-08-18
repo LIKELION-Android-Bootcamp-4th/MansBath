@@ -14,27 +14,25 @@ import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
 import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.home.HomeViewModel
-import com.aspa.aspa.features.main.MainScreen
-import com.aspa.aspa.features.main.navigation.BottomTab
-import com.aspa.aspa.features.main.navigation.MainDestinations
-import com.aspa.aspa.features.quiz.QuizScreen
-import com.aspa.aspa.features.quiz.QuizViewModel
-import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 
 object HomeDestinations {
     const val HOME = "home"
+    const val HOME_GRAPH_ROUTE = "homeGraph"
 }
 
 fun NavGraphBuilder.homeGraph(
-    navController: NavController,
-    viewModel: HomeViewModel
+    navController: NavController
 ) {
     navigation(
         startDestination = HomeDestinations.HOME,
-        route = "homeGraph"
+        route = HomeDestinations.HOME_GRAPH_ROUTE
     ) {
-        composable(HomeDestinations.HOME) {
-            // Hilt로 새로 생성하는 대신, 전달받은 viewModel 사용
+        composable(HomeDestinations.HOME) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeDestinations.HOME_GRAPH_ROUTE)
+            }
+            val viewModel: HomeViewModel = hiltViewModel(parentEntry)
+
             val uiState by viewModel.uiState.collectAsState()
             var inputText by remember { mutableStateOf("") }
             val chatStarted = uiState.messages.isNotEmpty()
