@@ -109,7 +109,7 @@ fun MainScreen(
                 modifier = Modifier.padding(innerPadding)
             ) {
 //                mainGraph(innerNavController)
-                homeGraph(navController = innerNavController, homeViewModel = HomeViewModel())
+                homeGraph(navController = innerNavController, homeViewModel)
                 roadmapGraph(navController = innerNavController)
                 quizGraph(navController = innerNavController)
                 mypageGraph(navController = innerNavController)

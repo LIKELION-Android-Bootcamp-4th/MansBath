@@ -81,6 +81,9 @@ dependencies {
     implementation("com.google.firebase:firebase-functions-ktx")
     // ---------- BOM ----------
     implementation(platform(libs.firebase.bom)) // CHANGED: Firebase BOM 한 번만
+    implementation(libs.firebase.appcheck)
+    implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.appcheck.playintegrity)
 
     // ---------- Firebase (KTX만, 버전 X) ----------
     implementation(libs.firebase.auth.ktx)      // CHANGED: -ktx로 통일
