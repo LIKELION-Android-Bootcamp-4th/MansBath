@@ -23,18 +23,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.model.Section
-import kotlin.collections.forEach
 
 @Composable
 fun QuizListCard(
@@ -45,7 +44,8 @@ fun QuizListCard(
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    navController: NavController
 ) {
     val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
@@ -153,7 +153,10 @@ fun QuizListCard(
                         if (completedSection == 0) {
                             Text(
                                 text = "시작하기",
-                                textDecoration = TextDecoration.Underline
+                                textDecoration = TextDecoration.Underline,
+                                /*modifier = Modifier.clickable {
+                                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                                }*/
                             )
                         } else {
                             Text(
@@ -197,7 +200,15 @@ fun QuizListCard(
                         val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .clickable{
+                                    if(it.status == true) {
+                                        navController.navigate(QuizDestinations.QUIZ_RESULT)
+                                    }
+                                    else {
+                                        navController.navigate(QuizDestinations.SOLVE_QUIZ)
+                                    }
+                                },
                             border = BorderStroke(1.dp, Color.Black.copy(0.1f)),
                             colors = CardDefaults.cardColors(
                                 containerColor = Color.White
