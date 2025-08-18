@@ -1,6 +1,7 @@
 import {logger} from "firebase-functions";
-import {model, SYSTEM_PROMPT} from "./gen_ai";
-import {ConceptDetail, Quiz} from "./types";
+import {model} from "../ai/gen_ai";
+import {SYSTEM_PROMPT} from "../ai/quiz_prompt";
+import {ConceptDetail, Quiz} from "../type/quiz_types";
 
 /**
  * Gemini AI에게 퀴즈 생성을 요청하고 결과를 파싱합니다.
