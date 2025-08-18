@@ -18,6 +18,7 @@ plugins {
 
     alias(libs.plugins.google.services) // CHANGED: plugins alias로 통일
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" // CHANGED: Kotlin(2.0.21)과 맞춤
+
 }
 
 android {
@@ -73,6 +74,11 @@ hilt {
 }
 
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-functions-ktx")
     // ---------- BOM ----------
     implementation(platform(libs.firebase.bom)) // CHANGED: Firebase BOM 한 번만
 
@@ -131,3 +137,4 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 }
+

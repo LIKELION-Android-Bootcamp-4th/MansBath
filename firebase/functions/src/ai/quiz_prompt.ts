@@ -1,15 +1,3 @@
-import {GoogleGenerativeAI} from "@google/generative-ai";
-
-// Gemini 설정
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
-}
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-// 모델과 프롬프트를 export하여 다른 파일에서 사용
-export const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
 
 export const SYSTEM_PROMPT = `
 우리의 서비스는 AI를 기반으로 사용자의 학습 목적을 도와주는 스터디 파트너 애플리케이션이야.

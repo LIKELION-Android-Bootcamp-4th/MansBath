@@ -1,13 +1,19 @@
+import {FieldValue} from "firebase-admin/firestore";
+
 export interface QuizQuestion {
   question: string;
   options: string[];
   answer: string;
-  explanation: string;
+  description: string;
 }
 
 export interface Quiz {
   quizTitle: string;
   questions: QuizQuestion[];
+  studyId: string;
+  roadmapId: string;
+  createdAt: FieldValue;
+  status: boolean;
 }
 
 export interface ConceptDetail {
@@ -15,6 +21,7 @@ export interface ConceptDetail {
   description: string;
   duration: string;
   status: boolean;
+  roadmapId: string;
   items: [{
     content: [{
       details: string;

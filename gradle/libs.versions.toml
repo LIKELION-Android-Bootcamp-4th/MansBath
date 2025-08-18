@@ -11,6 +11,7 @@ composeBom = "2024.09.00"
 firebaseBom = "33.7.0"
 googleServices = "4.4.3"
 compose-material = "1.6.0"
+
 navigationCompose = "2.8.1"     # CHANGED: 프로젝트와 라인 맞춤
 retrofit = "2.11.0"             # CHANGED: 3.0.0 → 2.11.0(실존)
 credentials = "1.5.0"
@@ -19,6 +20,8 @@ googleid = "1.1.1"
 hilt = "2.56.2"
 hiltnav = "1.2.0"
 ksp = "2.0.21-1.0.27"
+
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +39,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 
 # CHANGED: -ktx로 통일 (버전 없음: BOM이 관리)
@@ -47,10 +51,14 @@ firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-funct
 # firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 # firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
+
 google-signin = { group = "com.google.android.gms", name = "play-services-auth", version = "21.2.0" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material" }
+
+
+
 
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
  retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -64,6 +72,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltnav" }
 
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -72,3 +81,4 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp  = { id = "com.google.devtools.ksp", version.ref = "ksp"}
+

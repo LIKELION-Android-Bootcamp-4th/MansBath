@@ -15,6 +15,8 @@ import com.aspa.aspa.features.roadmap.components.RoadmapDialog
 import com.aspa.aspa.features.study.StudyScreen
 
 object RoadmapDestinations {
+//    const val ROADMAP_LIST = "roadmap/{id}"
+    // todo: make route roadmap/{questionId} from question
     const val ROADMAP_LIST = "roadmap"
     const val ROADMAP_DETAIL = "roadmap/detail/{id}"
     const val ROADMAP_DIALOG = "roadmap/dialog/{id}"
@@ -23,10 +25,15 @@ object RoadmapDestinations {
 }
 
 fun NavGraphBuilder.roadmapGraph(navController: NavController) {
-    composable(RoadmapDestinations.ROADMAP_LIST) {
+    composable(
+        route = RoadmapDestinations.ROADMAP_LIST,
+//        arguments = listOf(navArgument("id") { type = NavType.StringType })
+    ) {backStackEntry ->
+//        val questionId = backStackEntry.arguments?.getString("id") ?: ""
         RoadmapListScreen(
             navController = navController,
-            questionId = "questionId" // TODO: 실제 questionId 전달
+//            questionId = questionId
+            questionId = ""
         )
     }
 

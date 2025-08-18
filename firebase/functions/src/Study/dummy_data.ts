@@ -49,7 +49,7 @@ export const SYSTEM_PROMPT = `
   - status: 항상 false
   - items: 학습 상세 내용 배열 (무조건 4개 이상)
 
-- 각 item은 다음 구조여야 해 그리고 item은 무조건 최소 4개이상 뽑아야 해:
+- 각 item은 다음 구조여야 해 그리고 item은 4개이상 뽑아야 해:
   - title: 파트 주제
   - subtitle: 각 개념 주제 (string[])
   - content: 각 개념에 대한 설명 
