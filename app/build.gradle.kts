@@ -68,6 +68,11 @@ android {
     }
 }
 
+// hilt 관련 빌드 에러 회피 목적
+hilt {
+    enableAggregatingTask = false
+}
+
 dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")

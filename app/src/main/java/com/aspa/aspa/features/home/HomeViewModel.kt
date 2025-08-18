@@ -13,12 +13,15 @@ import com.aspa.aspa.features.home.components.UiUserMessage
 import com.aspa.aspa.model.Auth
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class QuestionHistory(
     val id: String,
@@ -33,12 +36,14 @@ data class HomeUiState(
     val activeConversationId: String? = null
 )
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val questionRepository: QuestionRepository,
+    private val db: FirebaseFirestore
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val db = Firebase.firestore
-    private val questionRepository = QuestionRepository()
     private lateinit var questionsCollection: CollectionReference
 
     fun initialize() {
@@ -189,6 +194,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun mapFirestoreHistoryToUiMessages(history: List<Map<String, Any>>, baseId: String): List<UiChatMessage> {
         return history.mapIndexedNotNull { index, item ->
             val role = item["role"] as? String ?: return@mapIndexedNotNull null

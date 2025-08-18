@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz.component
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,32 +24,36 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aspa.aspa.data.dto.QuizDto
+import com.aspa.aspa.data.dto.StageDto
+import com.aspa.aspa.features.quiz.QuizViewModel
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.model.Section
-import com.aspa.aspa.ui.components.QuizNav.QuizScreenRoute
-import kotlin.collections.forEach
+import com.google.firebase.Firebase
+import com.google.firebase.functions.HttpsCallableResult
+import com.google.firebase.functions.functions
 
 @Composable
 fun QuizListCard(
     index: Int,
     title: String,
     description: String,
-    section: List<Section>,
+    quizzes: List<QuizDto>,
     expandedIndex: Int,
     completedSection: Int,
     allSection: Int,
     onClick: (Int) -> Unit,
-    navController: NavController
+    navController: NavController,
+    viewModel: QuizViewModel
 ) {
     val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
@@ -157,9 +162,25 @@ fun QuizListCard(
                             Text(
                                 text = "시작하기",
                                 textDecoration = TextDecoration.Underline,
-                                /*modifier = Modifier.clickable {
-                                    navController.navigate(QuizScreenRoute.SolveQuiz.route)
-                                }*/
+                                modifier = Modifier.clickable {
+                                    val functions = Firebase.functions("asia-northeast3")
+
+                                    // 로컬 테스트 전용
+                                    functions.useEmulator("10.0.2.2", 5001)
+
+                                    val data = hashMapOf(
+                                        "quizName" to "3주 초단기 JLPT N3 합격 로드맵"
+                                    )
+
+                                    functions.getHttpsCallable("makeQuiz")
+                                        .call(data)
+                                        .addOnSuccessListener { result: HttpsCallableResult ->
+                                            Log.d("makeQuiz", "성공: ${result.getData()}")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e("makeQuiz", "오류 발생", e)
+                                        }
+                                }
                             )
                         } else {
                             Text(
@@ -199,17 +220,19 @@ fun QuizListCard(
                 ) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    section.forEach {
+                    quizzes.forEach {
                         val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
                             modifier = Modifier.fillMaxWidth()
                                 .clickable{
                                     if(it.status == true) {
-                                        navController.navigate(QuizScreenRoute.QuizResult.route)
+                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
+                                        navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {
-                                        navController.navigate(QuizScreenRoute.SolveQuiz.route)
+                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
+                                        navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },
                             border = BorderStroke(1.dp, Color.Black.copy(0.1f)),
@@ -229,7 +252,7 @@ fun QuizListCard(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = it.title,
+                                    text = it.quizTitle,
                                     fontSize = 14.sp
                                 )
                             }
