@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.login
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
@@ -31,7 +33,7 @@ import com.aspa.aspa.features.login.navigation.LoginDestinations
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    onLoginClick: () -> Unit,
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     Box(
         modifier = Modifier
@@ -70,7 +72,10 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                SocialButton("Google로 계속하기") {}
+                SocialButton("Google로 계속하기") {
+                    loginViewModel.signInWithGoogleCredential(navController.context as Activity)
+                    // TODO : 구글 로그인 성공 응답 처리
+                }
 
                 SocialButton("카카오톡으로 계속하기") {}
 
@@ -80,11 +85,6 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-//                        if (/* todo */ false) {  // 회원가입 시
-//                            navController.navigate("nickname")
-//                        } else {  // 로그인 시
-//                            onLoginClick
-//                        }
                         navController.navigate(LoginDestinations.NICKNAME)
                     },
                     modifier = Modifier
@@ -102,29 +102,9 @@ fun LoginScreen(
     }
 }
 
-//@Composable
-//fun AppNavHost() {
-//    val navController = rememberNavController()
-//
-//    NavHost(
-//        navController = navController,
-//        startDestination = "login"
-//    ) {
-//        composable("login") {
-//            LoginScreen(navController)
-//        }
-//        composable("home") {
-//            HomeScreen(
-//                state = TODO(),
-//                actions = TODO()
-//            )
-//        }
-//    }
-//}
-
 @Preview(showBackground = true)
 @Composable
 private fun LoginScreenPreview() {
     val nav = rememberNavController()
-    LoginScreen(navController = nav, onLoginClick = {})
+    LoginScreen(navController = nav)
 }
