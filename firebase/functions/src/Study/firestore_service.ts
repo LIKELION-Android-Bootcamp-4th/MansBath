@@ -4,7 +4,6 @@ import {
   FieldValue,
 } from "firebase-admin/firestore";
 import {logger} from "firebase-functions";
-import {formatError} from "./formetError";
 
 const USERS_COLLECTION = "users";
 const STUDIES_SUBCOLLECTION = "studies";
@@ -60,7 +59,7 @@ export async function saveStudy(
   } catch (error) {
     logger.error(
       `Study 데이터 저장 중 에러 (경로: ${studyRef.path})`,
-      formatError(error),
+
     );
     throw error;
   }

@@ -13,4 +13,4 @@ export * from "./question/question";
 export * from "./roadmap/roadmap";
 export * from "./quiz/quiz";
 export * from "./auth/naver";
-export * from "./study/study";
+export * from "./Study/study";
