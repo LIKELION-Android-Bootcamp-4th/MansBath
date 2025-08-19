@@ -4,52 +4,65 @@ import {
   FieldValue,
 } from "firebase-admin/firestore";
 import {logger} from "firebase-functions";
+import {formatError} from "../util/formetError";
 
 const USERS_COLLECTION = "users";
 const STUDIES_SUBCOLLECTION = "studies";
 
 /**
- * Firestore에서 Study 문서를 가져오거나 생성할 준비
+ * Firestore에서 Study 문서를 가져오거나 새로 생성할 준비
  * @param {string} uid - 대상 사용자의 ID.
- * @param {string} stepId - Study 문서의 ID (예: 제목).
  * @throws {Error} Firestore 작업 중 오류 발생 시.
  */
 export async function getOrCreateStudy(
   uid: string,
-  stepId: string,
 ): Promise<{
   studyRef: DocumentReference;
-  existingStudy: any | null; // 2. Study -> any로 변경
+  existingStudy: any | null;
+  studyId: string; // 확정된 studyId를 반환합니다.
 }> {
-  const studyRef = getFirestore()
-    .collection(`${USERS_COLLECTION}/${uid}/${STUDIES_SUBCOLLECTION}`)
-    .doc(stepId);
+  const collectionRef = getFirestore()
+    .collection(`${USERS_COLLECTION}/${uid}/${STUDIES_SUBCOLLECTION}`);
 
-  const docSnap = await studyRef.get();
+  let studyRef: DocumentReference;
+  let existingStudy: any | null = null;
+  let newStepId;
 
-  const existingStudy = docSnap.exists ? docSnap.data() : null;
+  if (newStepId) {
+    // stepId가 제공된 경우 (기존 문서 조회)
+    studyRef = collectionRef.doc(newStepId);
+    const docSnap = await studyRef.get();
+    if (docSnap.exists) {
+      existingStudy = docSnap.data() ?? null;
+    }
+  } else {
+    // stepId가 없는 경우 (새 문서 생성)
+    studyRef = collectionRef.doc();
+    newStepId = studyRef.id;
+  }
 
-  return {studyRef, existingStudy};
+  return {studyRef, existingStudy, studyId: newStepId};
 }
 
 /**
  * Study 데이터를 Firestore 문서에 저장하거나 업데이트
  * @param {DocumentReference} studyRef - 저장할 Firestore 문서의 참조.
  * @param {Record<string, any>} data - 저장할 데이터 객체.
- * @param {boolean} isNew - 새로 생성된 문서인지 여부.
+ * @param {any | null} existingStudy - 기존 Study 데이터. null이면 새 문서로 간주.
  * @throws {Error} Firestore 저장 중 오류 발생 시.
  */
 export async function saveStudy(
   studyRef: DocumentReference,
   data: Record<string, any>,
-  isNew: boolean,
+  existingStudy: any | null,
 ): Promise<void> {
   const dataToSave = {
     ...data,
     lastUpdatedAt: FieldValue.serverTimestamp(),
   };
 
-  if (isNew) {
+  // existingStudy가 null이면 새로운 문서이므로 createdAt을 추가합니다.
+  if (!existingStudy) {
     (dataToSave as any).createdAt = FieldValue.serverTimestamp();
   }
 
@@ -59,14 +72,14 @@ export async function saveStudy(
   } catch (error) {
     logger.error(
       `Study 데이터 저장 중 에러 (경로: ${studyRef.path})`,
-
+      formatError(error),
     );
     throw error;
   }
 }
 
 /**
- * Firestore에서 특정 문서를 범용적으로 조회
+ * Firestore에서 특정 문서를 범용적으로 조회 (이 함수는 변경되지 않았습니다)
  * @param {string} uid - 대상 사용자의 ID.
  * @param {string} docId - 조회할 문서의 ID.
  * @param {string} subCollection - 문서가 위치한 하위 컬렉션의 이름.

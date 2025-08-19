@@ -17,15 +17,8 @@ export const study = onCall(async (request) => {
 
     const studyData = await generateStudyContent(uid, questionId, roadmapId);
 
-    // 'any' 타입 객체의 title 속성에 접근
-    const stepId = studyData.title;
-
-    if (!stepId) {
-      throw new HttpsError("internal", "AI 응답에 'title'이 없습니다.");
-    }
-
     // Firestore 서비스 호출
-    const {studyRef, existingStudy} = await getOrCreateStudy(uid, stepId);
+    const {studyRef, existingStudy} = await getOrCreateStudy(uid);
 
     // Firestore에 저장
     await saveStudy(studyRef, studyData, existingStudy === null);

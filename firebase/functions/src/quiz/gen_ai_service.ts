@@ -28,7 +28,6 @@ export async function getQuiz(
       return {
         ...JSON.parse(match[0]),
         studyId: studyId,
-        roadmapId: conceptDetail.roadmapId,
         createdAt: FieldValue.serverTimestamp(),
         status: false,
       } as Quiz;
