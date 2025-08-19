@@ -11,23 +11,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.features.home.HomeScreen
-import com.aspa.aspa.features.home.HomeScreenActions
-import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.login.LoginScreen
-import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.model.Auth
@@ -55,21 +43,9 @@ class MainActivity : ComponentActivity() {
 
         initNaverLoginSDK(this)
         setContent {
-            val naverLoginLauncher = rememberNaverLoginLauncher()
-
             AspaTheme {
-//                Auth.uid = "test-user-for-web"
-//                AppNavigation()
-                Column {
-                    Spacer(Modifier.height(200.dp))
-                    Button(
-                        onClick = {
-                            NaverIdLoginSDK.authenticate(applicationContext, naverLoginLauncher)
-                        }
-                    ) {
-                        Text("네이버 로그인")
-                    }
-                }
+                Auth.uid = "test-user-for-web"
+                AppNavigation()
             }
         }
     }
