@@ -1,6 +1,6 @@
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
-import {SNS} from "../type/auth_types";
+import {provider} from "../type/auth_types";
 import {getAuth} from "firebase-admin/auth";
 
 export const loginWithNaver = onCall(
@@ -36,7 +36,7 @@ export const loginWithNaver = onCall(
     const userSnap = await userRef.get();
     if (!userSnap.exists) {
       await userRef.set({
-        sns: SNS.NAVER,
+        provider: provider.NAVER,
         uid: uid,
         email: profile.response.email || "",
         name: profile.response.nickname || "",
