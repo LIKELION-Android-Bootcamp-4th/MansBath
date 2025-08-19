@@ -137,7 +137,7 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
                                 "uid" to userUid,
                                 "email" to profile?.get("email") as? String,
                                 "name" to profile?.get("nickname") as? String,
-                                "sns" to "kakao",
+                                "provider" to "kakao",
                                 "lastLogin" to FieldValue.serverTimestamp()
                             )
                             if (user != null) {
