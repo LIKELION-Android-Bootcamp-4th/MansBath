@@ -12,15 +12,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.features.home.HomeScreen
-import com.aspa.aspa.features.home.HomeScreenActions
-import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.login.LoginScreen
-import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.model.Auth
@@ -239,7 +234,7 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "main") {  // todo: 테스트용 main 시작
         composable("login") {
             LoginScreen(navController)
         }
