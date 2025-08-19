@@ -11,14 +11,9 @@ fun RoadmapDto.toRoadmap(): Roadmap {
             title = s.title,
             description = s.description,
             concept = s.concept,
-            duration = s.learning_curve,
+            duration = s.learningCurve,
             status = false,
-            quiz = Quiz(
-                question = "TODO()",
-                choices =  listOf("TODO()"),
-                answer = "TODO()",
-                description = "TODO()"
-            )
+            quiz = Quiz()
         )
     }
 
