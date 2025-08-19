@@ -1,7 +1,6 @@
 package com.aspa.aspa.features.main
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -98,13 +97,7 @@ fun MainScreen(
                     BottomTab.MyPage.route
                 )
 
-                val navBackStackEntry by innerNavController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-
                 val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
-//                val shouldShowBottomBar = innerNavController.currentBackStack.value.any {
-//                    it.destination.route in bottomNavScreenRoutes
-//                }
 
                 if (shouldShowBottomBar) {
                     BottomNavigationBar(
