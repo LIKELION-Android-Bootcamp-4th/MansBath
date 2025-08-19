@@ -11,7 +11,7 @@ data class RoadmapDto(
 )
 
 data class StageDto(
-    val id: Int = 0,
+    val id: Int = -1,
     val title: String = "",
     val description: String = "",
     val concept: String = "",

@@ -5,19 +5,21 @@ import com.aspa.aspa.model.Quiz
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.model.Section
 
-fun RoadmapDto.toRoadmap(): Roadmap {
-    val sections = stages.map { s ->
+fun RoadmapDto.toRoadmap(roadmapId: String): Roadmap {
+    val sections = this.stages.map { s ->
         Section(
+            id = s.id,
             title = s.title,
             description = s.description,
             concept = s.concept,
-            duration = s.learningCurve,
+            duration = s.learning_curve,
             status = false,
             quiz = Quiz()
         )
     }
 
     return Roadmap(
+        id = roadmapId,
         title = title,
         description = description,
         completedSection = 0,
