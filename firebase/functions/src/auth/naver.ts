@@ -29,7 +29,7 @@ export const loginWithNaver = onCall(
       throw new HttpsError("unknown", `result code is not "00": ${profile.message}`);
     }
 
-    const uid = `naver:${profile.response.id}`;
+    const uid = `${profile.response.id}`;
 
     // Firestore 사용자 확인 / 신규 생성
     const userRef = getFirestore().collection("users").doc(uid);

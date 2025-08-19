@@ -11,7 +11,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,11 +54,22 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         initNaverLoginSDK(this)
-
         setContent {
+            val naverLoginLauncher = rememberNaverLoginLauncher()
+
             AspaTheme {
-                Auth.uid = "test-user-for-web"
-                AppNavigation()
+//                Auth.uid = "test-user-for-web"
+//                AppNavigation()
+                Column {
+                    Spacer(Modifier.height(200.dp))
+                    Button(
+                        onClick = {
+                            NaverIdLoginSDK.authenticate(applicationContext, naverLoginLauncher)
+                        }
+                    ) {
+                        Text("네이버 로그인")
+                    }
+                }
             }
         }
     }
@@ -220,6 +238,8 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
                 FirebaseAuth.getInstance().signInWithCustomToken(customToken)
                     .addOnSuccessListener {
                         Log.d("NAVER_LOGIN", "✅ Firebase 세션 로그인 성공")
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        Log.d("NAVER_LOGIN", "✅ Firebase 현재 uid : $uid")
                     }
                     .addOnFailureListener { e ->
                         Log.e("NAVER_LOGIN", "❌ Firebase 세션 로그인 실패", e)
