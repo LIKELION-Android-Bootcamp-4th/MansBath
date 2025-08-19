@@ -1,16 +1,10 @@
 package com.aspa.aspa.data.remote
 
 import android.util.Log
-import androidx.compose.animation.core.snap
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizDtoAlpha
 import com.aspa.aspa.data.dto.QuizzesDto
-import com.aspa.aspa.data.dto.RoadmapDto
-import com.aspa.aspa.data.dto.RoadmapDtoAlpha
-import com.aspa.aspa.model.Roadmap
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.HttpsCallableResult
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

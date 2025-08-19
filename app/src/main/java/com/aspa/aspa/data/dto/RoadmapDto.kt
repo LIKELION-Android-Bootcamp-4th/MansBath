@@ -11,9 +11,10 @@ data class RoadmapDto(
 )
 
 data class StageDto(
-    val id: Long? = null,
+    val id: Int = 0,
     val title: String = "",
     val description: String = "",
-    val learning_curve: String = "",
-    val concept: String = ""
+    val concept: String = "",
+    val learningCurve: String = "",
+    val isSolved: Boolean = false
 )
