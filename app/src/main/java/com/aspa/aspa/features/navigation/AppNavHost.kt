@@ -36,7 +36,7 @@ fun AppNavHost(isSignedIn: Boolean) {
         )
 //        mainGraph(navController) // 하단 탭이 있는 메인 그래프
         composable(MainDestinations.GRAPH) {
-            MainScreen() // 여기서 bottom tabs + 내부 NavHost(mainGraph)
+            MainScreen()
         }
     }
 }

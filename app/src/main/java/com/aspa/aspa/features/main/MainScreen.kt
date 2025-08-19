@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.main
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,18 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
+import com.aspa.aspa.features.home.navigation.HomeDestinations
 import com.aspa.aspa.features.home.navigation.homeGraph
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
@@ -34,25 +34,22 @@ import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
 import kotlinx.coroutines.launch
 
+@SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    homeViewModel: HomeViewModel = viewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     LaunchedEffect(key1 = Unit) {
         homeViewModel.initialize()
     }
 
     val innerNavController: NavHostController = rememberNavController()
-
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     val uiState by homeViewModel.uiState.collectAsState()
-    var inputText by remember { mutableStateOf("") }
-    val chatStarted = uiState.messages.isNotEmpty()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -68,11 +65,12 @@ fun MainScreen(
                     homeViewModel.createNewChat()
                     scope.launch { drawerState.close() }
                 },
-                onDeleteClick = { questionId ->
-                    homeViewModel.deleteQuestionHistory(questionId)
-                },
+                onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
                 onRenameClick = { questionId, newTitle ->
-                    homeViewModel.renameQuestion(questionId, newTitle)
+                    homeViewModel.renameQuestion(
+                        questionId,
+                        newTitle
+                    )
                 }
             )
         }
@@ -80,36 +78,49 @@ fun MainScreen(
         Scaffold(
             topBar = {
                 when (currentRoute) {
-                    BottomTab.Home.route -> HomeTopBar(
+                    HomeDestinations.HOME -> HomeTopBar(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-                    "roadmap/{questionId}" -> RoadmapTopBar() // todo: 하드코딩 제거
-                    QuizDestinations.SOLVE_QUIZ -> {}
-                    QuizDestinations.QUIZ_RESULT -> {}
+                    "roadmap/{questionId}" -> RoadmapTopBar()
+                    QuizDestinations.SOLVE_QUIZ, QuizDestinations.QUIZ_RESULT -> {}
                     else -> DefaultTopBar()
                 }
             },
             bottomBar = {
-                if (currentRoute in listOf(
-                        BottomTab.Home.route,
-                        BottomTab.Roadmap.route,
-                        BottomTab.Quiz.route,
-                        BottomTab.MyPage.route)) {
+                val bottomNavScreenRoutes = listOf(
+                    BottomTab.Home.route,
+                    BottomTab.Roadmap.route,
+                    BottomTab.Quiz.route,
+                    BottomTab.MyPage.route
+                )
+
+                val shouldShowBottomBar = innerNavController.currentBackStack.value.any {
+                    it.destination.route in bottomNavScreenRoutes
+                }
+
+                if (shouldShowBottomBar) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
-                        onTabSelected = { route -> innerNavController.navigate(route) }
+                        onTabSelected = { graphRoute ->
+                            innerNavController.navigate(graphRoute) {
+                                popUpTo(innerNavController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                     )
                 }
             }
         ) { innerPadding ->
             NavHost(
                 navController = innerNavController,
-                startDestination = BottomTab.Home.route,
+                startDestination = HomeDestinations.HOME_GRAPH_ROUTE,
                 modifier = Modifier.padding(innerPadding)
             ) {
-//                mainGraph(innerNavController)
-                homeGraph(navController = innerNavController, homeViewModel)
+                homeGraph(navController = innerNavController)
                 roadmapGraph(navController = innerNavController)
                 quizGraph(navController = innerNavController)
                 mypageGraph(navController = innerNavController)
