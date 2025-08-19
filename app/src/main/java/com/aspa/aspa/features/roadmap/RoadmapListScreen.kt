@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.roadmap
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,31 +22,57 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.data.dto.RoadmapDocumentDto
-import com.aspa.aspa.data.dto.RoadmapDto
 import com.aspa.aspa.data.mapper.toRoadmap
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoadmapListScreen(
     navController: NavController,
-    questionId: String?
+    questionId: String
 ) {
-    // todo: 분기 처리 필요
-    // question에서 진입 시 로드맵 생성 이후 해당 디테일 로드맵으로 이동
-    // 네비게이션 진입 시 그냥 전체 출력
+    val uid = "test-user-for-web"
+
+    if (questionId != "") {
+        val roadmapId by produceState<String>(initialValue = "") {
+            value = callGenerateRoadmap()
+        }
+
+        when {
+            roadmapId == "" -> {
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("로드맵 생성 중..")
+                    Spacer(Modifier.height(16.dp))
+                    CircularProgressIndicator()
+                }
+            }
+            else -> {
+                Log.d("MYTAG", "roadmapId: $roadmapId")
+                navController.navigate(RoadmapDestinations.roadmapDetail(roadmapId))  // todo: 이동 이후 뒤로가기 시 다시 로드맵 생성 호출됨 !!! viewModel에서 처리할 것
+            }
+        }
+
+        return
+    }
+
     Column(
         modifier = Modifier
             .padding(16.dp)
     ) {
-        val uid = "test-user-for-web"
         val roadmaps by produceState<List<Roadmap>?>(initialValue = null, uid) {
-            value = fetchRoadmaps(uid) // suspend
+            value = fetchRoadmaps(uid)
         }
 
         when {
@@ -106,34 +133,23 @@ suspend fun fetchRoadmaps(uid: String): List<Roadmap> {
 }
 
 
-/*******************************
- * 로드맵 생성은 홈에서 사용자가 로드맵 생성 버튼 클릭 시 ..
- * 그렇다면 바로 detail로 진입하는 것이 자연스럽다 !!
-fun callGenerateRoadmap (
+suspend fun callGenerateRoadmap (
     uid: String = "test-user-for-web",
     qid: String = "EZ6mff1gCh6u7Dp6vKUR"
-) {
-    val functions = Firebase.functions("asia-northeast3")
-    val generateRoadmap = functions.getHttpsCallable("generateRoadmap")
+): String {
+    val result = Firebase.functions("asia-northeast3")
+        .getHttpsCallable("generateRoadmap")
+        .call(mapOf("uid" to uid, "questionId" to qid))
+        .await()
 
-    generateRoadmap.call(mapOf(
-        "uid" to uid,
-        "questionId" to qid
-    ))
-        .addOnSuccessListener { result ->
-            val data = result.getData() as Map<*, *>
-            parseResponseToRoadmap(data)
-        }
-        .addOnFailureListener { e ->
-            Log.e("ROADMAP", "generateRoadmap 실패 ❌ : ${e.message}")
-        }
+    val payload = result.getData() as? Map<*, *>
+        ?: error("Empty payload")
+
+    val docId = payload["docId"] as? String
+        ?: error("docId missing in payload")
+
+    return docId
 }
-
-fun parseResponseToRoadmap(data: Map<*, *>): Roadmap {
-    val roadmapMap = data["data"] as Map<*, *>
-
-}
-**********************************/
 
 
 @Preview(showBackground = true)
