@@ -30,8 +30,8 @@ fun BottomNavigationBar(
             label = { Text("퀴즈") }
         )
         NavigationBarItem(
-            selected = currentRoute == "roadmap",
-            onClick = { onTabSelected("roadmap") },
+            selected = currentRoute?.startsWith("roadmap") == true,
+            onClick = { onTabSelected("roadmap?questionId=${""}") },
             icon = { Icon(Icons.Default.Explore, contentDescription = "로드맵") },
             label = { Text("로드맵") }
         )

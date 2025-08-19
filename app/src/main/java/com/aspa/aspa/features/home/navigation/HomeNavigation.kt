@@ -59,7 +59,7 @@ fun NavGraphBuilder.homeGraph(
                     },
                     onRoadmapCreateClicked = {
                         uiState.activeConversationId?.let { questionId ->
-                            navController.navigate("roadmap/$questionId")
+                            navController.navigate("roadmap?questionId=$questionId")
                         }
                     }
                 )
