@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.sampleRoadmap1
+import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @Composable
@@ -172,7 +173,7 @@ fun RoadmapDialog(
                 // 버튼
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        onClick = { navController.navigate("study") },
+                        onClick = { navController.navigate(StudyScreenRoute.Study.route) },
                         modifier = Modifier
                             .weight(1f),
                         colors = ButtonDefaults.buttonColors(
