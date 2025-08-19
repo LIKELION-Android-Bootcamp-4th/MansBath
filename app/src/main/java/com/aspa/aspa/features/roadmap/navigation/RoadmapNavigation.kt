@@ -5,14 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.aspa.aspa.features.quiz.QuizScreen
 import com.aspa.aspa.features.roadmap.RoadmapDetailScreen
 import com.aspa.aspa.features.roadmap.RoadmapListScreen
 import com.aspa.aspa.features.roadmap.components.RoadmapDialog
-import com.aspa.aspa.features.study.StudyScreen
 
 object RoadmapDestinations {
-    const val ROADMAP_LIST = "roadmap"
+    const val ROADMAP_LIST = "roadmap?questionId={questionId}"
     const val ROADMAP_DETAIL = "roadmap/detail/{id}"
     const val ROADMAP_DIALOG = "roadmap/dialog/{id}"
     const val STUDY = "study"
@@ -22,13 +20,15 @@ object RoadmapDestinations {
 fun NavGraphBuilder.roadmapGraph(navController: NavController) {
     composable(
         route = RoadmapDestinations.ROADMAP_LIST,
-//        arguments = listOf(navArgument("id") { type = NavType.StringType })
+        arguments = listOf(navArgument("questionId") {
+            type = NavType.StringType
+            defaultValue = ""
+        })
     ) {backStackEntry ->
-//        val questionId = backStackEntry.arguments?.getString("id") ?: ""
+        val questionId = backStackEntry.arguments?.getString("questionId") ?: ""
         RoadmapListScreen(
             navController = navController,
-            questionId = ""
-//            questionId = questionId
+            questionId = questionId
         )
     }
 
@@ -52,10 +52,6 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
     }
 
     composable(RoadmapDestinations.STUDY) {
-        StudyScreen()
-    }
-
-    composable(RoadmapDestinations.QUIZ) {
-        QuizScreen(navController = navController)
+//        StudyScreen()  // todo: 스터디 연동
     }
 }

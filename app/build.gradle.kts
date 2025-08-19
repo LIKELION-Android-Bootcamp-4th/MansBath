@@ -11,8 +11,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+
     alias(libs.plugins.google.services) // CHANGED: plugins alias로 통일
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" // CHANGED: Kotlin(2.0.21)과 맞춤
+
 }
 
 android {
@@ -62,9 +68,22 @@ android {
     }
 }
 
+// hilt 관련 빌드 에러 회피 목적
+hilt {
+    enableAggregatingTask = false
+}
+
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-functions-ktx")
     // ---------- BOM ----------
     implementation(platform(libs.firebase.bom)) // CHANGED: Firebase BOM 한 번만
+    implementation(libs.firebase.appcheck)
+    implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.appcheck.playintegrity)
 
     // ---------- Firebase (KTX만, 버전 X) ----------
     implementation(libs.firebase.auth.ktx)      // CHANGED: -ktx로 통일
@@ -116,4 +135,9 @@ dependencies {
 
     // 아이콘
     implementation(libs.compose.material.icons.extended)
+
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 }
+

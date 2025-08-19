@@ -12,7 +12,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import com.aspa.aspa.features.navigation.AppNavHost
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.features.home.HomeScreen
+import com.aspa.aspa.features.home.HomeScreenActions
+import com.aspa.aspa.features.home.HomeScreenState
+import com.aspa.aspa.features.login.LoginScreen
+import com.aspa.aspa.features.login.LoginViewModel
+import com.aspa.aspa.features.login.NicknameScreen
+import com.aspa.aspa.features.main.MainScreen
+import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -26,7 +37,9 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +50,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                AppNavHost(isSignedIn = false)  // todo: isSignedIn에 토큰 검사 로직 추가
+                Auth.uid = "test-user-for-web"
+                AppNavigation()
             }
         }
     }
@@ -221,3 +235,30 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(navController)
+        }
+        composable("nickname") {
+            NicknameScreen(
+                onNavigateToPrevious = {
+                    navController.popBackStack()
+                },
+                onNavigateToNext = {
+                    // "main"으로 이동하도록 수정
+                    navController.navigate("main") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("main") {
+            // navController를 전달하지 않음
+            MainScreen()
+        }
+    }
+}

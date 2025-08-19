@@ -32,6 +32,9 @@ fun RoadmapListScreen(
     navController: NavController,
     questionId: String?
 ) {
+    // todo: 분기 처리 필요
+    // question에서 진입 시 로드맵 생성 이후 해당 디테일 로드맵으로 이동
+    // 네비게이션 진입 시 그냥 전체 출력
     Column(
         modifier = Modifier
             .padding(16.dp)

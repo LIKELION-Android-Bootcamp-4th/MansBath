@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.NicknameScreen
+import com.aspa.aspa.features.main.MainScreen
 
 object LoginDestinations {
     const val GRAPH = "login_graph"
@@ -34,10 +35,6 @@ fun NavGraphBuilder.loginGraph(
 //                    Auth.uid = "test-user-for-web"
 //                    navController.navigate("nickname")
 //                }
-                onLoginClick = {
-                    // 로그인(또는 소셜 로그인) 성공 후 닉네임 화면으로
-                    navController.navigate(LoginDestinations.NICKNAME)
-                }
             )
         }
 
@@ -66,9 +63,8 @@ fun NavGraphBuilder.loginGraph(
 //            )
 //        }
 
-//        composable("main/{nickname}") { backStackEntry ->
-//            val nickname = backStackEntry.arguments?.getString("nickname") ?: "사용자"
-//            MainScreen()
-//        }
+        composable("main") { backStackEntry ->
+            MainScreen()
+        }
     }
 }

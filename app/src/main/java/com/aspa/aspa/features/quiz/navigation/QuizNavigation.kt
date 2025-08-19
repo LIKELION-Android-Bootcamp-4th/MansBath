@@ -1,10 +1,14 @@
 package com.aspa.aspa.features.quiz.navigation
 
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.aspa.aspa.features.quiz.QuizResultScreen
 import com.aspa.aspa.features.quiz.QuizScreen
+import com.aspa.aspa.features.quiz.QuizViewModel
 import com.aspa.aspa.features.quiz.SolveQuizScreen
 
 /** 퀴즈 라우트 상수 */
@@ -22,13 +26,35 @@ object QuizDestinations {
 
 
 fun NavGraphBuilder.quizGraph(navController: NavController) {
-    composable(QuizDestinations.QUIZ) {
-        QuizScreen(navController)
-    }
-    composable(QuizDestinations.SOLVE_QUIZ) {
-        SolveQuizScreen(navController)
-    }
-    composable(QuizDestinations.QUIZ_RESULT) {
-        QuizResultScreen(navController)
+
+    navigation(
+        startDestination = QuizDestinations.QUIZ,
+        route = "quizGraph"
+    ) {
+        composable(QuizDestinations.QUIZ) { backStackEntry ->
+            // navController에서 부모 그래프('quizGraph')의 BackStackEntry를 가져옵니다.
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry("quizGraph")
+            }
+            // 부모 Entry를 기준으로 ViewModel을 생성하여 공유 인스턴스를 사용합니다.
+            val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+            QuizScreen(navController, viewModel)
+        }
+
+        composable(QuizDestinations.SOLVE_QUIZ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry("quizGraph")
+            }
+            val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+            SolveQuizScreen(navController, viewModel)
+        }
+
+        composable(QuizDestinations.QUIZ_RESULT) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry("quizGraph")
+            }
+            val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+            QuizResultScreen(navController, viewModel)
+        }
     }
 }

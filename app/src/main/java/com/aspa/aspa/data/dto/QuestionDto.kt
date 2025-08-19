@@ -1,6 +1,7 @@
 package com.aspa.aspa.data.remote.dto
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 /**
  * Request DTO
@@ -19,6 +20,7 @@ data class QuestionRequestDto(
 @Serializable
 data class QuestionResponseDto(
     val questionId: String,
+    @SerialName("response")
     val message: String? = null,
     val choices: List<String>? = null,
     val result: Map<String, String>? = null,
