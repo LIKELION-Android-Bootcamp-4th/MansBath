@@ -14,6 +14,7 @@ import com.aspa.aspa.features.home.HomeScreen
 import com.aspa.aspa.features.home.HomeScreenActions
 import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.home.HomeViewModel
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 
 object HomeDestinations {
     const val HOME = "home"
@@ -59,7 +60,7 @@ fun NavGraphBuilder.homeGraph(
                     },
                     onRoadmapCreateClicked = {
                         uiState.activeConversationId?.let { questionId ->
-                            navController.navigate("roadmap?questionId=$questionId")
+                            navController.navigate(RoadmapDestinations.roadmapList(questionId))
                         }
                     }
                 )

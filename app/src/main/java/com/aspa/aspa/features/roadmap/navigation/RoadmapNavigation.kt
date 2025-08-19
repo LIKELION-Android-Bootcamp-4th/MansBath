@@ -11,10 +11,18 @@ import com.aspa.aspa.features.roadmap.components.RoadmapDialog
 
 object RoadmapDestinations {
     const val ROADMAP_LIST = "roadmap?questionId={questionId}"
-    const val ROADMAP_DETAIL = "roadmap/detail/{id}"
-    const val ROADMAP_DIALOG = "roadmap/dialog/{id}"
+    const val ROADMAP_DETAIL = "roadmap/{roadmapId}"
+    const val ROADMAP_DIALOG = "roadmap/{roadmapId}/{sectionId}"
     const val STUDY = "study"
-    const val QUIZ = "quiz"
+
+    fun roadmapList(questionId: String = "") =
+        "roadmap?questionId=$questionId"
+
+    fun roadmapDetail(roadmapId: String) =
+        "roadmap/$roadmapId"
+
+    fun roadmapDialog(roadmapId: String,sectionId: Int) =
+        "roadmap/$roadmapId/$sectionId"
 }
 
 fun NavGraphBuilder.roadmapGraph(navController: NavController) {
@@ -34,19 +42,21 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
 
     composable(
         route = RoadmapDestinations.ROADMAP_DETAIL,
-        arguments = listOf(navArgument("id") { type = NavType.StringType })
+        arguments = listOf(navArgument("roadmapId") { type = NavType.StringType })
     ) { backStackEntry ->
-        val roadmapId = backStackEntry.arguments?.getString("id") ?: ""
-        RoadmapDetailScreen(roadmapId, navController)
+        val roadmapId = backStackEntry.arguments?.getString("roadmapId")
+        RoadmapDetailScreen(roadmapId!!, navController)
     }
 
     composable(
         route = RoadmapDestinations.ROADMAP_DIALOG,
-        arguments = listOf(navArgument("id") { type = NavType.StringType })
+        arguments = listOf(navArgument("sectionId") { type = NavType.StringType })
     ) { backStackEntry ->
-        val sectionId = backStackEntry.arguments?.getString("id") ?: ""
+        val roadmapId = backStackEntry.arguments?.getString("roadmapId")
+        val sectionId = backStackEntry.arguments?.getInt("sectionId")
         RoadmapDialog(
-            sectionId = sectionId,
+            roadmapId = roadmapId!!,
+            sectionId = sectionId!!,
             navController = navController
         )
     }
