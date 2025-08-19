@@ -1,22 +1,16 @@
 import {initializeApp} from "firebase-admin/app";
+import {setGlobalOptions} from "firebase-functions/v2";
 
-import {question} from "./question/question";
-import {generateRoadmap} from "./roadmap/roadmap";
-import {Study} from "./Study/study";
-import {makeQuiz} from "./quiz/quiz";
-
-import {loginWithNaver} from "./auth/naver";
-
-// Firebase Admin SDK 초기화
+// Initialization
+setGlobalOptions({region: "asia-northeast3"});
 initializeApp();
 
-// =================================================================
-// ✨ 분리된 함수 내보내기
-// =================================================================
 
-export {question};
-export {generateRoadmap};
-export {Study};
-export {makeQuiz};
+// Functions
+export * from "./question/question";
+export * from "./roadmap/roadmap";
+export * from "./quiz/quiz";
+export * from "./auth/naver";
 
-export {loginWithNaver};
+// FIX
+// export * from "./Study/study";
