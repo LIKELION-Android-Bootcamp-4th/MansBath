@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.sampleRoadmap1
-import com.aspa.aspa.model.Section
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @Composable
@@ -187,7 +187,10 @@ fun RoadmapDialog(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     OutlinedButton(
-                        onClick = { navController.navigate("quiz") },
+                        onClick = { navController.navigate(QuizDestinations.QUIZ) {
+                            popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
+                        } },
                         modifier = Modifier
                             .weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
