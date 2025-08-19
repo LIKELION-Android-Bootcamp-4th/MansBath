@@ -1,8 +1,10 @@
 package com.aspa.aspa.features.roadmap
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +24,7 @@ import com.aspa.aspa.data.dto.RoadmapDocumentDto
 import com.aspa.aspa.data.dto.RoadmapDto
 import com.aspa.aspa.data.mapper.toRoadmap
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -46,7 +50,12 @@ fun RoadmapListScreen(
 
         when {
             roadmaps == null -> {
-                CircularProgressIndicator()
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
 
             roadmaps!!.isEmpty() -> {
@@ -58,8 +67,7 @@ fun RoadmapListScreen(
                     items(roadmaps!!.size) { index ->
 
                         RoadmapCard(roadmaps!![index]) {
-//                            navController.navigate("roadmap/detail/${sampleRoadmaps[index].title}")  // todo: title -> id
-                            navController.navigate("testing.. need id")
+                            navController.navigate(RoadmapDestinations.roadmapDetail(roadmaps!![index].id))
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                     }
@@ -83,11 +91,13 @@ suspend fun fetchRoadmaps(uid: String): List<Roadmap> {
 
     // 문서를 DTO로 변환 후 도메인으로 매핑
     val docDtos = snapshot.toObjects(RoadmapDocumentDto::class.java)
-    docDtos .forEachIndexed { index, dto ->
+    docDtos.forEachIndexed { index, dto ->
         Log.d("ROADMAP_FETCH", "DTO[$index].roadmap = ${dto.roadmap}")
     }
 
-    val roadmapList = docDtos.map { it.roadmap.toRoadmap() }
+    val ids = snapshot.documents.map { it.id }
+    val roadmapList = docDtos.mapIndexed { index, dto ->
+        dto.roadmap.toRoadmap(ids[index]) }
     roadmapList.forEachIndexed { index, roadmap ->
         Log.d("ROADMAP_FETCH", "Roadmap[$index] = $roadmap")
     }
