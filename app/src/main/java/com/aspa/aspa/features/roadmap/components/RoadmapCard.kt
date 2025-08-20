@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,21 +50,39 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
         onClick = onClick,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 if (isCompleted) {
                     Icon(icon, contentDescription = null, tint = iconColor)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(roadmap.title, fontWeight = FontWeight.Bold)
+                    Text(
+                        roadmap.title,
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Bold
+                    )
                 } else {
-                    Text(roadmap.title, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .background(color = Color(0xFFECEEF2), shape = RoundedCornerShape(6.75.dp))
-                            .padding(horizontal = 8.dp,),
-                        contentAlignment = Alignment.Center
+                    Text(
+                        roadmap.title,
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Surface (
+                        color = Color(0xFFECEEF2),
+                        shape = RoundedCornerShape(6.75.dp)
                     ) {
-                        Text("${roadmap.completedSection}/${roadmap.allSection}", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = "${roadmap.completedSection}/${roadmap.allSection}",
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
