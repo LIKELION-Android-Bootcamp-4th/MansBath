@@ -57,8 +57,12 @@ import com.google.firebase.ktx.Firebase
 fun RoadmapDialog(
     roadmapId: String,
     sectionId: Int,
+    questionId: String,
     navController: NavController,
 ) {
+    Log.d("MYTAG", "qid: $questionId")
+
+
     val uid = Firebase.auth.uid!!
     val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
         value = fetchRoadmap(
@@ -79,7 +83,6 @@ fun RoadmapDialog(
 
         else -> roadmap?.let { roadmap ->
             val section = roadmap.sections[sectionId]
-            Log.d("MYTAG", "section : $section")
 
             Dialog(onDismissRequest = { navController.popBackStack() }) {
                 Surface(
@@ -202,7 +205,11 @@ fun RoadmapDialog(
                         // 버튼
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Button(
-                                onClick = { navController.navigate(StudyScreenRoute.Study.route) },
+                                onClick = {
+                                    // roadmapId, questionId
+                                    Log.d("MYTAG", "qid: $questionId")
+//                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
+                                },
                                 modifier = Modifier
                                     .weight(1f),
                                 colors = ButtonDefaults.buttonColors(
@@ -257,6 +264,7 @@ fun RoadmapDialogPreview() {
             RoadmapDialog(
                 roadmapId = "",
                 sectionId = -1,
+                questionId = "",
                 navController = navController
             )
         }

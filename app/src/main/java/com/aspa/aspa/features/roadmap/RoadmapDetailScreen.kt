@@ -48,7 +48,10 @@ import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
+fun RoadmapDetailScreen(roadmapId: String, questionId: String, navController: NavController) {
+    Log.d("MYTAG", "qid: $questionId")
+
+
     val uid = Firebase.auth.uid
     val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
         value = fetchRoadmap(
@@ -159,7 +162,8 @@ fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
                                 navController.navigate(
                                     RoadmapDestinations.roadmapDialog(
                                         roadmapId = roadmapId,
-                                        sectionId = sectionId
+                                        sectionId = sectionId,
+                                        questionId = questionId
                                     )
                                 )
                             }
@@ -197,6 +201,6 @@ suspend fun fetchRoadmap(uid: String, roadmapId: String): Roadmap? {
 fun RoadmapDetailScreenPreview() {
     val nav = rememberNavController()
     AspaTheme {
-        RoadmapDetailScreen("roadmapId", nav)
+        RoadmapDetailScreen("roadmapId", "qid", nav)
     }
 }

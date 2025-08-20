@@ -39,6 +39,9 @@ fun RoadmapListScreen(
     navController: NavController,
     questionId: String
 ) {
+    Log.d("MYTAG", "qid: $questionId")
+
+
     val uid = Firebase.auth.uid!!
 
     if (questionId != "") {
@@ -62,7 +65,7 @@ fun RoadmapListScreen(
             }
             else -> {
                 Log.d("MYTAG", "roadmapId: $roadmapId")
-                navController.navigate(RoadmapDestinations.roadmapDetail(roadmapId))  // todo: 이동 이후 뒤로가기 시 다시 로드맵 생성 호출됨 !!! viewModel에서 처리할 것
+                navController.navigate(RoadmapDestinations.roadmapDetail(roadmapId, questionId))  // todo: 이동 이후 뒤로가기 시 다시 로드맵 생성 호출됨 !!! viewModel에서 처리할 것
             }
         }
 
@@ -96,7 +99,7 @@ fun RoadmapListScreen(
                     items(roadmaps!!.size) { index ->
 
                         RoadmapCard(roadmaps!![index]) {
-                            navController.navigate(RoadmapDestinations.roadmapDetail(roadmaps!![index].id))
+                            navController.navigate(RoadmapDestinations.roadmapDetail(roadmaps!![index].id, questionId))
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                     }
