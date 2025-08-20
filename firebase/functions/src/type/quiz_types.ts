@@ -8,12 +8,17 @@ export interface QuizQuestion {
 }
 
 export interface Quiz {
+  quizId: string;
   quizTitle: string;
   questions: QuizQuestion[];
   studyId: string;
-  roadmapId: string;
   createdAt: FieldValue;
   status: boolean;
+}
+
+export interface CreateQuizArgs {
+  quizTitle: string;
+  questions: QuizQuestion[];
 }
 
 export interface ConceptDetail {

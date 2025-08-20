@@ -13,15 +13,28 @@ import {HttpsError} from "firebase-functions/v2/https";
 export async function saveQuiz(
   uid: string,
   quiz: Quiz
-) {
+): Promise<Quiz> { // 반환 타입을 추가하여 저장된 데이터를 돌려줌
   const collectionRef = getFirestore()
     .collection("users")
     .doc(uid)
     .collection("quizzes")
     .doc(quiz.studyId)
     .collection("quiz");
-  const quizRef: DocumentReference = collectionRef.doc();
-  await quizRef.set(quiz, {merge: true});
+
+  // 1. 문서 참조를 미리 만듭니다. 이 시점에 `quizRef.id`에 고유 ID가 생성됩니다.
+  const quizRef = collectionRef.doc();
+
+  // 2. quiz 객체에 고유 ID를 추가합니다.
+  const quizDataWithId: Quiz = {
+    ...quiz,
+    quizId: quizRef.id,
+  };
+
+  // 3. ID가 포함된 최종 데이터를 Firestore에 저장합니다.
+  await quizRef.set(quizDataWithId, {merge: true});
+
+  // 4. ID가 포함된 완전한 객체를 반환합니다.
+  return quizDataWithId;
 }
 
 /**
