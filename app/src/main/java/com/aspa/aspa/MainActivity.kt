@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
-import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.OAuthProvider
@@ -36,7 +35,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AspaTheme {
-                Auth.uid = "test-user-for-web"
                 AppNavigation()
             }
         }
