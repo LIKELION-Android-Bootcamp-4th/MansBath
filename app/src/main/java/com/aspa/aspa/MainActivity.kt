@@ -12,15 +12,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.features.home.HomeScreen
-import com.aspa.aspa.features.home.HomeScreenActions
-import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.login.LoginScreen
-import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
 import com.aspa.aspa.model.Auth
@@ -47,7 +42,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         initNaverLoginSDK(this)
-
         setContent {
             AspaTheme {
                 Auth.uid = "test-user-for-web"
@@ -220,6 +214,8 @@ fun sendAccessTokenToFunctions(accessToken: String?) {
                 FirebaseAuth.getInstance().signInWithCustomToken(customToken)
                     .addOnSuccessListener {
                         Log.d("NAVER_LOGIN", "✅ Firebase 세션 로그인 성공")
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        Log.d("NAVER_LOGIN", "✅ Firebase 현재 uid : $uid")
                     }
                     .addOnFailureListener { e ->
                         Log.e("NAVER_LOGIN", "❌ Firebase 세션 로그인 실패", e)
