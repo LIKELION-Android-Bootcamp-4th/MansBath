@@ -1,4 +1,7 @@
 package com.aspa.aspa.data.dto
 
-class MistakeDto {
-}
+data class MistakeDto (
+    val roadmapId : String,
+    val quizTitle : String,
+    val items : List<MistakeDetailDto> = emptyList(),
+)

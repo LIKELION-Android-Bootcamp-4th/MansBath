@@ -1,17 +1,11 @@
 package com.aspa.aspa.data.remote
 
 import android.util.Log
-import androidx.compose.animation.core.snap
-import com.aspa.aspa.data.dto.MistakeAnswerDto
+import com.aspa.aspa.data.dto.MistakeDetailDto
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizDtoAlpha
 import com.aspa.aspa.data.dto.QuizzesDto
-import com.aspa.aspa.data.dto.RoadmapDto
-import com.aspa.aspa.data.dto.RoadmapDtoAlpha
-import com.aspa.aspa.model.Roadmap
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.HttpsCallableResult
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -133,21 +127,17 @@ class QuizRemoteDataSource @Inject constructor(
                 val chosen = (q["chosen"] as? String).orEmpty()
                 if(chosen.isBlank()|| chosen == answer) return@mapNotNull null
 
-                MistakeAnswerDto(
+                MistakeDetailDto(
                     question = (q["question"] as? String).orEmpty(),
                     answer = answer,
                     chosen = chosen,
-                    explanation = (q["explanation"]as? String).orEmpty(),
+                    description = (q["description"]as? String).orEmpty(),
                     options = (q["options"]as? List<String>) ?: emptyList(),
                 )
             }
-            if(mistakeAnswer.isEmpty()){
-                Log.d("오답체크","오답 없음")
-            }
+            val mistakeCol = firestore
+                .collection("users/$uid/mistakeAnswer")
 
-            val mistakeCol = firestore.collection("users/$uid/mistakeAnswer/")
-                .document(quizTitle)
-                .collection("items")
 
             //다시풀기가 있어서 같은 오답지는 삭제 처리
             val prev = mistakeCol
@@ -160,11 +150,15 @@ class QuizRemoteDataSource @Inject constructor(
             prev.documents.forEach{
                 batch.delete(it.reference)
             }
+            val target = mistakeCol.document()
 
-            mistakeAnswer.forEach{m ->
-                batch.set(mistakeCol.document(),m)
-            }
+            val data = hashMapOf(
+                "roadmapId" to roadmapId,
+                "quizTitle" to quizTitle,
+                "items" to mistakeAnswer,
+            )
 
+            batch.set(target,data)
             batch.commit().await()
             println("✅ Successfully updated chosen answers for quiz '$quizTitle'.")
             return true
