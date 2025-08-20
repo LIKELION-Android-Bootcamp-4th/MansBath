@@ -153,6 +153,12 @@ class QuizViewModel @Inject constructor(
 
     fun saveSolvedChosen(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>) {
         viewModelScope.launch {
+            val success = _quizState.value as? QuizState.Success
+            if( success == null){
+                Log.e("Quiz 상태","정상적인 상태가 아님")
+                return@launch
+            }
+            val quiz = success.quiz
             repository.updateQuizSolveResult(uid, roadmapId, quizTitle, chosenList)
                 .onSuccess {
                     Log.d("QuizViewModel", "퀴즈 풀이 데이터 저장 성공")

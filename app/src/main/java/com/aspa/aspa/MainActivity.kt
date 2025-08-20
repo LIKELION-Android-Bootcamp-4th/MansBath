@@ -23,6 +23,7 @@ import com.aspa.aspa.features.login.LoginScreen
 import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
+import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
@@ -49,9 +50,16 @@ class MainActivity : ComponentActivity() {
         initNaverLoginSDK(this)
 
         setContent {
+            val navController = rememberNavController()
             AspaTheme {
-                Auth.uid = "test-user-for-web"
-                AppNavigation()
+                NavHost(
+                    navController = navController,
+                    startDestination = "quizGraph"
+                ) {
+                    quizGraph(navController)
+
+                }
+
             }
         }
     }

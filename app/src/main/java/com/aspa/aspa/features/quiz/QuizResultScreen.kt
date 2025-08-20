@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.quiz
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.sp
+import com.aspa.aspa.features.quiz.component.QuestionCard
 
 
 @Composable
@@ -55,6 +58,7 @@ fun QuizResultScreen(
     Column(
         modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 24.dp)
+
     ) {
         // 상단 내비게이션
         Text(
@@ -110,8 +114,8 @@ fun QuizResultScreen(
                             tint = Color(0xFFFFCF00),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("${score}점", style = MaterialTheme.typography.headlineMedium)
-                        Text("$correctQuestions/$totalQuestions 문제 정답")
+                        Text("${score}점", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text("$correctQuestions/$totalQuestions 문제 정답", style = MaterialTheme.typography.headlineMedium, fontSize = 13.sp, color = Color.Gray)
                     }
                 }
 
@@ -120,91 +124,12 @@ fun QuizResultScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LazyColumn(
+                QuestionCard(
+                    questions = questions,
                     modifier = Modifier.weight(1f)
-                ) {
-                    items(totalQuestions) { index ->
-
-                        val questionIcon = if(questions[index].chosen == questions[index].answer) {
-                            listOf(Icons.Default.CheckCircle, Color(0xFF4CAF50))
-                        } else {
-                            listOf(Icons.Default.Cancel, Color.Red)
-                        }
+                )
 
 
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White
-                            ),
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = questionIcon[0] as ImageVector,
-                                        contentDescription = null,
-                                        tint = questionIcon[1] as Color,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("${index + 1}. ${questions[index].question}", fontWeight = FontWeight.Bold)
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text("당신의 답: ", fontWeight = FontWeight.SemiBold)
-                                    Text(
-                                        text = questions[index].chosen,
-                                        color = questionIcon[1] as Color,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-
-                                if(questions[index].chosen != questions[index].answer) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text("정답: ", fontWeight = FontWeight.SemiBold)
-                                        Text(
-                                            text = questions[index].answer,
-                                            color =  Color(0xFF4CAF50),
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-
-
-                                Spacer(modifier = Modifier.height(4.dp))
-
-                                Card(
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Color(0xFFECEEF2)
-                                    )
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(8.dp),
-                                        verticalAlignment = Alignment.Top,
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Lightbulb,
-                                            tint = Color(0xFFFFCF00),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(text = questions[index].description)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

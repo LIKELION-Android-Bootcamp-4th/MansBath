@@ -2,6 +2,7 @@ package com.aspa.aspa.data.remote
 
 import android.util.Log
 import androidx.compose.animation.core.snap
+import com.aspa.aspa.data.dto.MistakeAnswerDto
 import com.aspa.aspa.data.dto.QuizDto
 import com.aspa.aspa.data.dto.QuizDtoAlpha
 import com.aspa.aspa.data.dto.QuizzesDto
@@ -127,6 +128,45 @@ class QuizRemoteDataSource @Inject constructor(
             docRef.update("questions", newQuestions).await()
             docRef.update("status", true).await()
 
+            val mistakeAnswer = newQuestions.mapNotNull { q ->
+                val answer = (q["answer"] as? String).orEmpty()
+                val chosen = (q["chosen"] as? String).orEmpty()
+                if(chosen.isBlank()|| chosen == answer) return@mapNotNull null
+
+                MistakeAnswerDto(
+                    question = (q["question"] as? String).orEmpty(),
+                    answer = answer,
+                    chosen = chosen,
+                    explanation = (q["explanation"]as? String).orEmpty(),
+                    options = (q["options"]as? List<String>) ?: emptyList(),
+                    quizTitle = quizTitle
+                )
+            }
+            if(mistakeAnswer.isEmpty()){
+                Log.d("오답체크","오답 없음")
+            }
+
+            val mistakeCol = firestore.collection("users/$uid/mistakeAnswer/")
+                .document(quizTitle)
+                .collection("items")
+
+            //다시풀기가 있어서 같은 오답지는 삭제 처리
+            val prev = mistakeCol
+                .whereEqualTo("roadmapId", roadmapId)
+                .whereEqualTo("quizTitle",quizTitle)
+                .get()
+                .await()
+
+            val batch = firestore.batch()
+            prev.documents.forEach{
+                batch.delete(it.reference)
+            }
+
+            mistakeAnswer.forEach{m ->
+                batch.set(mistakeCol.document(),m)
+            }
+
+            batch.commit().await()
             println("✅ Successfully updated chosen answers for quiz '$quizTitle'.")
             return true
         } catch (e: Exception) {
