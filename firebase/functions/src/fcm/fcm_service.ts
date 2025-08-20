@@ -6,6 +6,7 @@ import {getFirestore} from "firebase-admin/firestore";
 export const checkFalseStatusScheduler = onSchedule({
   schedule: "0 11 * * *", // 매일 오전 11시, "every 30 seconds": 30초마다
   timeZone: "Asia/Seoul",
+  region: "asia-northeast3",
 }, async () => {
   return checkQuizStatus();
 });
