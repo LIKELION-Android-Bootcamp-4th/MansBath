@@ -11,7 +11,8 @@ export interface HistoryEntry {
 export interface AiResponse {
   message: string;
   choices?: string[];
-  result?: string;
+  result?: { [key: string]: any };
+  createdAt: string;
 }
 
 // Firestore에 저장될 질문 데이터 타입
@@ -21,5 +22,17 @@ export interface QuestionData {
   lastMessage: string;
   createdAt?: FieldValue;
   title?: string;
-  result?: string;
+  result?: { [key: string]: any };
+}
+
+// Gemini API에 전달할 선택지 전달 타입
+export interface AskQuestionArgs {
+  message: string;
+  choices: string[];
+}
+
+// Gemini API에 최종 분석서를 생성할 때 전달할 타입
+export interface CreateAnalysisArgs {
+  message: string;
+  result: string;
 }

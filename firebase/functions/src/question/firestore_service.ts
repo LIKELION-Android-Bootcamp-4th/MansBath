@@ -41,10 +41,10 @@ export async function getOrCreateQuestion(
 export async function saveConversation(
   ref: DocumentReference,
   data: {
-      history: HistoryEntry[],
-      userQuestion: string,
-      aiResponse: AiResponse,
-    },
+    history: HistoryEntry[],
+    userQuestion: string,
+    aiResponse: AiResponse,
+  },
 ) {
   const {history, userQuestion, aiResponse} = data;
   const updatedHistory: HistoryEntry[] = [
