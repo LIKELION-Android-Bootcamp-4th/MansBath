@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -22,7 +21,8 @@ object HomeDestinations {
 }
 
 fun NavGraphBuilder.homeGraph(
-    navController: NavController
+    navController: NavController,
+    homeViewModel: HomeViewModel
 ) {
     navigation(
         startDestination = HomeDestinations.HOME,
@@ -32,9 +32,8 @@ fun NavGraphBuilder.homeGraph(
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(HomeDestinations.HOME_GRAPH_ROUTE)
             }
-            val viewModel: HomeViewModel = hiltViewModel(parentEntry)
 
-            val uiState by viewModel.uiState.collectAsState()
+            val uiState by homeViewModel.uiState.collectAsState()
             var inputText by remember { mutableStateOf("") }
             val chatStarted = uiState.messages.isNotEmpty()
 
@@ -48,15 +47,15 @@ fun NavGraphBuilder.homeGraph(
                     onSendClicked = {
                         if (inputText.isNotBlank()) {
                             if (!chatStarted) {
-                                viewModel.startNewChat(inputText)
+                                homeViewModel.startNewChat(inputText)
                             } else {
-                                viewModel.handleFollowUpQuestion(inputText)
+                                homeViewModel.handleFollowUpQuestion(inputText)
                             }
                             inputText = ""
                         }
                     },
                     onOptionSelected = { selectedOption ->
-                        viewModel.selectOption(selectedOption)
+                        homeViewModel.selectOption(selectedOption)
                     },
                     onRoadmapCreateClicked = {
                         uiState.activeConversationId?.let { questionId ->

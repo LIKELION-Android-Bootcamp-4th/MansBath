@@ -41,9 +41,6 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) {
-        homeViewModel.initialize()
-    }
 
     val innerNavController: NavHostController = rememberNavController()
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
@@ -120,7 +117,7 @@ fun MainScreen(
                 startDestination = HomeDestinations.HOME_GRAPH_ROUTE,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                homeGraph(navController = innerNavController)
+                homeGraph(navController = innerNavController, homeViewModel = homeViewModel)
                 roadmapGraph(navController = innerNavController)
                 quizGraph(navController = innerNavController)
                 mypageGraph(navController = innerNavController)

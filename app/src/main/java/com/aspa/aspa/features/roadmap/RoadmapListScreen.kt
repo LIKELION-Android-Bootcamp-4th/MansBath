@@ -27,6 +27,7 @@ import com.aspa.aspa.features.roadmap.components.RoadmapCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.theme.AspaTheme
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
@@ -38,11 +39,12 @@ fun RoadmapListScreen(
     navController: NavController,
     questionId: String
 ) {
-    val uid = "test-user-for-web"
+    val uid = Firebase.auth.uid!!
 
     if (questionId != "") {
+        Log.d("MYTAG", "qid: $questionId")
         val roadmapId by produceState<String>(initialValue = "") {
-            value = callGenerateRoadmap()
+            value = callGenerateRoadmap(uid ,questionId)
         }
 
         when {
@@ -134,9 +136,11 @@ suspend fun fetchRoadmaps(uid: String): List<Roadmap> {
 
 
 suspend fun callGenerateRoadmap (
-    uid: String = "test-user-for-web",
-    qid: String = "EZ6mff1gCh6u7Dp6vKUR"
+    uid: String,
+    qid: String
 ): String {
+    Log.d("MYTAG", "uid: ${uid}")
+
     val result = Firebase.functions("asia-northeast3")
         .getHttpsCallable("generateRoadmap")
         .call(mapOf("uid" to uid, "questionId" to qid))

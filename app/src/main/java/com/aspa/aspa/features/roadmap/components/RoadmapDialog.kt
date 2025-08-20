@@ -50,6 +50,8 @@ import com.aspa.aspa.features.roadmap.fetchRoadmap
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 import com.aspa.aspa.ui.theme.AspaTheme
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun RoadmapDialog(
@@ -57,7 +59,7 @@ fun RoadmapDialog(
     sectionId: Int,
     navController: NavController,
 ) {
-    val uid = "test-user-for-web"
+    val uid = Firebase.auth.uid!!
     val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
         value = fetchRoadmap(
             uid,
