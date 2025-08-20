@@ -34,7 +34,6 @@ export const question = onCall(async (request) => {
 
     return {
       ...aiResponse,
-      createdAt: new Date().toISOString(),
       questionId: newQuestionId,
     };
   } catch (error) {

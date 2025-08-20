@@ -54,22 +54,23 @@ export const questionServiceTools: FunctionDeclarationsTool[] = [
 /**
  * Gemini에 전달할 대화 기록 배열을 생성합니다.
  * @param {HistoryEntry[]} history - 기존 대화 기록.
- * @return {object[]} Gemini API 형식에 맞는 대화 기록.
  */
 function buildChatHistory(history: HistoryEntry[]) {
   const geminiHistory = history.map((entry) => {
-    const content = typeof entry.message === "string" ?
-      entry.message :
-      JSON.stringify(entry.message);
+    let content: string;
+
+    // entry.message가 객체이고 내부에 'message' 속성이 있는지 확인합니다.
+    if (typeof entry.message === "object" && entry.message !== null && "message" in entry.message) {
+      // 객체라면, 핵심 질문 텍스트인 message 속성 값만 사용합니다.
+      content = (entry.message as { message: string }).message;
+    } else {
+      // 그 외의 경우 (사용자 답변 등)는 기존처럼 처리합니다.
+      content = typeof entry.message === "string" ?
+        entry.message :
+        JSON.stringify(entry.message);
+    }
     return {role: entry.role, parts: [{text: content}]};
   });
-
-  // 시스템 프롬프트와 함께 전체 대화 기록 구성
-  return [
-    {role: "user" as const, parts: [{text: QUESTION_SYSTEM_PROMPT}]},
-    {role: "model" as const, parts: [{text: "네, 알겠습니다."}]},
-    ...geminiHistory,
-  ];
 }
 
 /**

@@ -1,6 +1,5 @@
 import {
   getFirestore,
-  DocumentReference,
 } from "firebase-admin/firestore";
 import {ConceptDetail, Quiz} from "../type/quiz_types";
 import {HttpsError} from "firebase-functions/v2/https";
