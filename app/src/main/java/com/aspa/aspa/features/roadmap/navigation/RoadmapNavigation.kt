@@ -41,7 +41,11 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
 
     composable(
         route = RoadmapDestinations.ROADMAP_DETAIL,
-        arguments = listOf(navArgument("roadmapId") { type = NavType.StringType })
+        arguments =
+            listOf(
+                navArgument("roadmapId") { type = NavType.StringType },
+                navArgument("questionId") { type = NavType.StringType }
+            )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
         val questionId = backStackEntry.arguments?.getString("questionId")
@@ -51,7 +55,11 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
 
     composable(
         route = RoadmapDestinations.ROADMAP_DIALOG,
-        arguments = listOf(navArgument("sectionId") { type = NavType.StringType })
+        arguments = listOf(
+            navArgument("roadmapId") { type = NavType.StringType },
+            navArgument("sectionId") { type = NavType.IntType },
+            navArgument("questionId") { type = NavType.StringType }
+        )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
         val sectionId = backStackEntry.arguments?.getInt("sectionId")
