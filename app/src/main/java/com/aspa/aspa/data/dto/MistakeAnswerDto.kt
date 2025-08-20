@@ -6,5 +6,4 @@ data class MistakeAnswerDto(
     val chosen : String = "",
     val explanation : String = "",
     val options : List<String> = emptyList(),
-    val quizTitle : String = ""
 )

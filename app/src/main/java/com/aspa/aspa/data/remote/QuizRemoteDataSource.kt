@@ -139,7 +139,6 @@ class QuizRemoteDataSource @Inject constructor(
                     chosen = chosen,
                     explanation = (q["explanation"]as? String).orEmpty(),
                     options = (q["options"]as? List<String>) ?: emptyList(),
-                    quizTitle = quizTitle
                 )
             }
             if(mistakeAnswer.isEmpty()){
