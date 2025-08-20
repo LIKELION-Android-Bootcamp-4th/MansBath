@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.study
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,7 +65,7 @@ import com.aspa.aspa.ui.theme.Gray10
 fun StudyScreen (
     uiState: UiState<Study>,
     onClickItem: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
 ){
 
     LaunchedEffect(Unit) {
@@ -74,8 +75,18 @@ fun StudyScreen (
     val study : Study? = (uiState as? UiState.Success<Study>)?.data
     val contentList = study?.items ?: emptyList()
 
-
+    when(uiState) {
+        is UiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is UiState.Success -> {
     Scaffold (
+
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(study?.title ?:"")},
@@ -86,6 +97,7 @@ fun StudyScreen (
             )
         },
         content = { padding ->
+
             Column(
                 modifier = Modifier
                     .padding(padding)
@@ -195,6 +207,17 @@ fun StudyScreen (
 
             }
 
-        }
+                }
     )
-}
+            }
+
+        is UiState.Failure ->    Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("에러발생. 관리자에게 문의하세요")
+        }
+        UiState.Idle -> {}
+    }
+
+        }

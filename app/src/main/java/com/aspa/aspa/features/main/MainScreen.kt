@@ -33,6 +33,7 @@ import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
+import com.aspa.aspa.ui.components.StudyNav.studyGraph
 import kotlinx.coroutines.launch
 
 @SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
@@ -121,6 +122,7 @@ fun MainScreen(
                 roadmapGraph(navController = innerNavController)
                 quizGraph(navController = innerNavController)
                 mypageGraph(navController = innerNavController)
+                studyGraph(navController = innerNavController)
             }
         }
     }

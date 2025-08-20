@@ -206,9 +206,7 @@ fun RoadmapDialog(
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Button(
                                 onClick = {
-                                    // roadmapId, questionId
-                                    Log.d("MYTAG", "qid: $questionId")
-//                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
+                                  navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
                                 },
                                 modifier = Modifier
                                     .weight(1f),

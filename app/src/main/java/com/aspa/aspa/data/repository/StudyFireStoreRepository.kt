@@ -6,5 +6,6 @@ import javax.inject.Inject
 class StudyFireStoreRepository @Inject constructor(
     private val dataSource: StudyFireStoreDataSource
 ){
-    suspend fun fetchStudy() = runCatching { dataSource.getStudyFireStore() }
+    suspend fun fetchStudy(roadmapId: String?,questionId : String?) = runCatching {
+        dataSource.getStudyFireStore(roadmapId,questionId) }
 }

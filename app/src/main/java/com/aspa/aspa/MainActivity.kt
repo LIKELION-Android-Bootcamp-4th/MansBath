@@ -177,5 +177,6 @@ fun AppNavigation() {
             // navController를 전달하지 않음
             MainScreen()
         }
+
     }
 }

@@ -4,11 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.aspa.aspa.features.study.StudyDetail.StudyDetailScreen
 import com.aspa.aspa.features.study.StudyScreen
 import com.aspa.aspa.features.study.StudyViewModel
@@ -25,11 +28,12 @@ sealed class StudyScreenRoute(val route: String) {
         "study?roadmapId=$roadmapId&questionId=$questionId"
 }
 
-@Composable
-fun StudyNav(){
-    val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = StudyScreenRoute.Study.route, route = Graph.Study ){
+fun NavGraphBuilder.studyGraph(navController: NavHostController) {
+    navigation(
+        startDestination = StudyScreenRoute.Study.route,
+        route = Graph.Study
+    ) {
         composable(
             route = StudyScreenRoute.Study.route,
             arguments = listOf(
@@ -37,26 +41,29 @@ fun StudyNav(){
                 navArgument("questionId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Graph.Study)
+            }
+            val vm: StudyViewModel = hiltViewModel(parentEntry)
+            val roadmapId = backStackEntry.arguments?.getString("roadmapId")
+            val questionId = backStackEntry.arguments?.getString("questionId")
+
+            StudyScreen(
+                uiState = vm.uiState.collectAsStateWithLifecycle().value,
+                onClickItem = { navController.navigate(StudyScreenRoute.StudyDetail.route) },
+                onRefresh = { vm.fetchStudy() },
+            )
+        }
+        composable(StudyScreenRoute.StudyDetail.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(Graph.Study)
             }
             val vm: StudyViewModel = hiltViewModel(parentEntry)
 
-           StudyScreen(
-               uiState = vm.uiState.collectAsStateWithLifecycle().value,
-               onClickItem = { navController.navigate(StudyScreenRoute.StudyDetail.route)},
-               onRefresh = { vm.fetchStudy() }
-           )
-        }
-        composable(StudyScreenRoute.StudyDetail.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry){
-                navController.getBackStackEntry(Graph.Study)
-            }
-            val vm : StudyViewModel = hiltViewModel(parentEntry)
-
             StudyDetailScreen(
                 uiState = vm.uiState.collectAsStateWithLifecycle().value,
-                onRetry = {vm.fetchStudy()}
+                onRetry = { vm.fetchStudy() }
             )
         }
     }
