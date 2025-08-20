@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,7 @@ fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
     val progress = roadmap.completedSection.toFloat() / roadmap.allSection
 
     Scaffold(
+        contentWindowInsets =  WindowInsets(0, 0, 0, 0),
         topBar = {
             Column(
                 modifier = Modifier
@@ -110,7 +112,7 @@ fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
 
             }
 
-        },
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
