@@ -35,7 +35,7 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState = _loginState.asStateFlow()
 
-    fun signInWithGoogleCredential(activity: Activity) {
+    fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
@@ -76,6 +76,7 @@ class LoginViewModel @Inject constructor(
                     .onSuccess { dto ->
                         Log.d(TAG, "성공하였습니다.")
                         _loginState.value = LoginState.Success(dto)
+                        onSuccess()
                     }
                     .onFailure { e ->
                         Log.e(TAG, "repo failure: ", e)
@@ -91,7 +92,7 @@ class LoginViewModel @Inject constructor(
     fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
         _loginState.value = LoginState.Loading
         authRepository.signInWithNaver(accessToken)
-            .onSuccess { user -> _loginState.value = LoginState.Success(null) }
+            .onSuccess { _loginState.value = LoginState.Success(null) }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
             }

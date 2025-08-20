@@ -43,9 +43,14 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val naverLauncher = rememberNaverLoginLauncher { token ->
-        loginViewModel.signInWithNaver(token)
-    }
+    val naverLauncher = rememberNaverLoginLauncher(
+        onAccessToken = { token ->
+            loginViewModel.signInWithNaver(token)
+        },
+        onSuccess = {
+            navController.navigate("main")
+        },
+    )
 
     Box(
         modifier = Modifier
@@ -85,8 +90,10 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 SocialButton("Google로 계속하기") {
-                    loginViewModel.signInWithGoogleCredential(navController.context as Activity)
-                    // TODO : 구글 로그인 성공 응답 처리
+                    loginViewModel.signInWithGoogleCredential(
+                        activity = navController.context as Activity,
+                        onSuccess = { navController.navigate("main") },
+                    ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
                 SocialButton("카카오톡으로 계속하기") {}
@@ -121,7 +128,8 @@ fun LoginScreen(
 
 @Composable
 fun rememberNaverLoginLauncher(
-    onAccessToken: (String?) -> Unit
+    onAccessToken: (String?) -> Unit,
+    onSuccess: () -> Unit
 ): ActivityResultLauncher<Intent> {
 
     return rememberLauncherForActivityResult(
@@ -134,6 +142,7 @@ fun rememberNaverLoginLauncher(
             Log.d("NAVER_LOGIN", "AccessToken: $accessToken")
 
             onAccessToken(accessToken)
+            onSuccess()
         } else {
             val code = NaverIdLoginSDK.getLastErrorCode().code
             val desc = NaverIdLoginSDK.getLastErrorDescription()
