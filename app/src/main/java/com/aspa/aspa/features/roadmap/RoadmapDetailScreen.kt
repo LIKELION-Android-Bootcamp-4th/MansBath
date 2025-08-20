@@ -41,16 +41,18 @@ import com.aspa.aspa.features.roadmap.components.SectionCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.theme.AspaTheme
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoadmapDetailScreen(roadmapId: String, navController: NavController) {
-    val uid = "test-user-for-web"
+    val uid = Firebase.auth.uid
     val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
         value = fetchRoadmap(
-            uid,
+            uid!!,
             roadmapId,
         )
     }
