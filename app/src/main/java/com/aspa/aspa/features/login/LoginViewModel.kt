@@ -2,32 +2,24 @@ package com.aspa.aspa.features.login
 
 import android.app.Activity
 import android.util.Log
-import androidx.credentials.CustomCredential
 import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 sealed interface LoginState {
     object Idle : LoginState
     object Loading : LoginState
-    data class Success(val user: UserProfileDto) : LoginState
+    data class Success(val user: UserProfileDto?) : LoginState
     data class Error(val message: String) : LoginState
 }
 
@@ -96,4 +88,12 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
+        _loginState.value = LoginState.Loading
+        authRepository.signInWithNaver(accessToken)
+            .onSuccess { user -> _loginState.value = LoginState.Success(null) }
+            .onFailure { e ->
+                _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
+            }
+    }
 }

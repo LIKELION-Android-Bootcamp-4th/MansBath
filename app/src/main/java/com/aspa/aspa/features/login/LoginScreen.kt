@@ -1,6 +1,11 @@
 package com.aspa.aspa.features.login
 
 import android.app.Activity
+import android.content.Intent
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,12 +35,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.login.navigation.LoginDestinations
+import com.navercorp.nid.NaverIdLoginSDK
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val naverLauncher = rememberNaverLoginLauncher { token ->
+        loginViewModel.signInWithNaver(token)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -79,7 +91,12 @@ fun LoginScreen(
 
                 SocialButton("카카오톡으로 계속하기") {}
 
-                SocialButton("네이버로 계속하기") {}
+                SocialButton("네이버로 계속하기") {
+                    NaverIdLoginSDK.authenticate(
+                        context = context,
+                        launcher = naverLauncher
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -101,6 +118,33 @@ fun LoginScreen(
         }
     }
 }
+
+@Composable
+fun rememberNaverLoginLauncher(
+    onAccessToken: (String?) -> Unit
+): ActivityResultLauncher<Intent> {
+
+    return rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val accessToken = NaverIdLoginSDK.getAccessToken()
+
+            Log.d("NAVER_LOGIN", "✅ 로그인 성공")
+            Log.d("NAVER_LOGIN", "AccessToken: $accessToken")
+
+            onAccessToken(accessToken)
+        } else {
+            val code = NaverIdLoginSDK.getLastErrorCode().code
+            val desc = NaverIdLoginSDK.getLastErrorDescription()
+
+            Log.e("NAVER_LOGIN", "❌ 로그인 실패")
+            Log.e("NAVER_LOGIN", "Error Code: $code")
+            Log.e("NAVER_LOGIN", "Error Desc: $desc")
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
