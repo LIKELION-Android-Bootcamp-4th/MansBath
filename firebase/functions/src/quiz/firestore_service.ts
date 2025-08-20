@@ -18,7 +18,7 @@ export async function saveQuiz(
     .collection("users")
     .doc(uid)
     .collection("quizzes")
-    .doc(quiz.roadmapId)
+    .doc(quiz.studyId)
     .collection("quiz");
   const quizRef: DocumentReference = collectionRef.doc();
   await quizRef.set(quiz, {merge: true});

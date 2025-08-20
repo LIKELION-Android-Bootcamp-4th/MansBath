@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 
 @Composable
 fun BottomNavigationBar(
@@ -30,8 +31,8 @@ fun BottomNavigationBar(
             label = { Text("퀴즈") }
         )
         NavigationBarItem(
-            selected = currentRoute == "roadmap",
-            onClick = { onTabSelected("roadmap") },
+            selected = currentRoute?.startsWith("roadmap") == true,
+            onClick = { onTabSelected(RoadmapDestinations.roadmapList()) },
             icon = { Icon(Icons.Default.Explore, contentDescription = "로드맵") },
             label = { Text("로드맵") }
         )

@@ -1,22 +1,21 @@
-import {initializeApp} from "firebase-admin/app";
+import * as admin from "firebase-admin";
+import {setGlobalOptions} from "firebase-functions/v2";
 
-import {question} from "./question/question";
-import {generateRoadmap} from "./roadmap/roadmap";
-import {Study} from "./Study/study";
-import {makeQuiz} from "./quiz/quiz";
+// Initialization
+setGlobalOptions(
+  {
+    region: "asia-northeast3",
+    invoker: "public",
+  }
+);
 
-import {loginWithNaver} from "./auth/naver";
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 
-// Firebase Admin SDK 초기화
-initializeApp();
-
-// =================================================================
-// ✨ 분리된 함수 내보내기
-// =================================================================
-
-export {question};
-export {generateRoadmap};
-export {Study};
-export {makeQuiz};
-
-export {loginWithNaver};
+// Functions
+export * from "./question/question";
+export * from "./roadmap/roadmap";
+export * from "./quiz/quiz";
+export * from "./auth/naver";
+export * from "./Study/study";

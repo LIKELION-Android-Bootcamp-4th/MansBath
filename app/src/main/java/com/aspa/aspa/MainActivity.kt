@@ -2,41 +2,28 @@ package com.aspa.aspa
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.features.home.HomeScreen
-import com.aspa.aspa.features.home.HomeScreenActions
-import com.aspa.aspa.features.home.HomeScreenState
 import com.aspa.aspa.features.login.LoginScreen
-import com.aspa.aspa.features.login.LoginViewModel
 import com.aspa.aspa.features.login.NicknameScreen
 import com.aspa.aspa.features.main.MainScreen
-import com.aspa.aspa.model.Auth
 import com.aspa.aspa.ui.theme.AspaTheme
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import com.google.firebase.functions.functions
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.navercorp.nid.NaverIdLoginSDK
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,11 +33,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        initNaverLoginSDK(this)
-
         setContent {
             AspaTheme {
-                Auth.uid = "test-user-for-web"
                 AppNavigation()
             }
         }
@@ -137,7 +121,7 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
                                 "uid" to userUid,
                                 "email" to profile?.get("email") as? String,
                                 "name" to profile?.get("nickname") as? String,
-                                "sns" to "kakao",
+                                "provider" to "kakao",
                                 "lastLogin" to FieldValue.serverTimestamp()
                             )
                             if (user != null) {
@@ -164,73 +148,6 @@ private fun firebaseAuthWithKakao(kakaoAccessToken: String, context: Activity) {
             // Firebase 인증 실패
             Log.e("FirebaseAuth", "Firebase 로그인 실패", e)
         }
-}
-
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
-
-fun initNaverLoginSDK(activity: Activity) {
-
-    NaverIdLoginSDK.initialize(
-        context = activity.applicationContext,
-        clientId = BuildConfig.NAVER_CLIENT_ID,
-        clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
-        clientName = BuildConfig.APPLICATION_ID
-    )
-}
-
-@Composable
-fun rememberNaverLoginLauncher(): ActivityResultLauncher<Intent> {
-
-    return rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val accessToken = NaverIdLoginSDK.getAccessToken()
-
-            Log.d("NAVER_LOGIN", "✅ 로그인 성공")
-            Log.d("NAVER_LOGIN", "AccessToken: $accessToken")
-
-            sendAccessTokenToFunctions(accessToken)
-        } else {
-            val code = NaverIdLoginSDK.getLastErrorCode().code
-            val desc = NaverIdLoginSDK.getLastErrorDescription()
-
-            Log.e("NAVER_LOGIN", "❌ 로그인 실패")
-            Log.e("NAVER_LOGIN", "Error Code: $code")
-            Log.e("NAVER_LOGIN", "Error Desc: $desc")
-        }
-    }
-}
-
-fun sendAccessTokenToFunctions(accessToken: String?) {
-    if (!accessToken.isNullOrEmpty()) {
-        val functions = Firebase.functions("asia-northeast3")
-
-        val data = hashMapOf(
-            "accessToken" to accessToken
-        )
-
-        functions
-            .getHttpsCallable("loginWithNaver")
-            .call(data)
-
-            .addOnSuccessListener { result ->
-                val customToken = result.getData() as String
-                FirebaseAuth.getInstance().signInWithCustomToken(customToken)
-                    .addOnSuccessListener {
-                        Log.d("NAVER_LOGIN", "✅ Firebase 세션 로그인 성공")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("NAVER_LOGIN", "❌ Firebase 세션 로그인 실패", e)
-                    }
-            }
-            .addOnFailureListener { e ->
-                Log.e("NAVER_LOGIN", "❌ Functions 호출 실패", e)
-            }
-    } else {
-        Log.e("NAVER_LOGIN", "❌ Access Token이 없습니다.")
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
