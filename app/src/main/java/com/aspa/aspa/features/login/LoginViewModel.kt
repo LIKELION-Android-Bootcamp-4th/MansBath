@@ -2,32 +2,24 @@ package com.aspa.aspa.features.login
 
 import android.app.Activity
 import android.util.Log
-import androidx.credentials.CustomCredential
 import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 sealed interface LoginState {
     object Idle : LoginState
     object Loading : LoginState
-    data class Success(val user: UserProfileDto) : LoginState
+    data class Success(val user: UserProfileDto?) : LoginState
     data class Error(val message: String) : LoginState
 }
 
@@ -43,7 +35,7 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState = _loginState.asStateFlow()
 
-    fun signInWithGoogleCredential(activity: Activity) {
+    fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
@@ -84,6 +76,7 @@ class LoginViewModel @Inject constructor(
                     .onSuccess { dto ->
                         Log.d(TAG, "성공하였습니다.")
                         _loginState.value = LoginState.Success(dto)
+                        onSuccess()
                     }
                     .onFailure { e ->
                         Log.e(TAG, "repo failure: ", e)
@@ -96,4 +89,12 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
+        _loginState.value = LoginState.Loading
+        authRepository.signInWithNaver(accessToken)
+            .onSuccess { _loginState.value = LoginState.Success(null) }
+            .onFailure { e ->
+                _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
+            }
+    }
 }

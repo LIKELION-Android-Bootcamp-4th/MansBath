@@ -1,10 +1,7 @@
 package com.aspa.aspa.data.repository
 
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizDtoAlpha
 import com.aspa.aspa.data.dto.QuizzesDto
-import com.aspa.aspa.data.dto.RoadmapDto
-import com.aspa.aspa.data.dto.RoadmapDtoAlpha
 import com.aspa.aspa.data.remote.QuizRemoteDataSource
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject

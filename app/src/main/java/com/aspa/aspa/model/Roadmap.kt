@@ -1,7 +1,7 @@
 package com.aspa.aspa.model
 
 data class Roadmap (
-//    val user: User,
+    val id: String,
     val title: String,
     val description: String,
     val completedSection: Int,  // 2
