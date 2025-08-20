@@ -1,26 +1,27 @@
-import {initializeApp} from "firebase-admin/app";
+import * as admin from "firebase-admin";
+import {setGlobalOptions} from "firebase-functions/v2";
 
-import {question} from "./question/question";
-import {generateRoadmap} from "./roadmap/roadmap";
-import {Study} from "./Study/study";
-import {makeQuiz} from "./quiz/quiz";
-
-import {loginWithNaver} from "./auth/naver";
 import {checkFalseStatusScheduler /* , testCheckFalseStatus */} from "./fcm/fcm_service";
 
-// Firebase Admin SDK 초기화
-initializeApp();
+// Initialization
+setGlobalOptions(
+  {
+    region: "asia-northeast3",
+    invoker: "public",
+  }
+);
 
-// =================================================================
-// ✨ 분리된 함수 내보내기
-// =================================================================
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 
-export {question};
-export {generateRoadmap};
-export {Study};
-export {makeQuiz};
+// Functions
+export * from "./question/question";
+export * from "./roadmap/roadmap";
+export * from "./quiz/quiz";
+export * from "./auth/naver";
+export * from "./Study/study";
 
-export {loginWithNaver};
 export {checkFalseStatusScheduler};
 
 // TODO: 테스트 용, 배포시 주석 처리

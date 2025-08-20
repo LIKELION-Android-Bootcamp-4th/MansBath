@@ -1,6 +1,6 @@
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
-import {SNS} from "../type/auth_types";
+import {provider} from "../type/auth_types";
 import {getAuth} from "firebase-admin/auth";
 
 export const loginWithNaver = onCall(
@@ -29,14 +29,14 @@ export const loginWithNaver = onCall(
       throw new HttpsError("unknown", `result code is not "00": ${profile.message}`);
     }
 
-    const uid = `naver:${profile.response.id}`;
+    const uid = `${profile.response.id}`;
 
     // Firestore 사용자 확인 / 신규 생성
     const userRef = getFirestore().collection("users").doc(uid);
     const userSnap = await userRef.get();
     if (!userSnap.exists) {
       await userRef.set({
-        sns: SNS.NAVER,
+        provider: provider.NAVER,
         uid: uid,
         email: profile.response.email || "",
         name: profile.response.nickname || "",
