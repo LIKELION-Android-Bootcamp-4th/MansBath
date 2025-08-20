@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.login
 
 import android.app.Activity
+import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.credentials.CustomCredential
 import androidx.credentials.CredentialManager
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
+import com.aspa.aspa.data.repository.FcmRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
@@ -35,7 +37,8 @@ sealed interface LoginState {
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
-    private val getCredentialRequest: GetCredentialRequest
+    private val getCredentialRequest: GetCredentialRequest,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
 
     companion object { private const val TAG = "LoginVM" }
@@ -92,6 +95,15 @@ class LoginViewModel @Inject constructor(
             }catch (error : Exception){
                 Log.e(TAG,"문제가 발생했습니다. ${error.message}")
 
+            }
+        }
+    }
+
+    fun updateFcmToken() {
+        viewModelScope.launch {
+            val token = fcmRepository.getToken()
+            if(token != null) {
+                fcmRepository.updateFcmToken("test-user-for-web", token)
             }
         }
     }

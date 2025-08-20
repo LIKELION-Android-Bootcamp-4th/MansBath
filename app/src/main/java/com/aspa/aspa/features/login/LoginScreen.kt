@@ -86,6 +86,8 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         navController.navigate(LoginDestinations.NICKNAME)
+                        // TODO: 로그인 완료 시 파이어베이스에 FCM 토큰 전송 로직. 로그인 정리 후 코드 위치 교체 요망
+                        loginViewModel.updateFcmToken()
                     },
                     modifier = Modifier
                         .fillMaxWidth(),

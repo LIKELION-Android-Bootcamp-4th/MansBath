@@ -1,5 +1,6 @@
 package com.aspa.aspa.data.remote
 
+import android.util.Log
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,5 +24,17 @@ class UserRemoteDataSource @Inject constructor(
         )
         firestore.collection("users").document(docId).set(data, SetOptions.merge()).await()
         return dto.copy(uid = docId)
+    }
+
+    suspend fun updateFcmToken(uid: String, token: String): Boolean {
+        try {
+            firestore.collection("users").document(uid).update("fcmToken", token).await()
+            Log.d("UserInfo", "FCM 토큰 정보 업데이트 완료")
+            return true
+        }
+        catch (e: Exception) {
+            Log.e("UserInfo", "FCM 토큰 정보 업데이트 중 문제 발생", e)
+            return false
+        }
     }
 }
