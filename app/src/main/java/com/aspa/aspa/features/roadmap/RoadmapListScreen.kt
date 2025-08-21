@@ -41,12 +41,17 @@ fun RoadmapListScreen(
     LaunchedEffect(Unit) {
         if (questionId.isNotEmpty()) {
             viewModel.generateRoadmap(questionId) { roadmapId ->
+                // 먼저 questionId 없는 목록으로 교체
+                navController.navigate(RoadmapDestinations.roadmapList()) {
+                    popUpTo(RoadmapDestinations.ROADMAP_LIST) { inclusive = true }
+                }
+                // 그 다음에 상세 화면으로 이동
                 navController.navigate(
                     RoadmapDestinations.roadmapDetail(
                         roadmapId,
                         questionId
                     )
-                ) // todo: 이동 이후 뒤로가기 시 다시 로드맵 생성 호출됨 !!! viewModel에서 처리할 것
+                )
             }
         } else {
             viewModel.loadRoadmaps()
