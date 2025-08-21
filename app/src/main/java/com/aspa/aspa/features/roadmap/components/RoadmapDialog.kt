@@ -2,6 +2,7 @@ package com.aspa.aspa.features.roadmap.components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,42 +34,49 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
-import com.aspa.aspa.features.roadmap.fetchRoadmap
-import com.aspa.aspa.model.Roadmap
-import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
+import com.aspa.aspa.features.roadmap.RoadmapState
+import com.aspa.aspa.features.roadmap.RoadmapViewModel
 import com.aspa.aspa.ui.theme.AspaTheme
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun RoadmapDialog(
     roadmapId: String,
     sectionId: Int,
+    questionId: String,
     navController: NavController,
+    viewModel: RoadmapViewModel = hiltViewModel()
 ) {
-    val uid = Firebase.auth.uid!!
-    val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
-        value = fetchRoadmap(
-            uid,
-            roadmapId,
-        )
+    Log.d("MYTAG", "qid: $questionId")
+
+    val roadmapState by viewModel.roadmapState.collectAsState()
+    val quizExist by viewModel.quizExistState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadRoadmap(roadmapId)
+        viewModel.isQuizExist(roadmapId)
     }
 
-    when {
-        roadmap == null -> {
+    val context = LocalContext.current
+
+    when (val state = roadmapState) {
+        is RoadmapState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -77,9 +85,9 @@ fun RoadmapDialog(
             }
         }
 
-        else -> roadmap?.let { roadmap ->
+        is RoadmapState.Success -> {
+            val roadmap = state.roadmap
             val section = roadmap.sections[sectionId]
-            Log.d("MYTAG", "section : $section")
 
             Dialog(onDismissRequest = { navController.popBackStack() }) {
                 Surface(
@@ -201,8 +209,12 @@ fun RoadmapDialog(
 
                         // 버튼
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            Button(
-                                onClick = { navController.navigate(StudyScreenRoute.Study.route) },
+                            Button(  // 학습 버튼
+                                onClick = {
+                                    // roadmapId, questionId
+                                    Log.d("MYTAG", "qid: $questionId")
+//                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
+                                },
                                 modifier = Modifier
                                     .weight(1f),
                                 colors = ButtonDefaults.buttonColors(
@@ -216,11 +228,17 @@ fun RoadmapDialog(
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            OutlinedButton(
+                            OutlinedButton(  // 퀴즈 버튼
                                 onClick = {
-                                    navController.navigate(QuizDestinations.QUIZ) {
-                                        popUpTo(0) { inclusive = true }
-                                        launchSingleTop = true
+                                    when (quizExist) {
+                                        true -> {
+                                            navController.navigate(QuizDestinations.QUIZ) {
+                                                popUpTo(0) { inclusive = true }
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                        false -> Toast.makeText(context, "퀴즈가 존재하지 않습니다.\n먼저 학습을 시작해주세요.", Toast.LENGTH_SHORT).show()
+                                        null -> Toast.makeText(context, "퀴즈 탐색 중..", Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 modifier = Modifier
@@ -242,9 +260,9 @@ fun RoadmapDialog(
                 }
             }
         }
+
+        is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
     }
-
-
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -257,6 +275,7 @@ fun RoadmapDialogPreview() {
             RoadmapDialog(
                 roadmapId = "",
                 sectionId = -1,
+                questionId = "",
                 navController = navController
             )
         }
