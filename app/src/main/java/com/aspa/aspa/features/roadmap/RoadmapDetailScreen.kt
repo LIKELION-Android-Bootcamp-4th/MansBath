@@ -21,8 +21,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,36 +33,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.data.dto.RoadmapDocumentDto
-import com.aspa.aspa.data.dto.RoadmapDto
-import com.aspa.aspa.data.mapper.toRoadmap
 import com.aspa.aspa.features.roadmap.components.SectionCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
-import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.ui.theme.AspaTheme
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoadmapDetailScreen(roadmapId: String, questionId: String, navController: NavController) {
+fun RoadmapDetailScreen(
+    roadmapId: String,
+    questionId: String,
+    navController: NavController,
+    viewModel: RoadmapViewModel = hiltViewModel()
+) {
     Log.d("MYTAG", "qid: $questionId")
 
+    val roadmapState by viewModel.roadmapState.collectAsState()
 
-    val uid = Firebase.auth.uid
-    val roadmap by produceState<Roadmap?>(initialValue = null, uid) {
-        value = fetchRoadmap(
-            uid!!,
-            roadmapId,
-        )
+    LaunchedEffect(Unit) {
+        viewModel.loadRoadmap(roadmapId)
     }
 
-    when {
-        roadmap == null -> {
+    when (val state = roadmapState) {
+        RoadmapState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -69,10 +65,9 @@ fun RoadmapDetailScreen(roadmapId: String, questionId: String, navController: Na
                 CircularProgressIndicator()
             }
         }
-
-        else -> roadmap?.let { roadmap ->
+        is RoadmapState.Success -> {
+            val roadmap = state.roadmap
             val progress = roadmap.completedSection.toFloat() / roadmap.allSection
-
             Scaffold(
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 topBar = {
@@ -172,29 +167,12 @@ fun RoadmapDetailScreen(roadmapId: String, questionId: String, navController: Na
                     }
                 }
             }
+
+
         }
+        is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
     }
 }
-
-suspend fun fetchRoadmap(uid: String, roadmapId: String): Roadmap? {
-    val db = FirebaseFirestore.getInstance()
-    val snapshot = db.collection("users")
-        .document(uid)
-        .collection("roadmap")
-        .document(roadmapId)
-        .get()
-        .await()
-
-    if (!snapshot.exists()) {
-        Log.w("MYTAG", "❌ 문서 없음: $roadmapId (uid=$uid)")
-        return null
-    }
-
-    return snapshot.toObject(RoadmapDocumentDto::class.java)
-        ?.roadmap
-        ?.toRoadmap(roadmapId)
-}
-
 
 @Preview(showBackground = true)
 @Composable
