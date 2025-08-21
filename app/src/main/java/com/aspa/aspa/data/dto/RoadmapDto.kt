@@ -21,5 +21,6 @@ data class StageDto(
     val description: String = "",
     val concept: String = "",
     val learning_curve: String = "",
+    val status: Boolean = false,
     val isSolved: Boolean = false
 )

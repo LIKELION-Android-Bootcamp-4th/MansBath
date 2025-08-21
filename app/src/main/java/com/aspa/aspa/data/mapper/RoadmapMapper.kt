@@ -14,7 +14,8 @@ fun RoadmapDto.toRoadmap(roadmapId: String, questionId: String, createdAt: Times
             description = s.description,
             concept = s.concept,
             duration = s.learning_curve,
-            status = false,
+            status = s.status,
+            isSolved = s.isSolved,
             quiz = Quiz()
         )
     }
