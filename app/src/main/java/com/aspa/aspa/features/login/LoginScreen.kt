@@ -23,6 +23,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,11 +37,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.login.navigation.LoginDestinations
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.navercorp.nid.NaverIdLoginSDK
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController,
+    navController: NavController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -51,6 +58,16 @@ fun LoginScreen(
             navController.navigate("main")
         },
     )
+    val loginState by loginViewModel.loginState.collectAsState()
+
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            navController.navigate("main") /*{
+                popUpTo("login") { inclusive = true } // 뒤로가기 시 로그인화면 안보이게
+                launchSingleTop = true
+            }*/
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -96,7 +113,9 @@ fun LoginScreen(
                     ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
-                SocialButton("카카오톡으로 계속하기") {}
+                SocialButton("카카오톡으로 계속하기") {
+                    loginViewModel.signInWithKakao(context)
+                }
 
                 SocialButton("네이버로 계속하기") {
                     NaverIdLoginSDK.authenticate(
