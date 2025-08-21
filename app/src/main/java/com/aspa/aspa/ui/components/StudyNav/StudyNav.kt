@@ -1,5 +1,6 @@
 package com.aspa.aspa.ui.components.StudyNav
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,10 +49,15 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             val sectionId = backStackEntry.arguments?.getInt("sectionId")
             val questionId = backStackEntry.arguments?.getString("questionId")
 
+            LaunchedEffect(roadmapId,questionId) {
+                if(roadmapId != null && questionId != null){
+                    vm.fetchStudy()
+                }
+            }
+
             StudyScreen(
                 uiState = vm.uiState.collectAsStateWithLifecycle().value,
                 onClickItem = { navController.navigate(StudyScreenRoute.StudyDetail.route) },
-                onRefresh = { vm.fetchStudy() },
             )
         }
         composable(StudyScreenRoute.StudyDetail.route) { backStackEntry ->

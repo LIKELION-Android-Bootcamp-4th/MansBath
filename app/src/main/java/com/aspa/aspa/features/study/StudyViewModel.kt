@@ -25,24 +25,16 @@ class StudyViewModel @Inject constructor(
 
     private val roadmapIdFlow = savedStateHandle.getStateFlow<String?>("roadmapId", null)
     private val questionIdFlow = savedStateHandle.getStateFlow<String?>("questionId", null)
-    init {
-        viewModelScope.launch {
-                    fetchStudy()
-
-        }
-    }
-
-
-
+    val roadmapId = roadmapIdFlow.value
+    val questionId = questionIdFlow.value
 
     fun fetchStudy(){
-        val roadmapId = roadmapIdFlow.value
-        val questionId = questionIdFlow.value
-
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             repository.fetchStudy(roadmapId,questionId)
-                .onSuccess { _uiState.value = UiState.Success(it) }
+                .onSuccess {
+
+                    _uiState.value = UiState.Success(it) }
                 .onFailure {
                     android.util.Log.e("StudyVM", "fetchStudy failed", it)
                     _uiState.value = UiState.Failure(it.message ?: "Error 발생")

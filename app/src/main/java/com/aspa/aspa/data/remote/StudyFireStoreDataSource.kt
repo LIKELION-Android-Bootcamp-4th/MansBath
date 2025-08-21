@@ -48,7 +48,7 @@ class StudyFireStoreDataSource @Inject constructor(
                     .call(sendData)
                     .await()
                 Log.d("Data", "생성 성공")
-                val responseData = functions.getData() as? Map<*, *>
+                val responseData = functions.getData() as? Map<*, *> 
                     ?: error("Cloud Functions 응답 데이터가 없습니다.")
                 val studyDataMap = responseData["study"] as? Map<*, *>
                     ?: error("Cloud Functions 응답에 'study' 데이터가 없습니다.")
