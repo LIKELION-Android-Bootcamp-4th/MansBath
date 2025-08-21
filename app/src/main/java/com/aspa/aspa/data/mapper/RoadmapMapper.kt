@@ -24,6 +24,8 @@ fun RoadmapDto.toRoadmap(roadmapId: String): Roadmap {
         description = description,
         completedSection = 0,
         allSection = sections.size,
-        sections = sections
+        sections = sections,
+        questionId = questionId,
+        createdAt = createdAt,
     )
 }

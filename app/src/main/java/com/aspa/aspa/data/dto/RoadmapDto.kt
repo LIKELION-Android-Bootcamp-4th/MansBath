@@ -1,5 +1,7 @@
 package com.aspa.aspa.data.dto
 
+import com.google.type.Date
+
 data class RoadmapDocumentDto(
     val roadmap: RoadmapDto = RoadmapDto()
 )
@@ -7,7 +9,9 @@ data class RoadmapDocumentDto(
 data class RoadmapDto(
     val title: String = "",
     val description: String = "",
-    val stages: List<StageDto> = emptyList()
+    val stages: List<StageDto> = emptyList(),
+    val questionId: String = "",
+    val createdAt: Date? = null,
 )
 
 data class StageDto(
