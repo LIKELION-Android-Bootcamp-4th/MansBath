@@ -48,8 +48,7 @@ fun RoadmapListScreen(
                 // 그 다음에 상세 화면으로 이동
                 navController.navigate(
                     RoadmapDestinations.roadmapDetail(
-                        roadmapId,
-                        questionId
+                        roadmapId
                     )
                 )
             }
@@ -92,8 +91,7 @@ private fun RoadmapListSection(
                     RoadmapCard(roadmap) {
                         navController.navigate(
                             RoadmapDestinations.roadmapDetail(
-                                roadmap.id,
-                                questionId
+                                roadmap.id
                             )
                         )
                     }
