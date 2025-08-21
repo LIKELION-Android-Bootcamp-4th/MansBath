@@ -1,15 +1,12 @@
 package com.aspa.aspa.ui.components.StudyNav
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.aspa.aspa.features.study.StudyDetail.StudyDetailScreen
@@ -21,11 +18,11 @@ object Graph {
 }
 
 sealed class StudyScreenRoute(val route: String) {
-    object Study : StudyScreenRoute("study?roadmapId={roadmapId}&questionId={questionId}")
+    object Study : StudyScreenRoute("study?roadmapId={roadmapId}&sectionId={sectionId}&questionId={questionId}")
     object StudyDetail : StudyScreenRoute("study_detail")
 
-    fun study(roadmapId: String, questionId: String): String =
-        "study?roadmapId=$roadmapId&questionId=$questionId"
+    fun study(roadmapId: String, sectionId: Int, questionId: String): String =
+        "study?roadmapId=$roadmapId&sectionId=$sectionId&questionId=$questionId"
 }
 
 
@@ -38,6 +35,7 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             route = StudyScreenRoute.Study.route,
             arguments = listOf(
                 navArgument("roadmapId") { type = NavType.StringType },
+                navArgument("sectionId") { type = NavType.IntType },
                 navArgument("questionId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
@@ -47,6 +45,7 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             }
             val vm: StudyViewModel = hiltViewModel(parentEntry)
             val roadmapId = backStackEntry.arguments?.getString("roadmapId")
+            val sectionId = backStackEntry.arguments?.getInt("sectionId")
             val questionId = backStackEntry.arguments?.getString("questionId")
 
             StudyScreen(

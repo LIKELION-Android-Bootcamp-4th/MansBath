@@ -209,7 +209,7 @@ fun RoadmapDialog(
                             Button(  // 학습 버튼
                                 onClick = {
                                     Log.d("MYTAG", "qid: ${roadmap.questionId}")
-                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, roadmap.questionId))
+                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, sectionId, roadmap.questionId))
                                 },
                                 modifier = Modifier
                                     .weight(1f),
