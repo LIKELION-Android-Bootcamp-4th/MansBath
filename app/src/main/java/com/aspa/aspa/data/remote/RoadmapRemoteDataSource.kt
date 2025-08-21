@@ -24,7 +24,7 @@ class RoadmapRemoteDataSource @Inject constructor(
 
         val docDtos = snapshot.toObjects(RoadmapDocumentDto::class.java)
         val ids = snapshot.documents.map { it.id }  // roadmapId 추출
-        return docDtos.mapIndexed { i, dto -> dto.roadmap.toRoadmap(ids[i]) }  // dto -> Roadmap  // with roadmapId
+        return docDtos.mapIndexed { i, dto -> dto.roadmap.toRoadmap(ids[i], dto.questionId, dto.createdAt) }  // dto -> Roadmap  // with roadmapId, questionId, createdAt
     }
 
     suspend fun fetchRoadmap(roadmapId: String): Roadmap? {
@@ -35,9 +35,11 @@ class RoadmapRemoteDataSource @Inject constructor(
             .get()
             .await()
 
+        val docsDto = snapshot.toObject(RoadmapDocumentDto::class.java)!!
+
         return snapshot.toObject(RoadmapDocumentDto::class.java)
             ?.roadmap
-            ?.toRoadmap(roadmapId)
+            ?.toRoadmap(roadmapId, docsDto.questionId, docsDto.createdAt)
     }
 
     suspend fun generateRoadmap(questionId: String): String {

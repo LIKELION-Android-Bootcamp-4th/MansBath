@@ -4,8 +4,9 @@ import com.aspa.aspa.data.dto.RoadmapDto
 import com.aspa.aspa.model.Quiz
 import com.aspa.aspa.model.Roadmap
 import com.aspa.aspa.model.Section
+import com.google.firebase.Timestamp
 
-fun RoadmapDto.toRoadmap(roadmapId: String): Roadmap {
+fun RoadmapDto.toRoadmap(roadmapId: String, questionId: String, createdAt: Timestamp?): Roadmap {
     val sections = this.stages.map { s ->
         Section(
             id = s.id,
