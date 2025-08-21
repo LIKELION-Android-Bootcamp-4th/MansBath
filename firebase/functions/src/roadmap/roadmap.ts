@@ -36,7 +36,7 @@ export const generateRoadmap = onCall(async (request) => {
 
     const finalRoadmap: Roadmap = {
       ...roadmap,
-      from: questionId,
+      questionId: questionId,
     };
 
     const roadmapRefId = await saveRoadmap(uid, finalRoadmap);
