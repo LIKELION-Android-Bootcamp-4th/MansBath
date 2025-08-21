@@ -88,11 +88,12 @@ fun UserMessage(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.Top
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f, fill = false)
         ) {
             Text(
                 text = text,
