@@ -19,3 +19,7 @@ export * from "./roadmap/roadmap";
 export * from "./quiz/quiz";
 export * from "./auth/naver";
 export * from "./Study/study";
+
+// Triggers
+export {studyTrigger} from "./Study/triggers";
+export {quizTrigger} from "./quiz/triggers";

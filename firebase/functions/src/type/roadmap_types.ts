@@ -1,5 +1,6 @@
 export interface Roadmap {
   title: string;
+  from: string;
   description: string;
   stages: Stage[];
 }
