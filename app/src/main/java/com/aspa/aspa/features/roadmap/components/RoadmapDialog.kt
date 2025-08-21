@@ -37,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,12 +58,9 @@ import com.aspa.aspa.ui.theme.AspaTheme
 fun RoadmapDialog(
     roadmapId: String,
     sectionId: Int,
-    questionId: String,
     navController: NavController,
     viewModel: RoadmapViewModel = hiltViewModel()
 ) {
-    Log.d("MYTAG", "qid: $questionId")
-
     val roadmapState by viewModel.roadmapState.collectAsState()
     val quizExist by viewModel.quizExistState.collectAsState()
 
@@ -212,7 +208,7 @@ fun RoadmapDialog(
                             Button(  // 학습 버튼
                                 onClick = {
                                     // roadmapId, questionId
-                                    Log.d("MYTAG", "qid: $questionId")
+                                    Log.d("MYTAG", "qid: ${roadmap.questionId}")
 //                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
                                 },
                                 modifier = Modifier
@@ -275,7 +271,6 @@ fun RoadmapDialogPreview() {
             RoadmapDialog(
                 roadmapId = "",
                 sectionId = -1,
-                questionId = "",
                 navController = navController
             )
         }

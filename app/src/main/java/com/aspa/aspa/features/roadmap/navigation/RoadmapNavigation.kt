@@ -11,17 +11,17 @@ import com.aspa.aspa.features.roadmap.components.RoadmapDialog
 
 object RoadmapDestinations {
     const val ROADMAP_LIST = "roadmap?questionId={questionId}"
-    const val ROADMAP_DETAIL = "roadmap/{roadmapId}?questionId={questionId}"
-    const val ROADMAP_DIALOG = "roadmap/{roadmapId}/{sectionId}?questionId={questionId}"
+    const val ROADMAP_DETAIL = "roadmap/{roadmapId}"
+    const val ROADMAP_DIALOG = "roadmap/{roadmapId}/{sectionId}"
 
     fun roadmapList(questionId: String = "") =
         "roadmap?questionId=$questionId"
 
-    fun roadmapDetail(roadmapId: String, questionId: String) =
-        "roadmap/$roadmapId?questionId=$questionId"
+    fun roadmapDetail(roadmapId: String) =
+        "roadmap/$roadmapId"
 
-    fun roadmapDialog(roadmapId: String,sectionId: Int, questionId: String) =
-        "roadmap/$roadmapId/$sectionId?questionId=$questionId"
+    fun roadmapDialog(roadmapId: String,sectionId: Int) =
+        "roadmap/$roadmapId/$sectionId"
 }
 
 fun NavGraphBuilder.roadmapGraph(navController: NavController) {
@@ -44,13 +44,11 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
         arguments =
             listOf(
                 navArgument("roadmapId") { type = NavType.StringType },
-                navArgument("questionId") { type = NavType.StringType }
             )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
-        val questionId = backStackEntry.arguments?.getString("questionId")
 
-        RoadmapDetailScreen(roadmapId!!, questionId!!, navController)
+        RoadmapDetailScreen(roadmapId!!, navController)
     }
 
     composable(
@@ -58,16 +56,13 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
         arguments = listOf(
             navArgument("roadmapId") { type = NavType.StringType },
             navArgument("sectionId") { type = NavType.IntType },
-            navArgument("questionId") { type = NavType.StringType }
         )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
         val sectionId = backStackEntry.arguments?.getInt("sectionId")
-        val questionId = backStackEntry.arguments?.getString("questionId")
         RoadmapDialog(
             roadmapId = roadmapId!!,
             sectionId = sectionId!!,
-            questionId = questionId!!,
             navController = navController
         )
     }

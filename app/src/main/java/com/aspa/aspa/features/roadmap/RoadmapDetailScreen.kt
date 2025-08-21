@@ -1,6 +1,5 @@
 package com.aspa.aspa.features.roadmap
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,12 +46,9 @@ import com.aspa.aspa.ui.theme.AspaTheme
 @Composable
 fun RoadmapDetailScreen(
     roadmapId: String,
-    questionId: String,
     navController: NavController,
     viewModel: RoadmapViewModel = hiltViewModel()
 ) {
-    Log.d("MYTAG", "qid: $questionId")
-
     val roadmapState by viewModel.roadmapState.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -162,7 +158,6 @@ fun RoadmapDetailScreen(
                                     RoadmapDestinations.roadmapDialog(
                                         roadmapId = roadmapId,
                                         sectionId = sectionId,
-                                        questionId = questionId
                                     )
                                 )
                             }
@@ -183,6 +178,6 @@ fun RoadmapDetailScreen(
 fun RoadmapDetailScreenPreview() {
     val nav = rememberNavController()
     AspaTheme {
-        RoadmapDetailScreen("roadmapId", "qid", nav)
+        RoadmapDetailScreen("roadmapId", nav)
     }
 }
