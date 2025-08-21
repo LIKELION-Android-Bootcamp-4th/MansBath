@@ -13,7 +13,7 @@ class UserRemoteDataSource @Inject constructor(
 ) {
     //2) 양식에 맞게 변환 후 파이어 스토어 저장
     suspend fun upsertProfile(dto : UserProfileDto) : UserProfileDto{
-        val docId = "${dto.provider}"+":"+"${dto.uid}"
+        val docId = dto.uid
         val data = hashMapOf(
             "uid" to docId,
             "email" to dto.email,
