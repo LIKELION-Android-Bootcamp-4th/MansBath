@@ -52,6 +52,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.RoadmapState
 import com.aspa.aspa.features.roadmap.RoadmapViewModel
+import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @Composable
@@ -208,7 +209,7 @@ fun RoadmapDialog(
                             Button(  // 학습 버튼
                                 onClick = {
                                     Log.d("MYTAG", "qid: ${roadmap.questionId}")
-                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, questionId))
+                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, roadmap.questionId))
                                 },
                                 modifier = Modifier
                                     .weight(1f),
