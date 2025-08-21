@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -32,6 +33,7 @@ fun NavGraphBuilder.homeGraph(
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(HomeDestinations.HOME_GRAPH_ROUTE)
             }
+            val keyboardController = LocalSoftwareKeyboardController.current
 
             val uiState by homeViewModel.uiState.collectAsState()
             var inputText by remember { mutableStateOf("") }
@@ -52,6 +54,8 @@ fun NavGraphBuilder.homeGraph(
                                 homeViewModel.handleFollowUpQuestion(inputText)
                             }
                             inputText = ""
+
+                            keyboardController?.hide()
                         }
                     },
                     onOptionSelected = { selectedOption ->
