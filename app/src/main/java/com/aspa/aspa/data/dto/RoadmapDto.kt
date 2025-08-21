@@ -1,17 +1,18 @@
 package com.aspa.aspa.data.dto
 
-import com.google.type.Date
+import com.google.firebase.Timestamp
+
 
 data class RoadmapDocumentDto(
-    val roadmap: RoadmapDto = RoadmapDto()
+    val roadmap: RoadmapDto = RoadmapDto(),
+    val questionId: String = "",
+    val createdAt: Timestamp? = null,
 )
 
 data class RoadmapDto(
     val title: String = "",
     val description: String = "",
     val stages: List<StageDto> = emptyList(),
-    val questionId: String = "",
-    val createdAt: Date? = null,
 )
 
 data class StageDto(

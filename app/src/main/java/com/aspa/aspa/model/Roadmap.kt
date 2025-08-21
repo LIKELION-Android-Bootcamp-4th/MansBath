@@ -1,6 +1,6 @@
 package com.aspa.aspa.model
 
-import com.google.type.Date
+import com.google.firebase.Timestamp
 
 data class Roadmap (
     val id: String,
@@ -10,5 +10,5 @@ data class Roadmap (
     val allSection: Int,  // 6
     val sections: List<Section>,
     val questionId: String = "",
-    val createdAt: Date? = null
+    val createdAt: Timestamp? = null
 )
