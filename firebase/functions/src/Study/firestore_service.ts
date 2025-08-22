@@ -109,6 +109,9 @@ export async function fetchGenericFirebaseData(
     }
     return typeof result === "string" ? result : JSON.stringify(result);
   } else {
+    if (fieldName === "allData") {
+      return typeof data === "string" ? data : JSON.stringify(data);
+    }
     const result = data.roadmap[fieldName];
     if (typeof result === "undefined") {
       throw new Error(`"${fieldName}" 필드를 찾을 수 없습니다.`);

@@ -4,6 +4,7 @@ import {HttpsError} from "firebase-functions/v2/https";
 import {SYSTEM_PROMPT} from "./dummy_data";
 import {getAiModel} from "../ai/gen_ai";
 import {fetchGenericFirebaseData} from "./firestore_service";
+import {logger} from "firebase-functions/v2";
 
 /**
  * AI를 호출하여 새로운 Study 콘텐츠를 생성
@@ -31,15 +32,20 @@ export async function generateStudyContent(
 
   const model = getAiModel();
   const result = await model.generateContent([prompt], {timeout: 480000});
-  const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text;
-
+  const parts = result?.response?.candidates?.[0]?.content?.parts ?? [];
+  const full = parts
+    .map((p: { text?: string } | null | undefined) => (typeof p?.text === "string" ? p.text : ""))
+    .join("");
+  logger.log(result);
   try {
-    const match = text?.match(/\[([\s\S]*)]/);
-    if (!match?.[0]) {
-      throw new HttpsError("internal", "AI 응답에서 JSON 배열을 찾지 못했습니다.");
+    const bodyMatch = full.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    const body = (bodyMatch?.[1] ?? full).trim();
+    const start = body.search(/[{[]/);
+    if (start < 0) {
+      throw new HttpsError("internal", "AI 응답에서 JSON을 찾지 못했습니다.");
     }
-    const raw = JSON.parse(match[0]);
-    return raw[0]; // 3. as Study 타입 단언 제거
+    const parsed = JSON.parse(body.slice(start));
+    return Array.isArray(parsed) ? parsed[0] : parsed;
   } catch (error) {
     if (error instanceof HttpsError) throw error;
     throw new HttpsError("internal", "AI 응답 파싱에 실패했습니다.", error);
