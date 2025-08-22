@@ -10,21 +10,24 @@ export const study = onCall(async (request) => {
   const uid = request.auth?.uid || "test-user-for-web";
 
   try {
-    const {questionId, roadmapId} = request.data as {
+    const {questionId, roadmapId, sectionId} = request.data as {
       questionId: string;
       roadmapId: string;
+      sectionId : number;
     };
 
-    const studyData = await generateStudyContent(uid, questionId, roadmapId);
+    const studyData = await generateStudyContent(uid, questionId,
+      roadmapId, sectionId);
+    const data = {...studyData, roadmapId};
 
     // Firestore 서비스 호출
     const {studyRef, existingStudy} = await getOrCreateStudy(uid);
 
     // Firestore에 저장
-    await saveStudy(studyRef, studyData, existingStudy === null);
+    await saveStudy(studyRef, data, existingStudy === null);
 
-    logger.log("AI Study 생성 및 저장 성공", studyData);
-    return {message: "AI 응답 성공", study: studyData};
+    logger.log("AI Study 생성 및 저장 성공", data);
+    return {message: "AI 응답 성공", study: data};
   } catch (error) {
     logger.error("Study API 처리 중 오류 발생:", error);
     if (error instanceof HttpsError) {
