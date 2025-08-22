@@ -34,7 +34,7 @@ export const generateRoadmap = onCall(async (request) => {
 
     const roadmap = cleanAndParseAiResponse<Roadmap>(rawAiOutput);
 
-    const roadmapRefId = await saveRoadmap(uid, roadmap);
+    const roadmapRefId = await saveRoadmap(uid, questionId, roadmap);
 
     console.log(`roadmapRefId: ${roadmapRefId}`); // 예: "4z8QJXyBcM7n2Jgf1ZpA"
 
