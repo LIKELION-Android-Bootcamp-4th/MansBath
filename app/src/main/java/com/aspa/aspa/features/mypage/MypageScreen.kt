@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Logout
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -129,30 +131,33 @@ fun MyPageScreen() {
                         }
                     }
                 }
-                //로그아웃 버튼
-                Box(
+                // 로그아웃 버튼
+                Button(
+                    onClick = { /* 로그아웃 처리 */ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 15.dp)
-                        .background(Color.Red, shape = RoundedCornerShape(5.dp)),
-                    contentAlignment = Alignment.Center
-                ){
+                        .padding(horizontal = 20.dp, vertical = 15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
                     Row(
-                        modifier = Modifier
-                            .padding(8.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Logout,
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
                             contentDescription = "로그아웃",
-                            modifier = Modifier
-                                .size(20.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(5.dp))
-                        Text("로그아웃", style = MaterialTheme.typography.bodySmall, color = Color.White)
-
+                        Text(
+                            text = "로그아웃",
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
-
                 }
             }
         }
