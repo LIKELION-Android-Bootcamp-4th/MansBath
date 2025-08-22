@@ -12,6 +12,7 @@ import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FieldValue
@@ -21,7 +22,6 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -35,10 +35,11 @@ sealed interface LoginState {
 }
 
 @HiltViewModel //viewModel 등록 및 생성
-class LoginViewModel @Inject constructor(
+class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
-    private val getCredentialRequest: GetCredentialRequest
+    private val getCredentialRequest: GetCredentialRequest,
+    private val auth: FirebaseAuth,
 ) : ViewModel() {
 
     companion object { private const val TAG = "LoginVM" }

@@ -33,13 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.login.navigation.LoginDestinations
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.navercorp.nid.NaverIdLoginSDK
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
@@ -47,18 +43,18 @@ import androidx.navigation.NavController
 @Composable
 fun LoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val naverLauncher = rememberNaverLoginLauncher(
         onAccessToken = { token ->
-            loginViewModel.signInWithNaver(token)
+            authViewModel.signInWithNaver(token)
         },
         onSuccess = {
             navController.navigate("main")
         },
     )
-    val loginState by loginViewModel.loginState.collectAsState()
+    val loginState by authViewModel.loginState.collectAsState()
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
@@ -107,14 +103,14 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 SocialButton("Google로 계속하기") {
-                    loginViewModel.signInWithGoogleCredential(
+                    authViewModel.signInWithGoogleCredential(
                         activity = navController.context as Activity,
                         onSuccess = { navController.navigate("main") },
                     ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
                 SocialButton("카카오톡으로 계속하기") {
-                    loginViewModel.signInWithKakao(context)
+                    authViewModel.signInWithKakao(context)
                 }
 
                 SocialButton("네이버로 계속하기") {
