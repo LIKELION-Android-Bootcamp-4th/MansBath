@@ -35,15 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.ui.theme.Gray10
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun MyPageScreen() {
+fun MyPageScreen(rootNavController: NavHostController, innerNavController: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -59,16 +59,20 @@ fun MyPageScreen() {
                 )
         },
         content = { padding ->
-            Column(modifier = Modifier.padding(padding)
-                .background(Color.White)
-                .fillMaxSize()
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .background(Color.White)
+                    .fillMaxSize()
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 8.dp)
                 ) {
 
-                    Text("마이페이지", style = MaterialTheme.typography.bodyMedium,
+                    Text(
+                        "마이페이지", style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(3.dp))
@@ -84,14 +88,14 @@ fun MyPageScreen() {
                 )
 
                 //프로필 설정
-                Card (
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 12.dp, horizontal = 12.dp),
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.dp, Gray10),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                ){
+                ) {
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 15.dp, vertical = 15.dp)
@@ -103,22 +107,30 @@ fun MyPageScreen() {
                             tint = Color.Black
                         )
                         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                            Text("닉네임",
+                            Text(
+                                "닉네임",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontSize = 15.sp,
-                                color = Color.Black)
-                            Text("닉네임 설정해주세요",
+                                color = Color.Black
+                            )
+                            Text(
+                                "닉네임 설정해주세요",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontSize = 15.sp,
-                                color = Color.Gray)
+                                color = Color.Gray
+                            )
                         }
                         Spacer(modifier = Modifier.weight(1f))
 
                         Box(
                             modifier = Modifier
                                 .background(color = Color.White, shape = RoundedCornerShape(5.dp))
-                                .border(width = 1.dp,shape = RoundedCornerShape(5.dp), color = Color.Black.copy(alpha = 0.1f))
-                        ){
+                                .border(
+                                    width = 1.dp,
+                                    shape = RoundedCornerShape(5.dp),
+                                    color = Color.Black.copy(alpha = 0.1f)
+                                )
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Edit,
                                 contentDescription = "수정",
@@ -133,7 +145,11 @@ fun MyPageScreen() {
                 }
                 // 로그아웃 버튼
                 Button(
-                    onClick = { /* 로그아웃 처리 */ },
+                    onClick = {
+                        rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
+                            popUpTo(0)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 15.dp),
