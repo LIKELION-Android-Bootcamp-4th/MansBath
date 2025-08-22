@@ -3,7 +3,7 @@ package com.aspa.aspa.features.main.navigation
 object MainDestinations { const val GRAPH = "main_graph" }
 
 enum class BottomTab(val route: String) {
-    Home("home"), Roadmap("roadmap?questionId={questionId}"), Quiz("quiz"), MyPage("mypage")
+    Home("home"), Roadmap("roadmap?questionId={questionId}"), Quiz("quiz?roadmapId={roadmapId}"), MyPage("mypage")
 }
 
 //fun NavGraphBuilder.mainGraph(navController: NavController) {

@@ -216,8 +216,7 @@ fun QuizResultScreen(
                         onClick = {
                             // 기존 퀴즈 데이터 삭제
                             viewModel.deleteQuiz(
-                                "test-user-for-web",
-                                state.quiz.roadmapId,
+                                state.quiz.studyId,
                                 state.quiz.quizTitle
                             )
                             // 새 퀴즈 요청

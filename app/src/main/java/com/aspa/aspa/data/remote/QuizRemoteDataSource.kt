@@ -79,12 +79,21 @@ class QuizRemoteDataSource @Inject constructor(
             "studyId" to studyId
         )
         // 로컬 테스트 용
-//        functions.useEmulator("10.0.2.2", 5001)
+        functions.useEmulator("10.0.2.2", 5001)
         val result = functions.getHttpsCallable("makeQuiz")
             .call(data).await()
 
         val gson = Gson()
         return gson.fromJson(gson.toJson(result.getData()), QuizDto::class.java)
+    }
+
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String): QuizDto {
+        val snapshot = firestore.collection("users/${uid}/studies")
+            .whereEqualTo("roadmapId", roadmapId)
+            .limit(1)
+            .get().await()
+        val studyId = snapshot.documents.first().id
+        return sendToMakeQuiz(studyId)
     }
 
     suspend fun updateQuizSolveResult(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>): Boolean {

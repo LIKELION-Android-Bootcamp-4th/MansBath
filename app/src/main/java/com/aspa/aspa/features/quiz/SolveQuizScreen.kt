@@ -197,8 +197,8 @@ fun SolveQuizScreen(
                                 onClick = {
                                     if(solvingNum == sizeNum) {
                                         viewModel.changeSolvingChosen(solvingValue, selectedOption)
-                                        viewModel.saveSolvedChosen("test-user-for-web",
-                                            state.quiz.roadmapId,
+                                        viewModel.saveSolvedChosen(
+                                            state.quiz.studyId,
                                             state.quiz.quizTitle,
                                             viewModel.chosenAnswerList.value
                                         )

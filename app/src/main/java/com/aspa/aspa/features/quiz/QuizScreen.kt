@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,18 +31,27 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizScreen(
     navController: NavController,
-    viewModel: QuizViewModel
+    viewModel: QuizViewModel,
+    roadmapId: String?
 ) {
     val expandedIndex = remember { mutableStateOf(-1) }
     val quizListState by viewModel.quizListState.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.getQuizzes("test-user-for-web")
+        if(roadmapId != null && roadmapId != "") {
+            viewModel.requestQuizFromRoadmap(roadmapId)
+            Toast.makeText(context, "퀴즈 생성중입니다. 기다려주세요..", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            viewModel.getQuizzes()
+        }
     }
 
 

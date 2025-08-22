@@ -59,4 +59,14 @@ class QuizRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String): Result<QuizDto> {
+        return try {
+            val data = remoteDataSource.makeQuizFromRoadmap(uid, roadmapId)
+            Result.success(data)
+        }
+        catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

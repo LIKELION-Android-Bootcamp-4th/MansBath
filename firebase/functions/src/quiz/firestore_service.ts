@@ -1,6 +1,7 @@
 import {
   getFirestore,
   DocumentReference,
+  FieldValue,
 } from "firebase-admin/firestore";
 import {ConceptDetail, Quiz} from "../type/quiz_types";
 import {HttpsError} from "firebase-functions/v2/https";
@@ -18,10 +19,21 @@ export async function saveQuiz(
     .collection("users")
     .doc(uid)
     .collection("quizzes")
-    .doc(quiz.studyId)
-    .collection("quiz");
-  const quizRef: DocumentReference = collectionRef.doc();
-  await quizRef.set(quiz, {merge: true});
+    .doc(quiz.studyId);
+  const quizRef: DocumentReference = collectionRef.collection("quiz").doc();
+  const batch = getFirestore().batch();
+
+  batch.set(
+    collectionRef,
+    {lastModified: FieldValue.serverTimestamp()},
+    {merge: true}
+  );
+
+  batch.set(quizRef, quiz);
+
+  await batch.commit();
+
+  // await quizRef.set(quiz, {merge: true});
 }
 
 /**

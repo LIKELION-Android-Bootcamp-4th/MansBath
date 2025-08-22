@@ -163,7 +163,7 @@ fun QuizListCard(
                                 text = "시작하기",
                                 textDecoration = TextDecoration.Underline,
                                 modifier = Modifier.clickable {
-                                    val functions = Firebase.functions("asia-northeast3")
+                                    /*val functions = Firebase.functions("asia-northeast3")
 
                                     // 로컬 테스트 전용
                                     functions.useEmulator("10.0.2.2", 5001)
@@ -179,7 +179,7 @@ fun QuizListCard(
                                         }
                                         .addOnFailureListener { e ->
                                             Log.e("makeQuiz", "오류 발생", e)
-                                        }
+                                        }*/
                                 }
                             )
                         } else {
@@ -227,11 +227,11 @@ fun QuizListCard(
                             modifier = Modifier.fillMaxWidth()
                                 .clickable{
                                     if(it.status == true) {
-                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
+                                        viewModel.getQuiz(it.studyId, it.quizTitle)
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     }
                                     else {
-                                        viewModel.getQuiz("test-user-for-web", it.roadmapId, it.quizTitle)
+                                        viewModel.getQuiz(it.studyId, it.quizTitle)
                                         navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },

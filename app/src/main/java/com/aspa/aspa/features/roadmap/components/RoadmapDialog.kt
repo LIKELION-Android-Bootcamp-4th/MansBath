@@ -223,7 +223,8 @@ fun RoadmapDialog(
 
                             OutlinedButton(
                                 onClick = {
-                                    navController.navigate(QuizDestinations.QUIZ) {
+                                    val navigation = "quiz?roadmapId=${roadmapId}"
+                                    navController.navigate(navigation) {
                                         popUpTo(0) { inclusive = true }
                                         launchSingleTop = true
                                     }
