@@ -290,7 +290,7 @@ class AuthViewModel @Inject constructor(
                 Log.i("LOGOUT", "✅ 구글 로그아웃 완료")
             }
             .addOnFailureListener { e ->
-                Log.d("LOGOUT", "✅ 구글 로그아웃 실패")
+                Log.d("LOGOUT", "❌ 구글 로그아웃 실패")
                 throw e
             }
     }
@@ -300,7 +300,7 @@ class AuthViewModel @Inject constructor(
             if (e == null) {
                 Log.i("LOGOUT", "✅ 카카오 로그아웃 성공")
             } else {
-                Log.e("LOGOUT", "✅ 카카오 로그아웃 실패", e)
+                Log.e("LOGOUT", "❌ 카카오 로그아웃 실패", e)
                 throw e
             }
         }
