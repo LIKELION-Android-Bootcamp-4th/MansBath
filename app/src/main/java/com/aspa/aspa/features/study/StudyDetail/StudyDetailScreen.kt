@@ -3,6 +3,7 @@ package com.aspa.aspa.features.study.StudyDetail
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -35,7 +36,8 @@ import com.aspa.aspa.ui.theme.Gray10
 @Composable
 fun StudyDetailScreen(
     uiState: UiState<Study>,
-    onRetry: () -> Unit
+    onRetry : () -> Unit,
+    navigateRoadmap: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val study = (uiState as? UiState.Success<Study>)?.data
@@ -67,22 +69,6 @@ fun StudyDetailScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     color = Color.Black
                                 )
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.MenuBook,
-                                        contentDescription = "진행률 아이콘",
-                                        tint = Color.Gray,
-                                        modifier = Modifier.size(14.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "진행률 0%",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Gray
-                                    )
-                                }
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -112,7 +98,12 @@ fun StudyDetailScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clickable {
+
+                                        navigateRoadmap()
+                                    }
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.CheckCircle,
