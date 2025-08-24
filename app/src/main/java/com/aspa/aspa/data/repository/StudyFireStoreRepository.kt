@@ -8,4 +8,5 @@ class StudyFireStoreRepository @Inject constructor(
 ){
     suspend fun fetchStudy(roadmapId: String?,questionId : String?) = runCatching {
         dataSource.getStudyFireStore(roadmapId,questionId) }
+    suspend fun updateStatus(roadmapId: String?) = runCatching { dataSource.updateStatus(roadmapId) }
 }

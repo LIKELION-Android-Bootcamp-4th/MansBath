@@ -68,7 +68,16 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
 
             StudyDetailScreen(
                 uiState = vm.uiState.collectAsStateWithLifecycle().value,
-                onRetry = { vm.fetchStudy() }
+                onRetry = {vm.fetchStudy()},
+                navigateRoadmap = {
+                    val roadmapId = vm.roadmapId
+                    vm.updateStatus()
+                    navController.navigate("roadmap/$roadmapId"){
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+
+                }
             )
         }
     }

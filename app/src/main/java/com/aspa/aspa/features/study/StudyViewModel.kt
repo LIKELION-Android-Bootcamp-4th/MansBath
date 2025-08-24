@@ -27,9 +27,9 @@ class StudyViewModel @Inject constructor(
     val _uiState = MutableStateFlow<UiState<Study>>(UiState.Idle)
     val uiState : StateFlow<UiState<Study>> = _uiState
 
-    private val roadmapIdFlow = savedStateHandle.getStateFlow<String?>("roadmapId", null)
+    private val roadmapIdFlow = savedStateHandle.getStateFlow("roadmapId", "")
     private val questionIdFlow = savedStateHandle.getStateFlow<String?>("questionId", null)
-    val roadmapId = roadmapIdFlow.value
+    val roadmapId: String get() = roadmapIdFlow.value
     val questionId = questionIdFlow.value
 
     fun fetchStudy(){
@@ -46,6 +46,11 @@ class StudyViewModel @Inject constructor(
                     _uiState.value = UiState.Failure(it.message ?: "Error 발생")
                 }
 
+        }
+    }
+    fun updateStatus(){
+        viewModelScope.launch {
+            repository.updateStatus(roadmapId)
         }
     }
 

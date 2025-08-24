@@ -66,4 +66,17 @@ class StudyFireStoreDataSource @Inject constructor(
         }
 
     }
+    suspend fun updateStatus(roadmapId: String?){
+        val docRef = fireStore.collection("users")
+            .document(uid)
+            .collection("roadmap")
+            .document(roadmapId ?:"")
+        docRef.update("status" , true)
+            .addOnSuccessListener {
+                Log.d("Firestore","상태변경 완료")
+            }
+            .addOnFailureListener {
+                Log.d("Firestore","상태변경 실패")
+            }
+    }
 }
