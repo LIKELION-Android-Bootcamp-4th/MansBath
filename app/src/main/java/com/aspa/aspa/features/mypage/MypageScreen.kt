@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.mypage
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,19 +32,49 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.aspa.aspa.features.login.AuthViewModel
+import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.ui.theme.Gray10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyPageScreen(rootNavController: NavHostController, innerNavController: NavHostController) {
+fun MyPageScreen(
+    rootNavController: NavHostController,
+    innerNavController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val logoutState by authViewModel.logoutState.collectAsState()
+
+    LaunchedEffect(logoutState) {
+        when(logoutState) {
+            LogoutState.Idle -> {}
+
+            LogoutState.Success -> {
+                rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
+                    popUpTo(0)
+                }
+            }
+            is LogoutState.Error -> {
+                Toast.makeText(context, (logoutState as LogoutState.Error).message, Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -146,9 +177,8 @@ fun MyPageScreen(rootNavController: NavHostController, innerNavController: NavHo
                 // 로그아웃 버튼
                 Button(
                     onClick = {
-                        rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
-                            popUpTo(0)
-                        }
+                        authViewModel.signOut(context)
+                        authViewModel.resetLogoutState()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
