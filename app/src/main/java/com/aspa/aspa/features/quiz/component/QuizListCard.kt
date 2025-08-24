@@ -1,6 +1,5 @@
 package com.aspa.aspa.features.quiz.component
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,31 +29,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.StageDto
 import com.aspa.aspa.features.quiz.QuizViewModel
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
-import com.aspa.aspa.model.Section
-import com.google.firebase.Firebase
-import com.google.firebase.functions.HttpsCallableResult
-import com.google.firebase.functions.functions
+import com.aspa.aspa.model.QuizInfo
 
 @Composable
 fun QuizListCard(
     index: Int,
-    title: String,
-    description: String,
-    quizzes: List<QuizDto>,
+    item: QuizInfo,
     expandedIndex: Int,
-    completedSection: Int,
-    allSection: Int,
     onClick: (Int) -> Unit,
     navController: NavController,
     viewModel: QuizViewModel
 ) {
+    val title = item.title
+    val description = item.description
+    val quizzes = item.quizzes.quiz
+    val roadmapId = item.quizzes.roadmapId
+    val lastModifiedDate = viewModel.formatTimestamp(item.lastModified)
+
+    var correctQuestions = 0
+    var totalQuestions = 0
+    quizzes.forEach {
+        for (quiz in it.questions) {
+            totalQuestions++
+            if(quiz.chosen == quiz.answer) correctQuestions++
+        }
+    }
+    val score = (correctQuestions.toFloat() / totalQuestions.toFloat() * 100).toInt()
+
+    val completedSection = quizzes.count { it.status == true }
+    val allSection = quizzes.size
     val backgroundColor = if (completedSection == allSection) Color(0xFFB9F8CF) else Color.White
 
     Card(
@@ -106,10 +116,14 @@ fun QuizListCard(
                 ) {
                     Text(
                         text = description,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        maxLines = if(expandedIndex == index) Int.MAX_VALUE else 1,
+                        overflow = if(expandedIndex == index) TextOverflow.Clip else TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
 
                     if (completedSection == allSection) {
+
                         Card {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -122,7 +136,7 @@ fun QuizListCard(
                                 )
 
                                 Text(
-                                    text = "80점",
+                                    text = "${score}점",
                                     modifier = Modifier.padding(6.dp)
                                 )
                             }
@@ -142,7 +156,7 @@ fun QuizListCard(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Card(
+                            /*Card(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
@@ -155,36 +169,18 @@ fun QuizListCard(
                             Text(
                                 "3문제",
                                 color = Color.Gray
-                            )
+                            )*/
                         }
 
                         if (completedSection == 0) {
                             Text(
                                 text = "시작하기",
                                 textDecoration = TextDecoration.Underline,
-                                modifier = Modifier.clickable {
-                                    /*val functions = Firebase.functions("asia-northeast3")
 
-                                    // 로컬 테스트 전용
-                                    functions.useEmulator("10.0.2.2", 5001)
-
-                                    val data = hashMapOf(
-                                        "quizName" to "3주 초단기 JLPT N3 합격 로드맵"
-                                    )
-
-                                    functions.getHttpsCallable("makeQuiz")
-                                        .call(data)
-                                        .addOnSuccessListener { result: HttpsCallableResult ->
-                                            Log.d("makeQuiz", "성공: ${result.getData()}")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.e("makeQuiz", "오류 발생", e)
-                                        }*/
-                                }
                             )
                         } else {
                             Text(
-                                text = "2025. 8. 1.",
+                                text = lastModifiedDate,
                             )
                         }
                     }
@@ -224,14 +220,14 @@ fun QuizListCard(
                         val tintColor = if (it.status == true) Color(0xFF2EB67D) else Color(0xFFD8D8D8)
 
                         Card(
-                            modifier = Modifier.fillMaxWidth()
-                                .clickable{
-                                    if(it.status == true) {
-                                        viewModel.getQuiz(it.studyId, it.quizTitle)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (it.status == true) {
+                                        viewModel.getQuiz(roadmapId, it.quizTitle)
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
-                                    }
-                                    else {
-                                        viewModel.getQuiz(it.studyId, it.quizTitle)
+                                    } else {
+                                        viewModel.getQuiz(roadmapId, it.quizTitle)
                                         navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },

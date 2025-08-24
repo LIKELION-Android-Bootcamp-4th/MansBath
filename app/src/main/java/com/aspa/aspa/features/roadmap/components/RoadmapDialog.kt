@@ -2,6 +2,7 @@ package com.aspa.aspa.features.roadmap.components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -227,8 +228,7 @@ fun RoadmapDialog(
                                 onClick = {
                                     when (quizExist) {
                                         true -> {
-                                            val navigation = "quiz?roadmapId=${roadmapId}"
-                                            navController.navigate(navigation) {
+                                            navController.navigate(QuizDestinations.QUIZ) {
                                                 popUpTo(0) { inclusive = true }
                                                 launchSingleTop = true
                                             }
@@ -256,6 +256,8 @@ fun RoadmapDialog(
                 }
             }
         }
+
+        is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
     }
 
 
@@ -271,7 +273,6 @@ fun RoadmapDialogPreview() {
             RoadmapDialog(
                 roadmapId = "",
                 sectionId = -1,
-                questionId = "",
                 navController = navController
             )
         }

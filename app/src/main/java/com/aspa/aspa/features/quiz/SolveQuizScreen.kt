@@ -52,6 +52,7 @@ fun SolveQuizScreen(
     var selectedOption by remember { mutableStateOf("") }
     val quizState by viewModel.quizState.collectAsState()
     val solvingValue by viewModel.solvingValue.collectAsState()
+    val currentRoadmapId by viewModel.currentRoadmapId.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.solveQuizAgain()
@@ -198,7 +199,7 @@ fun SolveQuizScreen(
                                     if(solvingNum == sizeNum) {
                                         viewModel.changeSolvingChosen(solvingValue, selectedOption)
                                         viewModel.saveSolvedChosen(
-                                            state.quiz.studyId,
+                                            currentRoadmapId,
                                             state.quiz.quizTitle,
                                             viewModel.chosenAnswerList.value
                                         )

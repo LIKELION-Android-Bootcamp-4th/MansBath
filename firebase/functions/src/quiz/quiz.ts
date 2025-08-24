@@ -13,8 +13,14 @@ export const makeQuiz = onCall(async (request) => {
   try {
     // 2. 요청 데이터
     const {
-      studyId,
-    } = request.data as { studyId?: string; };
+      roadmapId, studyId,
+    } = request.data as {
+      roadmapId?: string,
+      studyId?: string; };
+
+    if (!roadmapId) {
+      throw new HttpsError("invalid-argument", "roadmapId is required.");
+    }
 
     if (!studyId) {
       throw new HttpsError("invalid-argument", "studyId is required.");
@@ -27,7 +33,7 @@ export const makeQuiz = onCall(async (request) => {
     const aiResponse = await getQuiz(conceptDetail, studyId);
 
     // 5. 퀴즈 내용 저장 (Firestore Service)
-    await saveQuiz(uid, aiResponse);
+    await saveQuiz(uid, aiResponse, roadmapId);
 
     // 6. 응답 반환
     return {

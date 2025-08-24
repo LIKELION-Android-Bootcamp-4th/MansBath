@@ -101,12 +101,8 @@ fun QuizScreen(
                             itemsIndexed(state.quizzes) { index, item ->
                                 QuizListCard(
                                     index = index,
-                                    title = item.quiz[0].studyId,
-                                    description = item.quiz[0].studyId,
-                                    quizzes = item.quiz,
+                                    item = item,
                                     expandedIndex = expandedIndex.value,
-                                    completedSection = 2,
-                                    allSection = 6,
                                     onClick = { expandedIndex.value = it },
                                     navController = navController,
                                     viewModel = viewModel

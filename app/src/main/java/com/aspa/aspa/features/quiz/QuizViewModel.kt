@@ -4,19 +4,23 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizzesDto
 import com.aspa.aspa.data.repository.QuizRepository
+import com.aspa.aspa.data.repository.RoadmapRepository
+import com.aspa.aspa.model.QuizInfo
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 sealed interface QuizListState {
     data object Loading : QuizListState
-    data class Success(val quizzes: List<QuizzesDto>) : QuizListState
+    data class Success(val quizzes: List<QuizInfo>) : QuizListState
     data class Error(val error: String) : QuizListState
 }
 
@@ -34,7 +38,8 @@ enum class SolvingState {
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val repository: QuizRepository,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val roadmapRepository: RoadmapRepository
 ) : ViewModel() {
 
     private val _quizListState = MutableStateFlow<QuizListState>(QuizListState.Loading)
@@ -49,6 +54,9 @@ class QuizViewModel @Inject constructor(
     private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
     val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
 
+    private val _currentRoadmapId = MutableStateFlow<String>("")
+    val currentRoadmapId: StateFlow<String> = _currentRoadmapId
+
     private val userUid = auth.currentUser!!.uid
 
     fun getQuizzes() {
@@ -58,12 +66,6 @@ class QuizViewModel @Inject constructor(
                 .onSuccess { quizzes ->
                     Log.d("QuizViewModel", "퀴즈 리스트 불러오기 성공")
                     _quizListState.value = QuizListState.Success(quizzes)
-                    quizzes.forEach {
-                        Log.d("QuizViewModel", it.toString())
-                        it.quiz.forEach {
-                            Log.d("QuizViewModel", it.quizTitle)
-                        }
-                    }
 
                 }
                 .onFailure { e ->
@@ -81,6 +83,7 @@ class QuizViewModel @Inject constructor(
                     Log.d("QuizViewModel", "퀴즈 불러오기 성공")
                     if (quiz != null) {
                         _quizState.value = QuizState.Success(quiz)
+                        _currentRoadmapId.value = roadmapId
                     } else {
                         _quizState.value = QuizState.Error("요청한 퀴즈 데이터가 잘못되었습니다.")
                     }
@@ -92,6 +95,23 @@ class QuizViewModel @Inject constructor(
                 }
         }
     }
+
+    /*fun getRoadmap(roadmapId: String) {
+        viewModelScope.launch {
+            roadmapRepository.fetchRoadmap(roadmapId)
+                .onSuccess {
+                    if(it != null) {
+                        it.title
+                    }
+                    else
+
+                }
+                .onFailure { e ->
+
+                }
+        }
+    }*/
+
 
     fun deleteQuiz(roadmapId: String, quizTitle: String) {
         viewModelScope.launch {
@@ -110,10 +130,10 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun requestQuiz(studyId: String) {
+    fun requestQuiz(roadmapId: String, studyId: String) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
-            repository.sendToMakeQuiz(studyId)
+            repository.sendToMakeQuiz(roadmapId, studyId)
                 .onSuccess { quiz ->
                     Log.d("QuizViewModel", "퀴즈 생성 성공")
                     if (quiz.quizTitle != "") {
@@ -200,5 +220,12 @@ class QuizViewModel @Inject constructor(
                 quiz = currentState.quiz.copy(questions = updatedQuestions)
             )
         }
+    }
+
+    fun formatTimestamp(timestamp: Timestamp?): String {
+        if (timestamp == null) return "시간 정보 없음"
+        val date = timestamp.toDate()
+        val sdf = SimpleDateFormat("yyyy. M. d.", Locale.getDefault())
+        return sdf.format(date)
     }
 }

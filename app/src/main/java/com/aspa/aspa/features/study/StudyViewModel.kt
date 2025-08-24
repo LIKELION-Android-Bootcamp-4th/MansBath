@@ -4,10 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.aspa.aspa.data.repository.QuizRepository
 import com.aspa.aspa.data.repository.StudyFireStoreRepository
 import com.aspa.aspa.data.repository.StudyRepository
 import com.aspa.aspa.features.state.UiState
 import com.aspa.aspa.model.Study
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class StudyViewModel @Inject constructor(
     private val repository: StudyFireStoreRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val quizRepository: QuizRepository,
+    private val auth: FirebaseAuth
 ): ViewModel() {
     val _uiState = MutableStateFlow<UiState<Study>>(UiState.Idle)
     val uiState : StateFlow<UiState<Study>> = _uiState
@@ -33,8 +37,10 @@ class StudyViewModel @Inject constructor(
             _uiState.value = UiState.Loading
             repository.fetchStudy(roadmapId,questionId)
                 .onSuccess {
-
-                    _uiState.value = UiState.Success(it) }
+                    _uiState.value = UiState.Success(it)
+                    // TODO: 트랜잭션 처리시 제거..
+                    quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId!!)
+                }
                 .onFailure {
                     android.util.Log.e("StudyVM", "fetchStudy failed", it)
                     _uiState.value = UiState.Failure(it.message ?: "Error 발생")
