@@ -42,10 +42,5 @@ class StudyViewModel @Inject constructor(
 
         }
     }
-    fun updateStatus(){
-        viewModelScope.launch {
-            repository.updateStatus(roadmapId)
-        }
-    }
 
 }

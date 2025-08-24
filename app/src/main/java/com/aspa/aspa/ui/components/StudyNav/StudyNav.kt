@@ -49,7 +49,7 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             val sectionId = backStackEntry.arguments?.getInt("sectionId")
             val questionId = backStackEntry.arguments?.getString("questionId")
 
-            LaunchedEffect(roadmapId,questionId) {
+            LaunchedEffect(roadmapId,questionId,sectionId) {
                 if(roadmapId != null && questionId != null){
                     vm.fetchStudy()
                 }

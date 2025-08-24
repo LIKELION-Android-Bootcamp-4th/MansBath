@@ -19,7 +19,7 @@ class StudyFireStoreDataSource @Inject constructor(
     private val firebaseFunctions: FirebaseFunctions
 ) {
     val uid = firebaseAuth.uid!!
-    suspend fun getStudyFireStore(roadmapId: String?, questionId: String?):
+    suspend fun getStudyFireStore(roadmapId: String?, questionId: String?, sectionId : Int?):
             Study {
         val response = fireStore
             .collection("users")
@@ -39,7 +39,8 @@ class StudyFireStoreDataSource @Inject constructor(
             } else {
                 val sendData = hashMapOf(
                     "roadmapId" to roadmapId,
-                    "questionId" to questionId
+                    "questionId" to questionId,
+                    "sectionId" to sectionId
                 )
                 Log.d("roadmapId",roadmapId?: "로드맵 데이터없음")
                 Log.d("questionId",questionId?: "로드맵 데이터없음")
