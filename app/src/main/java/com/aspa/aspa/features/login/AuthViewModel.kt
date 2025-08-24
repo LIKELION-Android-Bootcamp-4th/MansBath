@@ -25,6 +25,8 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +44,12 @@ sealed interface LogoutState {
     object Idle : LogoutState
     object Success : LogoutState
     data class Error(val message: String?) : LogoutState
+}
+
+sealed interface WithdrawState {
+    object Idle : WithdrawState
+    object Success : WithdrawState
+    data class Error(val message: String?) : WithdrawState
 }
 
 
@@ -62,6 +70,9 @@ class AuthViewModel @Inject constructor(
 
     private val _logoutState = MutableStateFlow<LogoutState>(LogoutState.Idle)
     val logoutState = _logoutState.asStateFlow()
+
+    private val _withdrawState = MutableStateFlow<WithdrawState>(WithdrawState.Idle)
+    val withdrawState = _withdrawState.asStateFlow()
 
     fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
@@ -313,6 +324,80 @@ class AuthViewModel @Inject constructor(
 
     fun resetLogoutState() {
         _logoutState.value = LogoutState.Idle
+    }
+
+    fun withdraw(context: Context) {
+        viewModelScope.launch {
+            // 소셜 unlink
+            authRepository.fetchProvider()
+                .onSuccess { provider ->
+                    when (provider) {
+                        Provider.GOOGLE -> withdrawGoogle(context)
+                        Provider.KAKAO -> withdrawKakao()
+                        Provider.NAVER -> withdrawNaver()
+                    }
+                    // Firebase 계정 회원탈퇴  // 자동으로 onDelete 트리거를 통한 functions 호출
+                    auth.currentUser?.delete()
+                        ?.addOnSuccessListener {
+                            Log.i("WITHDRAW", "✅ 파이어베이스 계정 삭제 완료")
+                            _withdrawState.value = WithdrawState.Success
+
+                        }
+                        ?.addOnFailureListener { e ->
+                            Log.i("WITHDRAW", "❌ 파이어베이스 계정 삭제 실패")
+                            _withdrawState.value = WithdrawState.Error(e.message)
+                        }
+                }
+                .onFailure { e ->
+                    _withdrawState.value = WithdrawState.Error(e.message)
+                }
+        }
+    }
+
+    private fun withdrawGoogle(context: Context) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+        googleSignInClient.revokeAccess()
+            .addOnCompleteListener {
+                Log.i("WITHDRAW", "✅ 구글 계정 연동 해제 완료")
+            }
+            .addOnFailureListener { e ->
+                Log.d("WITHDRAW", "❌ 구글 계정 연동 해제 실패")
+                throw e
+            }
+    }
+
+    private fun withdrawKakao() {
+        UserApiClient.instance.unlink { e ->
+            if (e == null) {
+                Log.i("WITHDRAW", "✅ 카카오 계정 연동 해제 성공")
+            } else {
+                Log.e("WITHDRAW", "❌ 카카오 계정 연동 해제 실패", e)
+                throw e
+            }
+        }
+    }
+
+    private fun withdrawNaver() {
+        NidOAuthLogin().callDeleteTokenApi(object: OAuthLoginCallback {
+            override fun onError(errorCode: Int, message: String) {
+                onFailure(errorCode, message)
+            }
+
+            override fun onFailure(httpStatus: Int, message: String) {
+                Log.e("WITHDRAW", "❌ 네이버 계정 연동 해제 실패: $httpStatus $message")
+            }
+
+            override fun onSuccess() {
+                Log.d("WITHDRAW", "✅ 네이버 계정 연동 해제 성공")
+            }
+        })
+        Log.i("WITHDRAW", "✅ 네이버 계정 연동 해제 성공")
+    }
+
+    fun resetWithdrawState() {
+        _withdrawState.value = WithdrawState.Idle
     }
 
 }

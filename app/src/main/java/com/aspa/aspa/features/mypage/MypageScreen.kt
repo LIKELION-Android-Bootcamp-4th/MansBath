@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.NoAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aspa.aspa.features.login.AuthViewModel
 import com.aspa.aspa.features.login.LogoutState
+import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.ui.theme.Gray10
 
@@ -58,8 +60,9 @@ fun MyPageScreen(
 ) {
     val context = LocalContext.current
     val logoutState by authViewModel.logoutState.collectAsState()
+    val withdrawState by authViewModel.withdrawState.collectAsState()
 
-    LaunchedEffect(logoutState) {
+    LaunchedEffect(logoutState, withdrawState) {
         when(logoutState) {
             LogoutState.Idle -> {}
 
@@ -72,6 +75,24 @@ fun MyPageScreen(
                 Toast.makeText(context, (logoutState as LogoutState.Error).message, Toast.LENGTH_SHORT)
                     .show()
             }
+        }
+
+        when(withdrawState) {
+            WithdrawState.Idle -> {}
+
+            WithdrawState.Success -> {
+                rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
+                    popUpTo(0)
+                }
+                Toast.makeText(context, "회원탈퇴 성공", Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            is WithdrawState.Error -> {
+                Toast.makeText(context, (withdrawState as WithdrawState.Error).message, Toast.LENGTH_SHORT)
+                    .show()
+            }
+
         }
     }
 
@@ -201,6 +222,37 @@ fun MyPageScreen(
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = "로그아웃",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                Button(
+                    onClick = {
+                        authViewModel.withdraw(context)
+                        authViewModel.resetWithdrawState()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Magenta,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.NoAccounts,
+                            contentDescription = "회원탈퇴",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = "회원탈퇴",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
