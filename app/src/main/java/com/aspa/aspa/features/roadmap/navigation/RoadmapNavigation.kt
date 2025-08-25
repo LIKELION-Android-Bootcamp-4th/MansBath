@@ -13,7 +13,6 @@ object RoadmapDestinations {
     const val ROADMAP_LIST = "roadmap?questionId={questionId}"
     const val ROADMAP_DETAIL = "roadmap/{roadmapId}"
     const val ROADMAP_DIALOG = "roadmap/{roadmapId}/{sectionId}"
-    const val STUDY = "study"
 
     fun roadmapList(questionId: String = "") =
         "roadmap?questionId=$questionId"
@@ -42,15 +41,22 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
 
     composable(
         route = RoadmapDestinations.ROADMAP_DETAIL,
-        arguments = listOf(navArgument("roadmapId") { type = NavType.StringType })
+        arguments =
+            listOf(
+                navArgument("roadmapId") { type = NavType.StringType },
+            )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
+
         RoadmapDetailScreen(roadmapId!!, navController)
     }
 
     composable(
         route = RoadmapDestinations.ROADMAP_DIALOG,
-        arguments = listOf(navArgument("sectionId") { type = NavType.StringType })
+        arguments = listOf(
+            navArgument("roadmapId") { type = NavType.StringType },
+            navArgument("sectionId") { type = NavType.IntType },
+        )
     ) { backStackEntry ->
         val roadmapId = backStackEntry.arguments?.getString("roadmapId")
         val sectionId = backStackEntry.arguments?.getInt("sectionId")
@@ -59,9 +65,5 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
             sectionId = sectionId!!,
             navController = navController
         )
-    }
-
-    composable(RoadmapDestinations.STUDY) {
-//        StudyScreen()  // todo: 스터디 연동
     }
 }

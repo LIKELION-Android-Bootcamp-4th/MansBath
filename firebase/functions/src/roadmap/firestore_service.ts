@@ -47,17 +47,22 @@ export async function getQuestionResult(
  * 로드맵을 Firestore에 저장하고 문서 ID를 반환합니다.
  *
  * @param {string} uid - 사용자 UID
+ * @param {string} questionId - question ID
  * @param {Roadmap} roadmap - 저장할 로드맵 데이터
  * @return {Promise<string>} 생성된 문서 ID
  * @throws {Error} 저장 실패 시 에러
  */
 export async function saveRoadmap(
-  uid: string, roadmap: Roadmap
+  uid: string, questionId: string, roadmap: Roadmap
 ): Promise<string> {
   try {
     const ref = await getFirestore()
       .collection(`users/${uid}/roadmap`)
-      .add(roadmap);
+      .add({
+        ...roadmap,
+        questionId,
+        createdAt: new Date(),
+      });
 
     return ref.id;
   } catch (err) {

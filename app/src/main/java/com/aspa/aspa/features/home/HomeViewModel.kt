@@ -168,19 +168,10 @@ class HomeViewModel @Inject constructor(
                     questionId = questionId
                 )
 
-                if (responseDto != null) {
-                    val assistantMessage = mapResponseDtoToUiMessage(responseDto)
-                    _uiState.update { currentState ->
-                        val newMessages = currentState.messages.filterNot { it.id == "loading" } + assistantMessage
-                        currentState.copy(
-                            messages = newMessages,
-                            activeConversationId = responseDto.questionId,
-                            isReportFinished = newMessages.any { it is UiAnalysisReport }
-                        )
-                    }
-                } else {
-                    throw Exception("서버로부터 유효한 응답을 받지 못했습니다.")
+                if (questionId == null && responseDto?.questionId != null) {
+                    loadChatHistory(responseDto.questionId)
                 }
+
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "sendMessage 실패", e)
                 _uiState.update { currentState ->
