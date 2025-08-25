@@ -28,6 +28,7 @@ class StudyFireStoreDataSource @Inject constructor(
         try {
             val snap = response
                 .whereEqualTo("roadmapId", roadmapId)
+                .whereEqualTo("sectionId", sectionId)
                 .get()
                 .await()
             if (!snap.isEmpty) {
