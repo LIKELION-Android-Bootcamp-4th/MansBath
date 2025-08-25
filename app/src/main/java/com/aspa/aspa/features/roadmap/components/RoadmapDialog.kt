@@ -228,7 +228,7 @@ fun RoadmapDialog(
                                 onClick = {
                                     when (quizExist) {
                                         true -> {
-                                            navController.navigate(QuizDestinations.QUIZ) {
+                                            navController.navigate(QuizDestinations.QUIZ_GRAPH_ROUTE) {
                                                 popUpTo(0) { inclusive = true }
                                                 launchSingleTop = true
                                             }

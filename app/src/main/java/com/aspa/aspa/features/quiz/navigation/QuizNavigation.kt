@@ -15,20 +15,23 @@ import com.aspa.aspa.features.quiz.SolveQuizScreen
 
 object QuizDestinations {
     const val QUIZ_GRAPH_ROUTE = "quiz_graph"
-    const val QUIZ = "quiz"
+    const val QUIZ = "quiz?roadmapId={roadmapId}"
     const val SOLVE_QUIZ = "quiz_solve"
     const val QUIZ_RESULT = "quiz_result"
+
+    fun quiz(roadmapId: String = "") =
+        "roadmap?roadmapId=$roadmapId"
 }
 
 
 fun NavGraphBuilder.quizGraph(navController: NavController) {
 
     navigation(
-        startDestination = "${QuizDestinations.QUIZ}?roadmapId={roadmapId}",
+        startDestination = QuizDestinations.QUIZ,
         route = QuizDestinations.QUIZ_GRAPH_ROUTE
     ) {
         composable(
-            route = "${QuizDestinations.QUIZ}?roadmapId={roadmapId}",
+            route = QuizDestinations.QUIZ,
             arguments = listOf(navArgument("roadmapId") {
                 type = NavType.StringType
                 nullable = true
