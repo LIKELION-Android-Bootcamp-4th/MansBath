@@ -18,4 +18,5 @@ export * from "./question/question";
 export * from "./roadmap/roadmap";
 export * from "./quiz/quiz";
 export * from "./auth/naver";
+export * from "./auth/withdraw";
 export * from "./Study/study";

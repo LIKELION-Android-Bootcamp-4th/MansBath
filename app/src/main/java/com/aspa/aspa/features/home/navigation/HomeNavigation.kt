@@ -17,8 +17,8 @@ import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 
 object HomeDestinations {
+    const val HOME_GRAPH_ROUTE = "home_graph"
     const val HOME = "home"
-    const val HOME_GRAPH_ROUTE = "homeGraph"
 }
 
 fun NavGraphBuilder.homeGraph(

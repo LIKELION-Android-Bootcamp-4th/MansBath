@@ -92,7 +92,7 @@ fun StudyDetailScreen(
                             ) {
                                 Text(
                                     text = study?.title.orEmpty(),
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleLarge,
                                     color = Color.Black
                                 )
                             }
@@ -120,16 +120,12 @@ fun StudyDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(35.dp)
-                                .background(Blue, shape = RoundedCornerShape(12.dp)),
+                                .background(Blue, shape = RoundedCornerShape(12.dp))
+                                .clickable { navigateRoadmap() },
                             contentAlignment = Alignment.Center
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .clickable {
-
-                                        navigateRoadmap()
-                                    }
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.CheckCircle,
