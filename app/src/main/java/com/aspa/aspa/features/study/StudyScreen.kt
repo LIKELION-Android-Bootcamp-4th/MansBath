@@ -88,10 +88,9 @@ fun StudyScreen (
         }
         is UiState.Success -> {
     Scaffold (
-
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(study?.title ?:"")},
+                title = {Text(study?.title ?:"") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black,
@@ -111,6 +110,8 @@ fun StudyScreen (
                     Modifier.background(Color.White)
                         .fillMaxWidth()
                 ) {
+
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(8.dp)

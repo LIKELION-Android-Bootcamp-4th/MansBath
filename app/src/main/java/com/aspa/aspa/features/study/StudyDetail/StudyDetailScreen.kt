@@ -70,7 +70,7 @@ fun StudyDetailScreen(
                             ) {
                                 Text(
                                     text = study?.title.orEmpty(),
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleLarge,
                                     color = Color.Black
                                 )
                             }
