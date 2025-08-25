@@ -18,12 +18,11 @@ import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.home.navigation.HomeDestinations
 import com.aspa.aspa.features.main.components.BottomNavigationBar
-import com.aspa.aspa.features.main.components.DefaultTopBar
+import com.aspa.aspa.features.main.components.CommonTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
 import com.aspa.aspa.features.main.navigation.MainNavigation
 import com.aspa.aspa.features.mypage.navigation.MypageDestination
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
-import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
 import kotlinx.coroutines.launch
@@ -54,10 +53,10 @@ fun MainScreen(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-                    RoadmapDestinations.ROADMAP_LIST -> RoadmapTopBar()
-                    RoadmapDestinations.ROADMAP_DETAIL, RoadmapDestinations.ROADMAP_DIALOG -> {}
-                    QuizDestinations.SOLVE_QUIZ, QuizDestinations.QUIZ_RESULT -> {}
-                    else -> DefaultTopBar()
+                    RoadmapDestinations.ROADMAP_LIST -> CommonTopBar("학습 로드맵", "단계별로 체계적인 학습을 진행하세요")
+                    QuizDestinations.QUIZ -> CommonTopBar("퀴즈", "학습한 내용을 확인해 보세요")
+                    MypageDestination.MYPAGE -> CommonTopBar("마이페이지", "프로필과 활동 내역을 관리하세요")
+                    else -> {}
                 }
             },
             bottomBar = {
