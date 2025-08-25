@@ -1,49 +1,43 @@
 package com.aspa.aspa.features.main
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.home.navigation.HomeDestinations
-import com.aspa.aspa.features.home.navigation.homeGraph
 import com.aspa.aspa.features.main.components.BottomNavigationBar
 import com.aspa.aspa.features.main.components.DefaultTopBar
 import com.aspa.aspa.features.main.components.HomeTopBar
-import com.aspa.aspa.features.main.navigation.BottomTab
-import com.aspa.aspa.features.mypage.navigation.mypageGraph
+import com.aspa.aspa.features.main.navigation.MainNavigation
+import com.aspa.aspa.features.mypage.navigation.MypageDestination
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
-import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
+import com.aspa.aspa.util.DoubleBackExitHandler
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
 import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 import com.aspa.aspa.ui.components.StudyNav.studyGraph
 import kotlinx.coroutines.launch
 
-@SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
+@SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    rootNavController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val innerNavController: NavHostController = rememberNavController()
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -51,30 +45,11 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val uiState by homeViewModel.uiState.collectAsState()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            HomeDrawerContent(
-                uiState = uiState,
-                onCloseClick = { scope.launch { drawerState.close() } },
-                onHistoryItemSelected = { questionId ->
-                    homeViewModel.loadChatHistory(questionId)
-                    scope.launch { drawerState.close() }
-                },
-                onNewChatClick = {
-                    homeViewModel.createNewChat()
-                    scope.launch { drawerState.close() }
-                },
-                onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
-                onRenameClick = { questionId, newTitle ->
-                    homeViewModel.renameQuestion(
-                        questionId,
-                        newTitle
-                    )
-                }
-            )
-        }
-    ) {
+    DoubleBackExitHandler()
+
+    val isHomeScreen = currentRoute == HomeDestinations.HOME
+    // 회면 상태 추가로 @Composable 로 변경함.
+    val mainContent = @Composable {
         Scaffold(
             topBar = {
                 when (currentRoute) {
@@ -85,27 +60,24 @@ fun MainScreen(
                     RoadmapDestinations.ROADMAP_LIST -> RoadmapTopBar()
                     RoadmapDestinations.ROADMAP_DETAIL, RoadmapDestinations.ROADMAP_DIALOG -> {}
                     QuizDestinations.SOLVE_QUIZ, QuizDestinations.QUIZ_RESULT -> {}
-                    StudyScreenRoute.Study.route,
-                    StudyScreenRoute.StudyDetail.route -> { /* 탑바 숨김 */ }
+                    StudyScreenRoute.Study.route, StudyScreenRoute.StudyDetail.route -> {}
                     else -> DefaultTopBar()
                 }
             },
             bottomBar = {
                 val bottomNavScreenRoutes = listOf(
-                    BottomTab.Home.route,
-                    BottomTab.Roadmap.route,
-                    BottomTab.Quiz.route,
-                    BottomTab.MyPage.route
+                    HomeDestinations.HOME,
+                    RoadmapDestinations.ROADMAP_LIST,
+                    QuizDestinations.QUIZ,
+                    MypageDestination.MYPAGE
                 )
-
                 val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
-
                 if (shouldShowBottomBar) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
                         onTabSelected = { graphRoute ->
                             innerNavController.navigate(graphRoute) {
-                                popUpTo(innerNavController.graph.findStartDestination().id) {
+                                popUpTo(0) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -116,17 +88,42 @@ fun MainScreen(
                 }
             }
         ) { innerPadding ->
-            NavHost(
-                navController = innerNavController,
-                startDestination = HomeDestinations.HOME_GRAPH_ROUTE,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                homeGraph(navController = innerNavController, homeViewModel = homeViewModel)
-                roadmapGraph(navController = innerNavController)
-                quizGraph(navController = innerNavController)
-                mypageGraph(navController = innerNavController)
-                studyGraph(navController = innerNavController)
-            }
+            MainNavigation(
+                rootNavController = rootNavController,
+                innerNavController = innerNavController,
+                innerPadding = innerPadding,
+                homeViewModel = homeViewModel,
+            )
         }
+    }
+    if (isHomeScreen) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                HomeDrawerContent(
+                    uiState = uiState,
+                    onCloseClick = { scope.launch { drawerState.close() } },
+                    onHistoryItemSelected = { questionId ->
+                        homeViewModel.loadChatHistory(questionId)
+                        scope.launch { drawerState.close() }
+                    },
+                    onNewChatClick = {
+                        homeViewModel.createNewChat()
+                        scope.launch { drawerState.close() }
+                    },
+                    onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
+                    onRenameClick = { questionId, newTitle ->
+                        homeViewModel.renameQuestion(
+                            questionId,
+                            newTitle
+                        )
+                    }
+                )
+            }
+        ) {
+            mainContent()
+        }
+    } else {
+        mainContent()
     }
 }
