@@ -1,6 +1,7 @@
 package com.aspa.aspa.model
 
 data class Section(
+    val id: Int,
     val title: String,
     val description: String,
     val concept: String,

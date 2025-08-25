@@ -7,7 +7,7 @@
 export function formatError(error: any) {
   return {
     message: error.message || "Unknown error",
-    name: error.name || "UnknownError",
+    name: error.name || "Unknown Error",
     stack: error.stack || null,
     code: error.code || null,
     cause: error.cause || null,

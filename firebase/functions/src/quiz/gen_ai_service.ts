@@ -1,5 +1,5 @@
 import {logger} from "firebase-functions";
-import {model} from "../ai/gen_ai";
+import {getAiModel} from "../ai/gen_ai";
 import {SYSTEM_PROMPT} from "../ai/quiz_prompt";
 import {ConceptDetail, Quiz} from "../type/quiz_types";
 import {FieldValue} from "firebase-admin/firestore";
@@ -15,6 +15,7 @@ export async function getQuiz(
   conceptDetail: ConceptDetail,
   studyId: string,
 ): Promise<Quiz> {
+  const model = getAiModel();
   const chat = model.startChat();
   const prompt = SYSTEM_PROMPT + JSON.stringify(conceptDetail);
   const result = await chat.sendMessage(prompt);
@@ -27,7 +28,6 @@ export async function getQuiz(
       return {
         ...JSON.parse(match[0]),
         studyId: studyId,
-        roadmapId: conceptDetail.roadmapId,
         createdAt: FieldValue.serverTimestamp(),
         status: false,
       } as Quiz;

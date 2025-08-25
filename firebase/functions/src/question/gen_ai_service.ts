@@ -1,5 +1,6 @@
+import {getAiModel} from "../ai/gen_ai";
 import {logger} from "firebase-functions";
-import {model} from "../ai/gen_ai";
+
 import {QUESTION_SYSTEM_PROMPT} from "../ai/question_prompt";
 import {HistoryEntry, AiResponse} from "../type/question_types";
 
@@ -35,6 +36,7 @@ export async function getAiResponse(
   userQuestion: string,
 ): Promise<AiResponse> {
   const fullHistoryForAI = buildChatHistory(history);
+  const model = getAiModel();
 
   const chat = model.startChat({history: fullHistoryForAI});
   const result = await chat.sendMessage(userQuestion);

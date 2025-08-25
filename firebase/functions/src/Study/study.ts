@@ -1,20 +1,35 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {logger} from "firebase-functions";
-import {getAiStudyResponse} from "./get_ai_response";
-import {formatError} from "./formetError";
+import {generateStudyContent} from "./gen_ai_service";
+import {getOrCreateStudy, saveStudy} from "./firestore_service";
 
-export const Study = onCall(
-  {
-    region: "asia-northeast3",
-  },
-  async () => {
-    try {
-      const study = await getAiStudyResponse();
-      logger.log("AI 응답 성공", study);
-      return {message: "AI 응답 성공", study};
-    } catch (error : any) {
-      logger.error("AI 응답 생성 실패", formatError(error));
-      throw new HttpsError("internal", formatError(error).message || "AI 응답 생성 실패");
+/**
+ * Study 콘텐츠 생성을 요청하고 Firestore에 저장하는 메인 API 엔드포인트입니다.
+ */
+export const study = onCall(async (request) => {
+  const uid = request.auth?.uid || "test-user-for-web";
+
+  try {
+    const {questionId, roadmapId} = request.data as {
+      questionId: string;
+      roadmapId: string;
+    };
+
+    const studyData = await generateStudyContent(uid, questionId, roadmapId);
+
+    // Firestore 서비스 호출
+    const {studyRef, existingStudy} = await getOrCreateStudy(uid);
+
+    // Firestore에 저장
+    await saveStudy(studyRef, studyData, existingStudy === null);
+
+    logger.log("AI Study 생성 및 저장 성공", studyData);
+    return {message: "AI 응답 성공", study: studyData};
+  } catch (error) {
+    logger.error("Study API 처리 중 오류 발생:", error);
+    if (error instanceof HttpsError) {
+      throw error;
     }
+    throw new HttpsError("internal", "An internal error occurred.", error);
   }
-);
+});

@@ -31,6 +31,7 @@ import com.aspa.aspa.features.mypage.navigation.mypageGraph
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
 import kotlinx.coroutines.launch
 
@@ -40,9 +41,6 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) {
-        homeViewModel.initialize()
-    }
 
     val innerNavController: NavHostController = rememberNavController()
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
@@ -82,7 +80,8 @@ fun MainScreen(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onNewChatClick = { homeViewModel.createNewChat() }
                     )
-                    "roadmap/{questionId}" -> RoadmapTopBar()
+                    RoadmapDestinations.ROADMAP_LIST -> RoadmapTopBar()
+                    RoadmapDestinations.ROADMAP_DETAIL, RoadmapDestinations.ROADMAP_DIALOG -> {}
                     QuizDestinations.SOLVE_QUIZ, QuizDestinations.QUIZ_RESULT -> {}
                     else -> DefaultTopBar()
                 }
@@ -95,9 +94,7 @@ fun MainScreen(
                     BottomTab.MyPage.route
                 )
 
-                val shouldShowBottomBar = innerNavController.currentBackStack.value.any {
-                    it.destination.route in bottomNavScreenRoutes
-                }
+                val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
 
                 if (shouldShowBottomBar) {
                     BottomNavigationBar(
@@ -120,7 +117,7 @@ fun MainScreen(
                 startDestination = HomeDestinations.HOME_GRAPH_ROUTE,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                homeGraph(navController = innerNavController)
+                homeGraph(navController = innerNavController, homeViewModel = homeViewModel)
                 roadmapGraph(navController = innerNavController)
                 quizGraph(navController = innerNavController)
                 mypageGraph(navController = innerNavController)

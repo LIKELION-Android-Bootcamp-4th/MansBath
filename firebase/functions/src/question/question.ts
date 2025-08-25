@@ -11,7 +11,8 @@ import {getAiResponse} from "./gen_ai_service";
  * @description onCall 방식으로 변환함. 테스트 필요함.
  * @route POST /
  */
-export const question = onCall({region: "asia-northeast3"}, async (request) => {
+export const question = onCall(async (request) => {
+  // 1. 사용자 식별 정보 (UID)
   const uid = request.auth?.uid || "test-user-for-web";
 
   try {

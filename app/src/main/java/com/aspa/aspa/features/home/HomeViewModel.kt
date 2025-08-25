@@ -10,12 +10,11 @@ import com.aspa.aspa.features.home.components.UiAssistantLoadingMessage
 import com.aspa.aspa.features.home.components.UiAssistantMessage
 import com.aspa.aspa.features.home.components.UiChatMessage
 import com.aspa.aspa.features.home.components.UiUserMessage
-import com.aspa.aspa.model.Auth
-import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,24 +38,46 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val questionRepository: QuestionRepository,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
     private lateinit var questionsCollection: CollectionReference
+    private val authStateListener: FirebaseAuth.AuthStateListener
 
-    fun initialize() {
-        val uid = Auth.uid
-        if (uid == null) {
-            Log.w("HomeViewModel", "UID가 null이므로 초기화할 수 없습니다.")
+    init {
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                initializeForUser(user)
+            } else {
+                Log.w("HomeViewModel", "사용자가 로그인되어 있지 않습니다.")
+                _uiState.update { it.copy(questionHistories = emptyList(), messages = emptyList()) }
+            }
+        }
+        auth.addAuthStateListener(authStateListener)
+    }
+
+    private fun initializeForUser(user: FirebaseUser) {
+        val uid = user.uid
+        val documentId = "$uid"
+
+        Log.d("HomeViewModel", "Firestore Document ID: $documentId")
+
+        if (this::questionsCollection.isInitialized && questionsCollection.parent?.id == documentId) {
             return
         }
-        if (this::questionsCollection.isInitialized && questionsCollection.parent?.id == uid) {
-            return
-        }
-        questionsCollection = db.collection("users").document(uid).collection("questions")
+
+        Log.d("HomeViewModel", "사용자($documentId)를 위해 초기화를 시작합니다.")
+        questionsCollection = db.collection("users").document(documentId).collection("questions")
         fetchQuestionHistories()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        auth.removeAuthStateListener(authStateListener)
     }
 
     private fun fetchQuestionHistories() {
@@ -128,24 +149,6 @@ class HomeViewModel @Inject constructor(
         sendMessage(question, _uiState.value.activeConversationId)
     }
 
-    private fun mapResponseDtoToUiMessage(response: QuestionResponseDto): UiChatMessage {
-        return if (response.result != null) {
-            UiAnalysisReport(
-                id = "report_${response.questionId}",
-                date = response.createdAt,
-                title = "[ 사용자 분석 결과 ]",
-                items = response.result
-            )
-        } else {
-            UiAssistantMessage(
-                id = "asst_${response.questionId}",
-                date = response.createdAt,
-                text = response.message ?: "내용이 없습니다.",
-                options = response.choices
-            )
-        }
-    }
-
     private fun sendMessage(text: String, questionId: String?) {
         if (!this::questionsCollection.isInitialized) {
             Log.e("HomeViewModel", "sendMessage 호출 실패: collection이 초기화되지 않았습니다.")
@@ -165,19 +168,10 @@ class HomeViewModel @Inject constructor(
                     questionId = questionId
                 )
 
-                if (responseDto != null) {
-                    val assistantMessage = mapResponseDtoToUiMessage(responseDto)
-                    _uiState.update { currentState ->
-                        val newMessages = currentState.messages.filterNot { it.id == "loading" } + assistantMessage
-                        currentState.copy(
-                            messages = newMessages,
-                            activeConversationId = responseDto.questionId,
-                            isReportFinished = newMessages.any { it is UiAnalysisReport }
-                        )
-                    }
-                } else {
-                    throw Exception("서버로부터 유효한 응답을 받지 못했습니다.")
+                if (questionId == null && responseDto?.questionId != null) {
+                    loadChatHistory(responseDto.questionId)
                 }
+
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "sendMessage 실패", e)
                 _uiState.update { currentState ->
@@ -191,6 +185,24 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun mapResponseDtoToUiMessage(response: QuestionResponseDto): UiChatMessage {
+        return if (response.result != null) {
+            UiAnalysisReport(
+                id = "report_${response.questionId}",
+                date = response.createdAt,
+                title = "[ 사용자 분석 결과 ]",
+                items = response.result
+            )
+        } else {
+            UiAssistantMessage(
+                id = "asst_${response.questionId}",
+                date = response.createdAt,
+                text = response.message ?: "내용이 없습니다.",
+                options = response.choices
+            )
         }
     }
 
