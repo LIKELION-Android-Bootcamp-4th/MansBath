@@ -95,7 +95,7 @@ class QuizRemoteDataSource @Inject constructor(
             "studyId" to studyId
         )
         // 로컬 테스트 용
-        functions.useEmulator("10.0.2.2", 5001)
+        // functions.useEmulator("10.0.2.2", 5001)
         val result = functions.getHttpsCallable("makeQuiz")
             .call(data).await()
 
