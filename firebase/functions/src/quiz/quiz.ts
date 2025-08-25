@@ -13,8 +13,15 @@ export const makeQuiz = onCall(async (request) => {
   try {
     // 2. 요청 데이터
     const {
-      studyId,
-    } = request.data as { studyId?: string; };
+      roadmapId, studyId, sectionId,
+    } = request.data as {
+      roadmapId?: string,
+      studyId?: string,
+    sectionId: number };
+
+    if (!roadmapId) {
+      throw new HttpsError("invalid-argument", "roadmapId is required.");
+    }
 
     if (!studyId) {
       throw new HttpsError("invalid-argument", "studyId is required.");
@@ -24,10 +31,10 @@ export const makeQuiz = onCall(async (request) => {
     const conceptDetail = await getConceptDetail(uid, studyId);
 
     // 4. AI 응답 요청 (Gemini Service)
-    const aiResponse = await getQuiz(conceptDetail, studyId);
+    const aiResponse = await getQuiz(conceptDetail, studyId, sectionId);
 
     // 5. 퀴즈 내용 저장 (Firestore Service)
-    await saveQuiz(uid, aiResponse);
+    await saveQuiz(uid, aiResponse, roadmapId);
 
     // 6. 응답 반환
     return {

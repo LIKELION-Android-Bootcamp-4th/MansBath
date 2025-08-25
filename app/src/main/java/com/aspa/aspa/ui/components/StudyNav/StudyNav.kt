@@ -89,7 +89,14 @@ fun NavGraphBuilder.studyGraph(navController: NavController) {
                     // 로드맵 상세 화면만 남기고 복귀
                     navController.popBackStack(RoadmapDestinations.ROADMAP_DETAIL, false)
 
-                }
+                },
+                navigateToQuiz = {
+                    navController.navigate("quiz") {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                viewModel = vm
             )
         }
     }

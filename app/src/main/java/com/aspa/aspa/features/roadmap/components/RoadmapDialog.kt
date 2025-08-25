@@ -228,7 +228,7 @@ fun RoadmapDialog(
                                 onClick = {
                                     when (quizExist) {
                                         true -> {
-                                            navController.navigate(QuizDestinations.QUIZ) {
+                                            navController.navigate(QuizDestinations.QUIZ_GRAPH_ROUTE) {
                                                 popUpTo(0) { inclusive = true }
                                                 launchSingleTop = true
                                             }
@@ -259,6 +259,8 @@ fun RoadmapDialog(
 
         is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
     }
+
+
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

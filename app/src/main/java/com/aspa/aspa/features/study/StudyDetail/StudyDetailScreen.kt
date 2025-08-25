@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.study.StudyDetail
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,10 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.aspa.aspa.features.state.MakeQuizState
 import com.aspa.aspa.features.state.UiState
+import com.aspa.aspa.features.study.StudyViewModel
 import com.aspa.aspa.model.Study
 import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray
@@ -41,12 +47,28 @@ import com.aspa.aspa.ui.theme.Gray10
 fun StudyDetailScreen(
     uiState: UiState<Study>,
     onRetry : () -> Unit,
-    navigateRoadmap: () -> Unit
+    navigateRoadmap: () -> Unit,
+    navigateToQuiz: () -> Unit,
+    viewModel: StudyViewModel = hiltViewModel()
 ) {
     val listState = rememberLazyListState()
     val study = (uiState as? UiState.Success<Study>)?.data
     val sections = study?.items ?: emptyList()
     val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
+    val context= LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.makeQuizFlow.collect { event ->
+            when(event) {
+                MakeQuizState.Idle -> {}
+                is MakeQuizState.Navigate -> {
+                    Toast.makeText(context,
+                        "퀴즈 생성이 완료되어 퀴즈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+                    navigateToQuiz()
+                }
+            }
+        }
+    }
 
     when (uiState) {
         is UiState.Loading, UiState.Idle -> {
@@ -124,7 +146,14 @@ fun StudyDetailScreen(
                                     BorderStroke(1.dp, Gray10),
                                     shape = RoundedCornerShape(12.dp)
                                 )
-                                .background(Color.White, shape = RoundedCornerShape(12.dp)),
+                                .background(Color.White, shape = RoundedCornerShape(12.dp))
+                                .clickable {
+                                    viewModel.makeQuiz()
+                                    Toast.makeText(context,
+                                        "서버에 퀴즈 생성 요청을 보냈습니다.",
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                            ,
                             contentAlignment = Alignment.Center
                         ) {
                             Text("퀴즈 풀기", color = Color.Black)

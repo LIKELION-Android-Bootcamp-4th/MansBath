@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
@@ -25,12 +27,20 @@ import com.aspa.aspa.features.quiz.component.QuizListCard
 @Composable
 fun QuizScreen(
     navController: NavController,
-    viewModel: QuizViewModel
+    viewModel: QuizViewModel,
+    roadmapId: String?
 ) {
     val expandedIndex = remember { mutableStateOf(-1) }
     val quizListState by viewModel.quizListState.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.getQuizzes("test-user-for-web")
+        if(roadmapId != null && roadmapId != "") {
+            // viewModel.requestQuizFromRoadmap(roadmapId)
+            Toast.makeText(context, "퀴즈 생성중입니다. 기다려주세요..", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            viewModel.getQuizzes()
+        }
     }
 
 
@@ -66,12 +76,8 @@ fun QuizScreen(
                             itemsIndexed(state.quizzes) { index, item ->
                                 QuizListCard(
                                     index = index,
-                                    title = item.quiz[0].studyId,
-                                    description = item.quiz[0].studyId,
-                                    quizzes = item.quiz,
+                                    item = item,
                                     expandedIndex = expandedIndex.value,
-                                    completedSection = 2,
-                                    allSection = 6,
                                     onClick = { expandedIndex.value = it },
                                     navController = navController,
                                     viewModel = viewModel

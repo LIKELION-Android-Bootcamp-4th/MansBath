@@ -52,6 +52,7 @@ fun QuizResultScreen(
 ) {
     val quizState by viewModel.quizState.collectAsState()
     val chosenAnswerList by viewModel.chosenAnswerList.collectAsState()
+    val currentRoadmapId by viewModel.currentRoadmapId.collectAsState()
     Column(
         modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 24.dp)
@@ -216,12 +217,11 @@ fun QuizResultScreen(
                         onClick = {
                             // 기존 퀴즈 데이터 삭제
                             viewModel.deleteQuiz(
-                                "test-user-for-web",
-                                state.quiz.roadmapId,
+                                currentRoadmapId,
                                 state.quiz.quizTitle
                             )
                             // 새 퀴즈 요청
-                            viewModel.requestQuiz(state.quiz.studyId)
+                            viewModel.requestQuiz(currentRoadmapId, state.quiz.studyId, state.quiz.sectionId)
                             navController.navigate(QuizDestinations.SOLVE_QUIZ)
                         },
                         modifier = Modifier.weight(1f),
