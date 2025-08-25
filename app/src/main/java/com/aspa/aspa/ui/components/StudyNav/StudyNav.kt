@@ -86,6 +86,12 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
                     }
 
                 },
+                navigateToQuiz = {
+                    navController.navigate("quiz") {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 viewModel = vm
             )
         }

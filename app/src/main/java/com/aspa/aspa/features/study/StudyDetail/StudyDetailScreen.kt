@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.aspa.aspa.features.state.MakeQuizState
 import com.aspa.aspa.features.state.UiState
 import com.aspa.aspa.features.study.StudyViewModel
 import com.aspa.aspa.model.Study
@@ -46,6 +48,7 @@ fun StudyDetailScreen(
     uiState: UiState<Study>,
     onRetry : () -> Unit,
     navigateRoadmap: () -> Unit,
+    navigateToQuiz: () -> Unit,
     viewModel: StudyViewModel = hiltViewModel()
 ) {
     val listState = rememberLazyListState()
@@ -53,6 +56,19 @@ fun StudyDetailScreen(
     val sections = study?.items ?: emptyList()
     val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
     val context= LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.makeQuizFlow.collect { event ->
+            when(event) {
+                MakeQuizState.Idle -> {}
+                is MakeQuizState.Navigate -> {
+                    Toast.makeText(context,
+                        "퀴즈 생성이 완료되어 퀴즈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+                    navigateToQuiz()
+                }
+            }
+        }
+    }
 
     when (uiState) {
         is UiState.Loading, UiState.Idle -> {
