@@ -77,7 +77,13 @@ fun StudyScreen (
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("학습 생성중...")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    CircularProgressIndicator()
+                }
             }
         }
         is UiState.Success -> {
