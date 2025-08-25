@@ -25,13 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,8 +51,22 @@ fun RoadmapDetailScreen(
 ) {
     val roadmapState by viewModel.roadmapState.collectAsState()
 
-    LaunchedEffect(Unit) {
+    // 최초 진입 시 로드
+    LaunchedEffect(roadmapId) {
         viewModel.loadRoadmap(roadmapId)
+    }
+
+    val backStackEntry = remember {
+        navController.getBackStackEntry(RoadmapDestinations.ROADMAP_DETAIL)
+    }
+    val savedStateHandle = backStackEntry.savedStateHandle
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle.getStateFlow("reload", false).collect { reload ->  // 플래그 가져오기
+            if (reload) {
+                viewModel.loadRoadmap(roadmapId)
+                savedStateHandle.remove<Boolean>("reload") // flag 삭제
+            }
+        }
     }
 
     when (val state = roadmapState) {
@@ -86,7 +100,7 @@ fun RoadmapDetailScreen(
                                 fontWeight = FontWeight.Bold,
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Surface (
+                            Surface(
                                 color = Color(0xFFECEEF2),
                                 shape = RoundedCornerShape(6.75.dp)
                             ) {
@@ -169,6 +183,7 @@ fun RoadmapDetailScreen(
 
 
         }
+
         is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
     }
 }
