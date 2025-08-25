@@ -65,7 +65,7 @@ fun ExpandableContentCard(
 
                 ) {
                     Text(
-                        text = (index + 1).toString(),
+                        text = index.toString(),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium
                     )

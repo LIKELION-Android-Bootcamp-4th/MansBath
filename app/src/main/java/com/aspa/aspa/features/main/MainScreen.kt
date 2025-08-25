@@ -26,6 +26,9 @@ import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.components.RoadmapTopBar
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
+import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
+import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
+import com.aspa.aspa.ui.components.StudyNav.studyGraph
 import kotlinx.coroutines.launch
 
 @SuppressLint("RestrictedApi")
@@ -57,6 +60,7 @@ fun MainScreen(
                     RoadmapDestinations.ROADMAP_LIST -> RoadmapTopBar()
                     RoadmapDestinations.ROADMAP_DETAIL, RoadmapDestinations.ROADMAP_DIALOG -> {}
                     QuizDestinations.SOLVE_QUIZ, QuizDestinations.QUIZ_RESULT -> {}
+                    StudyScreenRoute.Study.route, StudyScreenRoute.StudyDetail.route -> {}
                     else -> DefaultTopBar()
                 }
             },

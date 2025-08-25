@@ -1,8 +1,10 @@
 package com.aspa.aspa.features.study.StudyDetail
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,8 +19,11 @@ import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,149 +40,159 @@ import com.aspa.aspa.ui.theme.Gray10
 @Composable
 fun StudyDetailScreen(
     uiState: UiState<Study>,
-    onRetry: () -> Unit
+    onRetry : () -> Unit,
+    navigateRoadmap: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val study = (uiState as? UiState.Success<Study>)?.data
     val sections = study?.items ?: emptyList()
-    val expanded = remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
+
+    when (uiState) {
+        is UiState.Loading, UiState.Idle -> {
+            // 로딩 상태일 때 로딩 인디케이터 표시
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is UiState.Success -> {
 
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
 
-                    ) {
-                        Text(
-                            text = study?.title.orEmpty(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Black
+                            ) {
+                                Text(
+                                    text = study?.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = Color.Black
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.White
                         )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
+                    )
+                },
+                bottomBar = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding()
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(35.dp)
+                                .background(Blue, shape = RoundedCornerShape(12.dp))
+                                .clickable { navigateRoadmap() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.MenuBook,
-                                contentDescription = "진행률 아이콘",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "진행률 0%",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.CheckCircle,
+                                    contentDescription = "완료",
+                                    modifier = Modifier.size(18.dp),
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("이 섹션 완료하기", color = Color.White)
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(35.dp)
+                                .border(
+                                    BorderStroke(1.dp, Gray10),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .background(Color.White, shape = RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("퀴즈 풀기", color = Color.Black)
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
-            )
-        },
-        bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 12.dp,
-                        bottom = WindowInsets.navigationBars
-                            .asPaddingValues()
-                            .calculateBottomPadding()
-                    ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(35.dp)
-                        .background(Blue, shape = RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "완료",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("이 섹션 완료하기", color = Color.White)
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(35.dp)
-                        .border(BorderStroke(1.dp, Gray10), shape = RoundedCornerShape(12.dp))
-                        .background(Color.White, shape = RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("퀴즈 풀기", color = Color.Black)
-                }
-            }
-        },
-        content = { padding ->
-            when (uiState) {
-                UiState.Loading -> {
-                    Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-                is UiState.Failure -> {
-                    Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(uiState.message ?: "오류가 발생했어요.")
-                            Spacer(Modifier.height(12.dp))
-                            Button(onClick = onRetry) { Text("다시 시도") }
-                        }
-                    }
-                }
-                UiState.Idle, is UiState.Success -> {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .padding(padding)
-                            .fillMaxSize()
-                            .background(Gray),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        sections.forEachIndexed { sIdx, sec ->
-                            val count = minOf(sec.subtitle.size, sec.content.size)
-
-                            items(count, key = { subIdx -> "row-$sIdx-$subIdx" }) { subIdx ->
-                                val title = sec.subtitle[subIdx]
-                                val detail = sec.content[subIdx]
-                                val isExpanded = expanded.value == Pair(sIdx, subIdx)
-
-                                ExpandableContentCard(
-                                    index = subIdx + 1,
-                                    title = title,
-                                    content = detail,
-                                    expanded = isExpanded,
-                                    onClick = {
-                                        expanded.value = if (isExpanded) null else Pair(sIdx, subIdx)
-                                    }
-                                )
-                                Spacer(Modifier.height(10.dp))
+                content = { padding ->
+                    when (uiState) {
+                        UiState.Loading -> {
+                            Box(
+                                Modifier.padding(padding).fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
                             }
+                        }
 
-                            item { Spacer(Modifier.height(6.dp)) } // 섹션 간 간격
+                        is UiState.Failure -> {
+                            Box(
+                                Modifier.padding(padding).fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(uiState.message ?: "오류가 발생했어요.")
+                                    Spacer(Modifier.height(12.dp))
+                                    Button(onClick = onRetry) { Text("다시 시도") }
+                                }
+                            }
+                        }
+
+                        UiState.Idle, is UiState.Success -> {
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                                    .background(Gray),
+                                contentPadding = PaddingValues(vertical = 8.dp)
+                            ) {
+                                sections.forEachIndexed { sIdx, sec ->
+
+                                    items(1, key = { subIdx -> "row-$sIdx-$subIdx" }) { subIdx ->
+                                        val title = sec.title
+                                        val detail = sec.content[subIdx]
+                                        val isExpanded = expanded.value == Pair(sIdx, subIdx)
+
+                                        ExpandableContentCard(
+                                            index = sIdx + 1,
+                                            title = title,
+                                            content = detail,
+                                            expanded = isExpanded,
+                                            onClick = {
+                                                expanded.value = if (isExpanded) null else Pair(sIdx, subIdx)
+                                            }
+                                        )
+                                        Spacer(Modifier.height(10.dp))
+                                    }
+
+                                    item { Spacer(Modifier.height(6.dp)) } // 섹션 간 간격
+                                }
+                            }
                         }
                     }
                 }
-            }
+            )
         }
-    )
+
+        is UiState.Failure -> Text("에러발생")
+    }
 }
 
