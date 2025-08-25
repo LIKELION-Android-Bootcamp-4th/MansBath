@@ -85,7 +85,8 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
                         restoreState = true
                     }
 
-                }
+                },
+                viewModel = vm
             )
         }
     }

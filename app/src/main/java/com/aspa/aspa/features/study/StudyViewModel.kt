@@ -42,8 +42,6 @@ class StudyViewModel @Inject constructor(
             repository.fetchStudy(roadmapId,questionId,sectionId)
                 .onSuccess {
                     _uiState.value = UiState.Success(it)
-                    // TODO: 트랜잭션 처리시 제거..
-                    quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId!!)
                 }
                 .onFailure {
                     android.util.Log.e("StudyVM", "fetchStudy failed", it)
@@ -55,6 +53,13 @@ class StudyViewModel @Inject constructor(
     fun updateStatus(){
         viewModelScope.launch {
             repository.updateStatus(roadmapId,sectionId)
+        }
+    }
+
+    fun makeQuiz() {
+        viewModelScope.launch {
+            // TODO: 트랜잭션 처리시 제거..
+            quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId)
         }
     }
 

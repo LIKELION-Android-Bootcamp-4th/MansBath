@@ -3,7 +3,10 @@ package com.aspa.aspa.data.remote
 import android.util.Log
 import com.aspa.aspa.data.dto.QuizDto
 import com.aspa.aspa.data.dto.QuizzesDto
+import com.aspa.aspa.model.QuizInfo
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
@@ -14,16 +17,20 @@ class QuizRemoteDataSource @Inject constructor(
     private val functions: FirebaseFunctions
 ) {
 
-    suspend fun getQuizzes(uid: String): List<QuizzesDto> {
-        val resultList = mutableListOf<QuizzesDto>()
+    suspend fun getQuizzes(uid: String): List<QuizInfo> {
+        val resultList = mutableListOf<QuizInfo>()
 
         val quizzesSnapshot = firestore.collection("users")
             .document(uid)
             .collection("quizzes")
+            .orderBy("lastModified", Query.Direction.DESCENDING)
             .get()
             .await()
 
         for (quizDoc in quizzesSnapshot) {
+            val title = quizDoc.get("title") as String
+            val description = quizDoc.get("description") as String
+            val lastModified = quizDoc.get("lastModified") as Timestamp
             val quizSnapshot = quizDoc.reference
                 .collection("quiz")
                 .orderBy("createdAt")
@@ -32,7 +39,15 @@ class QuizRemoteDataSource @Inject constructor(
             Log.d("Quizzes", "quizSnapshot detected!!!!!!")
 
             val quizList = quizSnapshot.toObjects(QuizDto::class.java)
-            resultList.add(QuizzesDto(roadmapId = quizDoc.id, quiz = quizList))
+
+            resultList.add(
+                QuizInfo(
+                    title,
+                    description,
+                    lastModified,
+                    QuizzesDto(roadmapId = quizDoc.id, quiz = quizList)
+                )
+            )
         }
 
         return resultList
@@ -74,8 +89,9 @@ class QuizRemoteDataSource @Inject constructor(
 
     }
 
-    suspend fun sendToMakeQuiz(studyId: String) : QuizDto {
+    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String) : QuizDto {
         val data = hashMapOf(
+            "roadmapId" to roadmapId,
             "studyId" to studyId
         )
         // 로컬 테스트 용
@@ -93,7 +109,7 @@ class QuizRemoteDataSource @Inject constructor(
             .limit(1)
             .get().await()
         val studyId = snapshot.documents.first().id
-        return sendToMakeQuiz(studyId)
+        return sendToMakeQuiz(roadmapId, studyId)
     }
 
     suspend fun updateQuizSolveResult(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>): Boolean {
