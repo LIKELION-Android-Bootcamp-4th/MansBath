@@ -130,10 +130,10 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun requestQuiz(roadmapId: String, studyId: String) {
+    fun requestQuiz(roadmapId: String, studyId: String, sectionId: Int) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
-            repository.sendToMakeQuiz(roadmapId, studyId)
+            repository.sendToMakeQuiz(roadmapId, studyId, sectionId)
                 .onSuccess { quiz ->
                     Log.d("QuizViewModel", "퀴즈 생성 성공")
                     if (quiz.quizTitle != "") {
@@ -149,11 +149,11 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun requestQuizFromRoadmap(roadmapId: String) {
+    fun requestQuizFromRoadmap(roadmapId: String, sectionId: Int) {
         viewModelScope.launch {
             _quizListState.value = QuizListState.Loading
             Log.d("QuizViewModel", "로드맵을 통한 퀴즈 생성 중: $roadmapId")
-            repository.makeQuizFromRoadmap(userUid, roadmapId)
+            repository.makeQuizFromRoadmap(userUid, roadmapId, sectionId)
                 .onSuccess { quiz ->
                     Log.d("QuizViewModel", "퀴즈 생성 성공")
                     if (quiz.quizTitle != "") {

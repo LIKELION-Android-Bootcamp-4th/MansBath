@@ -221,7 +221,7 @@ fun QuizResultScreen(
                                 state.quiz.quizTitle
                             )
                             // 새 퀴즈 요청
-                            viewModel.requestQuiz(currentRoadmapId, state.quiz.studyId)
+                            viewModel.requestQuiz(currentRoadmapId, state.quiz.studyId, state.quiz.sectionId)
                             navController.navigate(QuizDestinations.SOLVE_QUIZ)
                         },
                         modifier = Modifier.weight(1f),

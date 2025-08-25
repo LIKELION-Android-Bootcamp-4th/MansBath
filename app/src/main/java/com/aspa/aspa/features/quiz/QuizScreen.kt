@@ -46,7 +46,7 @@ fun QuizScreen(
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         if(roadmapId != null && roadmapId != "") {
-            viewModel.requestQuizFromRoadmap(roadmapId)
+            // viewModel.requestQuizFromRoadmap(roadmapId)
             Toast.makeText(context, "퀴즈 생성중입니다. 기다려주세요..", Toast.LENGTH_SHORT).show()
         }
         else {

@@ -59,7 +59,7 @@ class StudyViewModel @Inject constructor(
     fun makeQuiz() {
         viewModelScope.launch {
             // TODO: 트랜잭션 처리시 제거..
-            quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId)
+            quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId, sectionId)
         }
     }
 

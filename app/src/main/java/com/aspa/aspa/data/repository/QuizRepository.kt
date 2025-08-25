@@ -51,9 +51,9 @@ class QuizRepository @Inject constructor(
         }
     }
 
-    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String): Result<QuizDto> {
+    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String, sectionId: Int): Result<QuizDto> {
         return try {
-            val data = remoteDataSource.sendToMakeQuiz(roadmapId, studyId)
+            val data = remoteDataSource.sendToMakeQuiz(roadmapId, studyId, sectionId)
             Log.d("QuizRepository", "퀴즈 생성 성공!")
             Result.success(data)
         }
@@ -63,9 +63,9 @@ class QuizRepository @Inject constructor(
         }
     }
 
-    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String): Result<QuizDto> {
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String, sectionId: Int): Result<QuizDto> {
         return try {
-            val data = remoteDataSource.makeQuizFromRoadmap(uid, roadmapId)
+            val data = remoteDataSource.makeQuizFromRoadmap(uid, roadmapId, sectionId)
             Result.success(data)
         }
         catch (e: Exception) {

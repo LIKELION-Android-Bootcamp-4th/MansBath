@@ -89,10 +89,11 @@ class QuizRemoteDataSource @Inject constructor(
 
     }
 
-    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String) : QuizDto {
+    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String, sectionId: Int) : QuizDto {
         val data = hashMapOf(
             "roadmapId" to roadmapId,
-            "studyId" to studyId
+            "studyId" to studyId,
+            "sectionId" to sectionId
         )
         // 로컬 테스트 용
         // functions.useEmulator("10.0.2.2", 5001)
@@ -103,13 +104,14 @@ class QuizRemoteDataSource @Inject constructor(
         return gson.fromJson(gson.toJson(result.getData()), QuizDto::class.java)
     }
 
-    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String): QuizDto {
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String, sectionId: Int): QuizDto {
         val snapshot = firestore.collection("users/${uid}/studies")
             .whereEqualTo("roadmapId", roadmapId)
+            .whereEqualTo("sectionId", sectionId)
             .limit(1)
             .get().await()
         val studyId = snapshot.documents.first().id
-        return sendToMakeQuiz(roadmapId, studyId)
+        return sendToMakeQuiz(roadmapId, studyId, sectionId)
     }
 
     suspend fun updateQuizSolveResult(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>): Boolean {
