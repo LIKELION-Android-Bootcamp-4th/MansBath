@@ -28,14 +28,13 @@ import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
 import kotlinx.coroutines.launch
 
-@SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
+@SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     rootNavController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val innerNavController: NavHostController = rememberNavController()
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -45,30 +44,9 @@ fun MainScreen(
 
     DoubleBackExitHandler()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            HomeDrawerContent(
-                uiState = uiState,
-                onCloseClick = { scope.launch { drawerState.close() } },
-                onHistoryItemSelected = { questionId ->
-                    homeViewModel.loadChatHistory(questionId)
-                    scope.launch { drawerState.close() }
-                },
-                onNewChatClick = {
-                    homeViewModel.createNewChat()
-                    scope.launch { drawerState.close() }
-                },
-                onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
-                onRenameClick = { questionId, newTitle ->
-                    homeViewModel.renameQuestion(
-                        questionId,
-                        newTitle
-                    )
-                }
-            )
-        }
-    ) {
+    val isHomeScreen = currentRoute == HomeDestinations.HOME
+    // 회면 상태 추가로 @Composable 로 변경함.
+    val mainContent = @Composable {
         Scaffold(
             topBar = {
                 when (currentRoute) {
@@ -89,9 +67,7 @@ fun MainScreen(
                     QuizDestinations.QUIZ,
                     MypageDestination.MYPAGE
                 )
-
                 val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
-
                 if (shouldShowBottomBar) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
@@ -115,5 +91,35 @@ fun MainScreen(
                 homeViewModel = homeViewModel,
             )
         }
+    }
+    if (isHomeScreen) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                HomeDrawerContent(
+                    uiState = uiState,
+                    onCloseClick = { scope.launch { drawerState.close() } },
+                    onHistoryItemSelected = { questionId ->
+                        homeViewModel.loadChatHistory(questionId)
+                        scope.launch { drawerState.close() }
+                    },
+                    onNewChatClick = {
+                        homeViewModel.createNewChat()
+                        scope.launch { drawerState.close() }
+                    },
+                    onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
+                    onRenameClick = { questionId, newTitle ->
+                        homeViewModel.renameQuestion(
+                            questionId,
+                            newTitle
+                        )
+                    }
+                )
+            }
+        ) {
+            mainContent()
+        }
+    } else {
+        mainContent()
     }
 }
