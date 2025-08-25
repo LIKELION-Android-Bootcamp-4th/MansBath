@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.roadmap
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.roadmap.components.SectionCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.ui.theme.AspaTheme
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +65,8 @@ fun RoadmapDetailScreen(
     LaunchedEffect(savedStateHandle) {
         savedStateHandle.getStateFlow("reload", false).collect { reload ->  // 플래그 가져오기
             if (reload) {
+                delay(1000) // 임시 조치 // todo: studyViewModel에서 상태 관리한 후 해당 코드 삭제할 것
+                Log.d("DETAIL", "분기 진입 완료")
                 viewModel.loadRoadmap(roadmapId)
                 savedStateHandle.remove<Boolean>("reload") // flag 삭제
             }
