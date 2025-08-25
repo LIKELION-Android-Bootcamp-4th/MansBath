@@ -8,7 +8,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,13 +34,12 @@ import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
 import kotlinx.coroutines.launch
 
-@SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
+@SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val innerNavController: NavHostController = rememberNavController()
     val currentBackStackEntry by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -49,30 +47,9 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val uiState by homeViewModel.uiState.collectAsState()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            HomeDrawerContent(
-                uiState = uiState,
-                onCloseClick = { scope.launch { drawerState.close() } },
-                onHistoryItemSelected = { questionId ->
-                    homeViewModel.loadChatHistory(questionId)
-                    scope.launch { drawerState.close() }
-                },
-                onNewChatClick = {
-                    homeViewModel.createNewChat()
-                    scope.launch { drawerState.close() }
-                },
-                onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
-                onRenameClick = { questionId, newTitle ->
-                    homeViewModel.renameQuestion(
-                        questionId,
-                        newTitle
-                    )
-                }
-            )
-        }
-    ) {
+    val isHomeScreen = currentRoute == HomeDestinations.HOME
+    // 회면 상태 추가로 @Composable 로 변경함.
+    val mainContent = @Composable {
         Scaffold(
             topBar = {
                 when (currentRoute) {
@@ -93,9 +70,7 @@ fun MainScreen(
                     BottomTab.Quiz.route,
                     BottomTab.MyPage.route
                 )
-
                 val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
-
                 if (shouldShowBottomBar) {
                     BottomNavigationBar(
                         currentRoute = currentRoute,
@@ -123,5 +98,35 @@ fun MainScreen(
                 mypageGraph(navController = innerNavController)
             }
         }
+    }
+    if (isHomeScreen) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                HomeDrawerContent(
+                    uiState = uiState,
+                    onCloseClick = { scope.launch { drawerState.close() } },
+                    onHistoryItemSelected = { questionId ->
+                        homeViewModel.loadChatHistory(questionId)
+                        scope.launch { drawerState.close() }
+                    },
+                    onNewChatClick = {
+                        homeViewModel.createNewChat()
+                        scope.launch { drawerState.close() }
+                    },
+                    onDeleteClick = { questionId -> homeViewModel.deleteQuestionHistory(questionId) },
+                    onRenameClick = { questionId, newTitle ->
+                        homeViewModel.renameQuestion(
+                            questionId,
+                            newTitle
+                        )
+                    }
+                )
+            }
+        ) {
+            mainContent()
+        }
+    } else {
+        mainContent()
     }
 }
