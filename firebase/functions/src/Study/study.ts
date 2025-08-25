@@ -18,7 +18,7 @@ export const study = onCall(async (request) => {
 
     const studyData = await generateStudyContent(uid, questionId,
       roadmapId, sectionId);
-    const data = {...studyData, roadmapId};
+    const data = {...studyData, roadmapId, sectionId};
 
     // Firestore 서비스 호출
     const {studyRef, existingStudy} = await getOrCreateStudy(uid);
