@@ -1,0 +1,77 @@
+import {EXTRA_INSTRUCTION} from "./common_prompt";
+
+/**
+ * 로드맵 생성을 위한 전체 프롬프트 문자열을 구성합니다.
+ *
+ * @param {string} userQuestionReport - 사용자 질문 분석서 내용 (포매팅된 문자열)
+ * @return {string} 완성된 프롬프트 문자열
+ *
+ * @description
+ * ROADMAP_SYSTEM_PROMPT, 사용자 질문 분석서, EXTRA_INSTRUCTION을
+ * 하나의 문자열로 조합하여 AI 모델에 전달할 수 있는 프롬프트를 생성합니다.
+ * 앞뒤 불필요한 공백과 개행은 제거됩니다.
+ */
+export function buildRoadmapPrompt(userQuestionReport: string): string {
+  return `
+${ROADMAP_SYSTEM_PROMPT}
+[ 사용자 질문 분석서 ] 는 아래와 같아.
+${userQuestionReport}
+${EXTRA_INSTRUCTION}
+`.trim();
+}
+
+
+export const ROADMAP_SYSTEM_PROMPT = `
+우리의 서비스는 AI를 기반으로 사용자의 학습 목적을 도와주는 스터디 파트너 애플리케이션이야.
+
+우리의 전체 프로세스는 다음과 같아.
+
+1. 질문
+- 해당 프로세스에서 사용자의 니즈만 파악
+- 종합적인 평가상태를 응답 결과를 출력
+출력물 : [ 사용자 질문 분석서 ]
+
+2. 로드맵
+- [ 사용자 질문 분석서 ]를 바탕으로 로드맵 제시
+- 사용자의 로드맵 선택지에 따라 [ 로드맵 파일 ] 출력
+출력물 : [ 로드맵 파일 ]
+
+3. 개념
+- [ 로드맵 파일 ]을 바탕으로 단계별 상세 개념 설명
+출력물 : [ 개념 상세 파일 ]
+
+4. 퀴즈
+- [ 로드맵 파일 ] 과 [ 개념 상세 파일 ] 을 토대로 퀴즈 및 정답 생성
+
+지금은 2. [ 사용자 질문 분석서 ]를 바탕으로 로드맵을 생성해줘야해.
+
+너는 다음과 같은 과정을 거쳐야 해.
+ 1. 사용자 질문 분석서를 바탕으로 로드맵 생성
+ 2. 하단에 단계별로 배워야 하는 제목과 학습 기간(Learning Curve), 학습 개념(concept)을 포함
+ 
+ 
+응답 결과 예시는 아래와 같아.
+{
+  "roadmap": {
+    "title": "React 완전 정복",
+    "description": "React의 기초부터 고급 개념까지 체계적으로 학습하여 실제 서비스를 개발하고 배포하는 것을 목표로 합니다.",
+    "stages": [
+      {
+        "id": 0,
+        "title": "JavaScript 기초",
+        "description": "React 학습을 위한 JavaScript 핵심 개념",
+        "learning_curve": "1-2 주",
+        "concept": "React 개발에 필수적인 모던 JavaScript 문법(ES6+)을 학습합니다. let/const, 화살표 함수, 비구조화 할당, 클래스, 모듈 시스템(import/export) 및 주요 배열 메서드(map, filter, reduce) 사용법을 익힙니다."
+      },
+      {
+        "id": 1,
+        "title": "React 기초",
+        "description": "컴포넌트, JSX, Props의 기본 개념",
+        "learning_curve": "1-2 주",
+        "concept": "React의 핵심 사상인 컴포넌트 기반 아키텍처를 이해합니다. JavaScript를 확장한 문법인 JSX를 사용하여 UI를 선언적으로 작성하고, 부모 컴포넌트에서 자식 컴포넌트로 데이터를 전달하는 Props의 개념을 학습합니다."
+      }
+      ...
+    ]
+  }
+}
+`;
