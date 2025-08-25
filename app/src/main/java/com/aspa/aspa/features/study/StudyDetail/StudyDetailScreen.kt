@@ -60,7 +60,11 @@ fun StudyDetailScreen(
     LaunchedEffect(Unit) {
         viewModel.makeQuizFlow.collect { event ->
             when(event) {
-                MakeQuizState.Idle -> {}
+                MakeQuizState.Waiting -> {
+                    Toast.makeText(context,
+                        "서버에 퀴즈 생성 요청을 보냈습니다.",
+                        Toast.LENGTH_SHORT).show()
+                }
                 is MakeQuizState.Navigate -> {
                     Toast.makeText(context,
                         "퀴즈 생성이 완료되어 퀴즈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
@@ -148,10 +152,7 @@ fun StudyDetailScreen(
                                 )
                                 .background(Color.White, shape = RoundedCornerShape(12.dp))
                                 .clickable {
-                                    viewModel.makeQuiz()
-                                    Toast.makeText(context,
-                                        "서버에 퀴즈 생성 요청을 보냈습니다.",
-                                        Toast.LENGTH_SHORT).show()
+                                    viewModel.navigateOrMakeQuiz()
                                 }
                             ,
                             contentAlignment = Alignment.Center
