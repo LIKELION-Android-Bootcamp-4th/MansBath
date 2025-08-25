@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.repository.QuizRepository
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aspa.aspa.data.repository.StudyFireStoreRepository
 import com.aspa.aspa.data.repository.StudyRepository
 import com.aspa.aspa.features.state.UiState
@@ -29,13 +30,16 @@ class StudyViewModel @Inject constructor(
 
     private val roadmapIdFlow = savedStateHandle.getStateFlow("roadmapId", "")
     private val questionIdFlow = savedStateHandle.getStateFlow<String?>("questionId", null)
+    private val sectionIdFlow = savedStateHandle.getStateFlow("sectionId", -1)
     val roadmapId: String get() = roadmapIdFlow.value
     val questionId = questionIdFlow.value
+    val sectionId = sectionIdFlow.value
+
 
     fun fetchStudy(){
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            repository.fetchStudy(roadmapId,questionId)
+            repository.fetchStudy(roadmapId,questionId,sectionId)
                 .onSuccess {
                     _uiState.value = UiState.Success(it)
                     // TODO: 트랜잭션 처리시 제거..
@@ -50,7 +54,7 @@ class StudyViewModel @Inject constructor(
     }
     fun updateStatus(){
         viewModelScope.launch {
-            repository.updateStatus(roadmapId)
+            repository.updateStatus(roadmapId,sectionId)
         }
     }
 

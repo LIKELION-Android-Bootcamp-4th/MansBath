@@ -19,7 +19,7 @@ class StudyFireStoreDataSource @Inject constructor(
     private val firebaseFunctions: FirebaseFunctions
 ) {
     val uid = firebaseAuth.uid!!
-    suspend fun getStudyFireStore(roadmapId: String?, questionId: String?):
+    suspend fun getStudyFireStore(roadmapId: String?, questionId: String?, sectionId : Int?):
             Study {
         val response = fireStore
             .collection("users")
@@ -39,7 +39,8 @@ class StudyFireStoreDataSource @Inject constructor(
             } else {
                 val sendData = hashMapOf(
                     "roadmapId" to roadmapId,
-                    "questionId" to questionId
+                    "questionId" to questionId,
+                    "sectionId" to sectionId
                 )
                 Log.d("roadmapId",roadmapId?: "로드맵 데이터없음")
                 Log.d("questionId",questionId?: "로드맵 데이터없음")
@@ -66,17 +67,32 @@ class StudyFireStoreDataSource @Inject constructor(
         }
 
     }
-    suspend fun updateStatus(roadmapId: String?){
+
+    suspend fun updateStatus(roadmapId: String?,sectionId: Int?){
         val docRef = fireStore.collection("users")
             .document(uid)
             .collection("roadmap")
             .document(roadmapId ?:"")
-        docRef.update("status" , true)
-            .addOnSuccessListener {
-                Log.d("Firestore","상태변경 완료")
+        try {
+            val snap = docRef.get().await()
+            val roadmap = snap.get("roadmap") as? Map<*, *>
+            val raw = roadmap?.get("stages")
+            if(raw == null){
+                Log.d("stages","스테이지 빈값입니다")
+                return
             }
-            .addOnFailureListener {
-                Log.d("Firestore","상태변경 실패")
+            val stages = (raw as? List<*>)?.map { (it as Map<*, *>).toMutableMap() as MutableMap<String, Any?> }?.toMutableList()
+                ?: run { Log.d("stages","roadmap.stages 형식이 배열이 아님"); return }
+            val id = sectionId?: -1
+            val update = stages[id].toMutableMap().apply {
+                this["status"] = true
             }
+            stages[id] = update
+            docRef.update(com.google.firebase.firestore.FieldPath.of("roadmap", "stages"), stages).await()
+
+            Log.d("FireStore","상태변경완료")
+        }catch (e : Exception){
+            Log.e("FireStore","에러발생: $e")
+        }
     }
 }

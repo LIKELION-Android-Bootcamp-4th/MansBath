@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.study.StudyDetail
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,8 +19,11 @@ import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +46,7 @@ fun StudyDetailScreen(
     val listState = rememberLazyListState()
     val study = (uiState as? UiState.Success<Study>)?.data
     val sections = study?.items ?: emptyList()
-    val expanded = remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
 
     when (uiState) {
         is UiState.Loading, UiState.Idle -> {
@@ -165,23 +169,19 @@ fun StudyDetailScreen(
                                 contentPadding = PaddingValues(vertical = 8.dp)
                             ) {
                                 sections.forEachIndexed { sIdx, sec ->
-                                    val count = minOf(sec.subtitle.size, sec.content.size)
 
-                                    items(
-                                        count,
-                                        key = { subIdx -> "row-$sIdx-$subIdx" }) { subIdx ->
-                                        val title = sec.subtitle[subIdx]
+                                    items(1, key = { subIdx -> "row-$sIdx-$subIdx" }) { subIdx ->
+                                        val title = sec.title
                                         val detail = sec.content[subIdx]
                                         val isExpanded = expanded.value == Pair(sIdx, subIdx)
 
                                         ExpandableContentCard(
-                                            index = subIdx + 1,
+                                            index = sIdx + 1,
                                             title = title,
                                             content = detail,
                                             expanded = isExpanded,
                                             onClick = {
-                                                expanded.value =
-                                                    if (isExpanded) null else Pair(sIdx, subIdx)
+                                                expanded.value = if (isExpanded) null else Pair(sIdx, subIdx)
                                             }
                                         )
                                         Spacer(Modifier.height(10.dp))

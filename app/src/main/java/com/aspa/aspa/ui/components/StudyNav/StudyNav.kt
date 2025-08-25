@@ -1,5 +1,6 @@
 package com.aspa.aspa.ui.components.StudyNav
 
+import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,15 +42,21 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             )
         ) { backStackEntry ->
 
-            val parentEntry = remember(backStackEntry) {
+            val parentEntry = remember(navController) {
                 navController.getBackStackEntry(Graph.Study)
             }
             val vm: StudyViewModel = hiltViewModel(parentEntry)
             val roadmapId = backStackEntry.arguments?.getString("roadmapId")
             val sectionId = backStackEntry.arguments?.getInt("sectionId")
             val questionId = backStackEntry.arguments?.getString("questionId")
+            Log.d("roadmapId",roadmapId?:"")
 
-            LaunchedEffect(roadmapId,questionId) {
+
+            parentEntry.savedStateHandle["roadmapId"] = roadmapId
+            parentEntry.savedStateHandle["questionId"] = questionId
+            parentEntry.savedStateHandle["sectionId"] = sectionId
+
+            LaunchedEffect(roadmapId,questionId,sectionId) {
                 if(roadmapId != null && questionId != null){
                     vm.fetchStudy()
                 }
@@ -71,6 +78,7 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
                 onRetry = {vm.fetchStudy()},
                 navigateRoadmap = {
                     val roadmapId = vm.roadmapId
+
                     vm.updateStatus()
                     navController.navigate("roadmap/$roadmapId"){
                         launchSingleTop = true
