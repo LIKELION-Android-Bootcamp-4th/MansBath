@@ -102,7 +102,7 @@ fun OnboardingScreen(
                             launchSingleTop = true
                         }
                     },
-                    color = Color.Gray,
+                    color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -118,7 +118,7 @@ fun OnboardingScreen(
                             launchSingleTop = true
                         }
                     },
-                    color = Color.Gray,
+                    color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
