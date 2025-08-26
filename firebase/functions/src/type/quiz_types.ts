@@ -32,3 +32,13 @@ export interface ConceptDetail {
     title: string;
   }];
 }
+
+export interface RoadmapDto {
+  questionId: string;
+  roadmap: {
+    description: string;
+    stages: [];
+    title: string;
+  };
+  createdAt: FieldValue;
+}

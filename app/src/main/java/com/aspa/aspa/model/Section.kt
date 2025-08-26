@@ -7,5 +7,6 @@ data class Section(
     val concept: String,
     val duration: String,
     val status: Boolean,
+    val isSolved: Boolean,
     val quiz: Quiz,
 )

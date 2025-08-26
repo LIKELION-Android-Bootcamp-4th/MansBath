@@ -4,6 +4,7 @@ import android.util.Log
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.remote.GoogleRemoteDataSource
 import com.aspa.aspa.data.remote.UserRemoteDataSource
+import com.aspa.aspa.model.Provider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.functions.FirebaseFunctions
@@ -65,4 +66,16 @@ class AuthRepositoryImpl @Inject constructor(
         Log.e("AuthRepo", "signInWithNaver FAILED: ${it.javaClass.simpleName} ${it.message}", it)
     }
 
+    override suspend fun fetchProvider(): Result<Provider> = runCatching {
+        val provider = userDs.fecthProvider()
+        Log.d("LOGOUT", "provider: $provider")
+        when (provider) {
+            "google" -> Provider.GOOGLE
+            "kakao" -> Provider.KAKAO
+            "naver" -> Provider.NAVER
+            else -> throw IllegalStateException("❌ Unknown provider")
+        }
+    }.onFailure { e ->
+        Log.e("LOGOUT", "❌ fetchProvider FAILED: ${e.javaClass.simpleName} ${e.message}", e)
+    }
 }
