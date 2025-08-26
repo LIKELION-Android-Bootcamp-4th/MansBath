@@ -32,6 +32,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +47,14 @@ import com.aspa.aspa.features.login.AuthViewModel
 import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
+import com.aspa.aspa.features.mypage.components.ConfirmDialog
 import com.aspa.aspa.ui.theme.Gray10
+
+enum class DialogType {
+    LOGOUT,
+    WITHDRAW,
+    NONE
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,11 +64,13 @@ fun MyPageScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    var dialogType by remember { mutableStateOf(DialogType.NONE) }
+
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
 
     LaunchedEffect(logoutState, withdrawState) {
-        when(logoutState) {
+        when (logoutState) {
             LogoutState.Idle -> {}
 
             LogoutState.Success -> {
@@ -66,13 +78,18 @@ fun MyPageScreen(
                     popUpTo(0)
                 }
             }
+
             is LogoutState.Error -> {
-                Toast.makeText(context, (logoutState as LogoutState.Error).message, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    (logoutState as LogoutState.Error).message,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
 
-        when(withdrawState) {
+        when (withdrawState) {
             WithdrawState.Idle -> {}
 
             WithdrawState.Success -> {
@@ -84,7 +101,11 @@ fun MyPageScreen(
             }
 
             is WithdrawState.Error -> {
-                Toast.makeText(context, (withdrawState as WithdrawState.Error).message, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    (withdrawState as WithdrawState.Error).message,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
 
@@ -157,10 +178,7 @@ fun MyPageScreen(
                 }
                 // 로그아웃 버튼
                 Button(
-                    onClick = {
-                        authViewModel.signOut(context)
-                        authViewModel.resetLogoutState()
-                    },
+                    onClick = { dialogType = DialogType.LOGOUT },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -187,11 +205,9 @@ fun MyPageScreen(
                     }
                 }
 
+                // 회원탈퇴 버튼
                 Button(
-                    onClick = {
-                        authViewModel.withdraw(context)
-                        authViewModel.resetWithdrawState()
-                    },
+                    onClick = { dialogType = DialogType.WITHDRAW },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -216,6 +232,32 @@ fun MyPageScreen(
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
+                }
+
+                when (dialogType) {
+                    DialogType.LOGOUT -> {
+                        ConfirmDialog(
+                            text = "로그아웃",
+                            onDismiss = { dialogType = DialogType.NONE },
+                            onConfirm = {
+                                authViewModel.signOut(context)
+                                authViewModel.resetLogoutState()
+                            },
+                        )
+                    }
+
+                    DialogType.WITHDRAW -> {
+                        ConfirmDialog(
+                            text = "회원탈퇴",
+                            onDismiss = { dialogType = DialogType.NONE },
+                            onConfirm = {
+                                authViewModel.withdraw(context)
+                                authViewModel.resetWithdrawState()
+                            },
+                        )
+                    }
+
+                    DialogType.NONE -> {}
                 }
             }
         }
