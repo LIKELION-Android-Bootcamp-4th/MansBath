@@ -15,7 +15,8 @@ data class UiAssistantMessage(
     override val id: String,
     override val date: String?,
     val text: String,
-    val options: List<String>? = null
+    val options: List<String>? = null,
+    val roadmapId: String? = null
 ) : UiChatMessage
 
 data class UiAnalysisReport(
