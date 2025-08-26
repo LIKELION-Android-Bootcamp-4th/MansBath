@@ -66,8 +66,6 @@ fun StudyDetailScreen(
                         Toast.LENGTH_SHORT).show()
                 }
                 is MakeQuizState.Navigate -> {
-                    Toast.makeText(context,
-                        "퀴즈 생성이 완료되어 퀴즈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                     navigateToQuiz()
                 }
             }
