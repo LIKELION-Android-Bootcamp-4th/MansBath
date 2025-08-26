@@ -77,6 +77,8 @@ fun MyPageScreen(
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
+                Toast.makeText(context, "로그아웃 완료", Toast.LENGTH_SHORT)
+                    .show()
             }
 
             is LogoutState.Error -> {
@@ -96,7 +98,7 @@ fun MyPageScreen(
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
-                Toast.makeText(context, "회원탈퇴 성공", Toast.LENGTH_SHORT)
+                Toast.makeText(context, "회원탈퇴 완료", Toast.LENGTH_SHORT)
                     .show()
             }
 
