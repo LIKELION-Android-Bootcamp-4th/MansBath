@@ -64,12 +64,8 @@ import com.aspa.aspa.ui.theme.Gray10
 fun StudyScreen (
     uiState: UiState<Study>,
     onClickItem: () -> Unit,
-    onRefresh: () -> Unit
 ){
 
-    LaunchedEffect(Unit) {
-        onRefresh()
-    }
 
     val study : Study? = (uiState as? UiState.Success<Study>)?.data
     val contentList = study?.items ?: emptyList()

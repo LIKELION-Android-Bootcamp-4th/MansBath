@@ -1,6 +1,9 @@
 package com.aspa.aspa.features.study
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.repository.StudyFireStoreRepository
 import com.aspa.aspa.data.repository.StudyRepository
@@ -9,21 +12,34 @@ import com.aspa.aspa.model.Study
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StudyViewModel @Inject constructor(
-    private val repository: StudyFireStoreRepository
+    private val repository: StudyFireStoreRepository,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
     val _uiState = MutableStateFlow<UiState<Study>>(UiState.Idle)
     val uiState : StateFlow<UiState<Study>> = _uiState
 
+    private val roadmapIdFlow = savedStateHandle.getStateFlow<String?>("roadmapId", null)
+    private val questionIdFlow = savedStateHandle.getStateFlow<String?>("questionId", null)
+    private val sectionIdFlow = savedStateHandle.getStateFlow<Int?>("sectionId", null)
+    val roadmapId = roadmapIdFlow.value
+    val questionId = questionIdFlow.value
+    val sectionId = sectionIdFlow.value
+
     fun fetchStudy(){
+        Log.d("sectionId","${sectionId}")
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            repository.fetchStudy()
-                .onSuccess { _uiState.value = UiState.Success(it) }
+            repository.fetchStudy(roadmapId,questionId,sectionId)
+
+                .onSuccess {
+
+                    _uiState.value = UiState.Success(it) }
                 .onFailure {
                     android.util.Log.e("StudyVM", "fetchStudy failed", it)
                     _uiState.value = UiState.Failure(it.message ?: "Error 발생")
