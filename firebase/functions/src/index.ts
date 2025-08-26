@@ -21,3 +21,7 @@ export * from "./auth/naver";
 export * from "./auth/withdraw";
 export * from "./Study/study";
 export * from "./mistakenotebook/mistake_notebook";
+
+// Triggers
+export {studyTrigger} from "./Study/triggers";
+export {quizTrigger} from "./quiz/triggers";
