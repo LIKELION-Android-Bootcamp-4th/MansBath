@@ -67,7 +67,7 @@ fun RoadmapDialog(
 
     LaunchedEffect(Unit) {
         viewModel.loadRoadmap(roadmapId)
-        viewModel.isQuizExist(roadmapId)
+        viewModel.isQuizExist(roadmapId, sectionId)
     }
 
     val context = LocalContext.current

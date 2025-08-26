@@ -83,9 +83,9 @@ class RoadmapViewModel @Inject constructor(
         }
     }
 
-    fun isQuizExist(roadmapId: String) {
+    fun isQuizExist(roadmapId: String, sectionId: Int) {
         viewModelScope.launch {
-            repository.isQuizExist(roadmapId)
+            repository.isQuizExist(roadmapId, sectionId)
                 .onSuccess { exists ->
                     _quizExistState.value = exists
                 }
