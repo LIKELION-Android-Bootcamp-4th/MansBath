@@ -1,7 +1,6 @@
 // study/gen_ai_service.ts
-
 import {HttpsError} from "firebase-functions/v2/https";
-import {SYSTEM_PROMPT} from "./dummy_data";
+import {SYSTEM_PROMPT} from "./prompt";
 import {getAiModel} from "../ai/gen_ai";
 import {fetchGenericFirebaseData} from "./firestore_service";
 import {logger} from "firebase-functions/v2";
