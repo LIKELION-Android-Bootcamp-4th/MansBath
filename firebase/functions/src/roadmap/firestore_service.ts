@@ -97,7 +97,7 @@ export async function getRoadmapIdFromQuestion(
 ): Promise<string | null> {
   try {
     const docRef = await getFirestore()
-      .collection(`users/${uid}/question`)
+      .collection(`users/${uid}/questions`)
       .doc(questionId)
       .get();
 
@@ -133,7 +133,7 @@ async function addRoadmapIdToQuestion(
 ) {
   try {
     await getFirestore()
-      .collection(`users/${uid}/question`)
+      .collection(`users/${uid}/questions`)
       .doc(questionId)
       .set({roadmapId: roadmapId}, {merge: true});
 
