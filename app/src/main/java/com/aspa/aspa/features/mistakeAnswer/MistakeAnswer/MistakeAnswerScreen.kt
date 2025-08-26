@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +38,7 @@ fun MistakeNoteBookScreen(
             .fillMaxWidth()
             .fillMaxHeight()
             .background(Color.White)
+            .safeContentPadding()
 
     ) {
         when(state){
@@ -73,8 +75,7 @@ fun MistakeNoteBookScreen(
                         modifier = Modifier.padding(top = 16.dp)
                     )
                 }else {
-                    Text("틀린 문제들을 다시 확인하고 학습하세요", style = MaterialTheme.typography.bodyMedium, color = Gray)
-                    LazyColumn(
+                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(vertical = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)

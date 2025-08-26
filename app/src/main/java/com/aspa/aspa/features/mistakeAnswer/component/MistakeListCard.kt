@@ -46,14 +46,13 @@ fun MistakeListCard(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(10.dp),
-
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = quizTitle , style = MaterialTheme.typography.bodyMedium, color = Color.Black,
+                Text(text = quizTitle , style = MaterialTheme.typography.bodyLarge, color = Color.Black,
                     fontWeight = FontWeight.Bold
                 )
-                Text("보기", style = MaterialTheme.typography.labelSmall, color = Blue)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -68,7 +67,7 @@ fun MistakeListCard(
             }
             Spacer(modifier = Modifier.height(15.dp))
             Row {
-                Text("틀린문제:", style = MaterialTheme.typography.bodyMedium, color = Color.Black.copy(alpha = 0.5f), fontWeight = FontWeight.Bold)
+                Text("틀린문제:", style = MaterialTheme.typography.bodyMedium,  fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(text = "${index}개", style = MaterialTheme.typography.bodyMedium, color = Color.Red, fontWeight = FontWeight.SemiBold)
             }

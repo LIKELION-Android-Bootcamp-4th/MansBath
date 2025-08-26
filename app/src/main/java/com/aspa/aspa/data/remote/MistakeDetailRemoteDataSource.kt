@@ -7,6 +7,7 @@ import com.aspa.aspa.data.remote.dto.QuestionResponseDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Source
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.google.firebase.functions.HttpsCallableResult
@@ -38,23 +39,17 @@ class MistakeDetailRemoteDataSource @Inject constructor(
                 "uid" to uid,
                 "docId" to mistakeId
             )
-
-            val result = try {
-                functions.getHttpsCallable("mistakeNotebook")
+            functions.getHttpsCallable("mistakeNotebook")
                     .call(data)
                     .await()
-            } catch (e: FirebaseFunctionsException) {
-                Log.e(TAG, "CF error code=${e.code}, details=${e.details}", e)
-                throw e
-            } catch (e: Exception) {
-                Log.e(TAG, "CF call failed", e)
-                throw e
-            }
 
-            val map = requireNotNull(result.getData()) { "문서를 찾을 수 없습니다" }
+            val response = colRef.get(Source.SERVER).await()
+            val map = requireNotNull(response.data) { "문서를 찾을 수 없습니다" }
             val json = gson.toJson(map)
             val dto = gson.fromJson(json, MistakeDto::class.java)
             return dto
+
+
         }else{
             val map = requireNotNull(snap.data){"문서를 찾을 수 없습니다"}
             val json = gson.toJson(map)

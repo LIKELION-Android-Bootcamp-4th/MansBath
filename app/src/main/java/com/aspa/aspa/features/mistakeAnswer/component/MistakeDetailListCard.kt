@@ -38,6 +38,8 @@ fun MistakeDetailListCard(
         border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f))
     ) {
         Column(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             Text("문제", style = MaterialTheme.typography.bodyMedium)
@@ -46,10 +48,11 @@ fun MistakeDetailListCard(
             Text("내 답안", style = MaterialTheme.typography.bodyMedium, color = Color.Red.copy(alpha = 0.8f))
             Box(
                 modifier = Modifier
+                    .padding(4.dp)
                     .fillMaxWidth()
-                    .padding(10.dp)
-                    .background(color = Color.Red.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
-                    .border(width = 1.dp, color = Color.Red.copy(alpha = 0.8f),RoundedCornerShape(4.dp)),
+                    .background(color = Color.Red.copy(alpha = 0.5f), RoundedCornerShape(5.dp))
+                    .border(width = 1.dp, color = Color.Red.copy(alpha = 0.8f),RoundedCornerShape(5.dp))
+                    .padding(12.dp),
                 contentAlignment = Alignment.CenterStart
             ){
                 Text("$chosen",style = MaterialTheme.typography.bodyMedium, color = Color.Black)
@@ -57,10 +60,12 @@ fun MistakeDetailListCard(
             Text("정답", style = MaterialTheme.typography.bodyMedium, color = Color.Green.copy(alpha = 0.8f))
             Box(
                 modifier = Modifier
+                    .padding(4.dp)
                     .fillMaxWidth()
-                    .padding(10.dp)
-                    .background(color = Color.Green.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
-                    .border(width = 1.dp, color = Color.Green.copy(alpha = 0.8f),RoundedCornerShape(4.dp)),
+
+                    .background(color = Color.Green.copy(alpha = 0.5f), RoundedCornerShape(5.dp))
+                    .border(width = 1.dp, color = Color.Green.copy(alpha = 0.8f),RoundedCornerShape(5.dp))
+                    .padding(12.dp),
                 contentAlignment = Alignment.CenterStart
             ){
                 Text("$answer",style = MaterialTheme.typography.bodyMedium, color = Color.Black)
