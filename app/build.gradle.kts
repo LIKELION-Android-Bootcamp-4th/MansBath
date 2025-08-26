@@ -79,6 +79,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-functions-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
     // ---------- BOM ----------
     implementation(platform(libs.firebase.bom)) // CHANGED: Firebase BOM 한 번만
     implementation(libs.firebase.appcheck)
@@ -139,5 +140,8 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // EncryptedSharedPreferences
+    implementation("androidx.security:security-crypto:1.1.0-alpha03")
 }
 

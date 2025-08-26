@@ -1,6 +1,11 @@
 package com.aspa.aspa.features.quiz
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.QuizDto
@@ -10,8 +15,10 @@ import com.aspa.aspa.model.QuizInfo
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -30,6 +37,12 @@ sealed interface QuizState {
     data class Error(val error: String) : QuizState
 }
 
+sealed class PermissionState {
+    object Idle : PermissionState() // 초기 상태
+    object Granted : PermissionState() // 권한 허용
+    data class Denied(val shouldShowRationale: Boolean) : PermissionState() // 권한 거부
+}
+
 enum class SolvingState {
     NEXT,
     PREVIOUS
@@ -38,8 +51,9 @@ enum class SolvingState {
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val repository: QuizRepository,
+    @ApplicationContext private val context: Context,
     private val auth: FirebaseAuth,
-    private val roadmapRepository: RoadmapRepository
+    private val roadmapRepository: RoadmapRepository,
 ) : ViewModel() {
 
     private val _quizListState = MutableStateFlow<QuizListState>(QuizListState.Loading)
@@ -54,6 +68,26 @@ class QuizViewModel @Inject constructor(
     private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
     val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
 
+    private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
+    val permissionState = _permissionState.asStateFlow()
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (isGranted) {
+                _permissionState.update { PermissionState.Granted }
+            } else {
+                // 아직 권한이 없다면 초기 상태(Idle)를 유지
+                _permissionState.update { PermissionState.Idle }
+            }
+        }
+    }
+
+    // fun getQuizzes(uid: String) {
     private val _currentRoadmapId = MutableStateFlow<String>("")
     val currentRoadmapId: StateFlow<String> = _currentRoadmapId
 
@@ -219,6 +253,14 @@ class QuizViewModel @Inject constructor(
             _quizState.value = currentState.copy(
                 quiz = currentState.quiz.copy(questions = updatedQuestions)
             )
+        }
+    }
+
+    fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
+        if (isGranted) {
+            _permissionState.update { PermissionState.Granted }
+        } else {
+            _permissionState.update { PermissionState.Denied(shouldShowRationale) }
         }
     }
 
