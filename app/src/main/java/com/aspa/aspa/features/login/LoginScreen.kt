@@ -127,25 +127,6 @@ fun LoginScreen(
                         launcher = naverLauncher
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-//                        navController.navigate(LoginDestinations.NICKNAME)
-                        // TODO: 로그인 완료 시 파이어베이스에 FCM 토큰 전송 로직. 로그인 정리 후 코드 위치 교체 요망
-                        // authViewModel.updateFcmToken()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("로그인")
-                }
             }
         }
     }
