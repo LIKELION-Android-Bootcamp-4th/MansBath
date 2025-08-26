@@ -62,8 +62,13 @@ fun NavGraphBuilder.homeGraph(
                         homeViewModel.selectOption(selectedOption)
                     },
                     onRoadmapCreateClicked = {
-                        uiState.activeConversationId?.let { questionId ->
+                        uiState.questionId?.let { questionId ->
                             navController.navigate(RoadmapDestinations.roadmapList(questionId))
+                        }
+                    },
+                    onGoToRoadmapClicked = {
+                        uiState.roadmapId?.let { roadmapId ->
+                            navController.navigate(RoadmapDestinations.roadmapListByRoadmapId(roadmapId))
                         }
                     }
                 )
