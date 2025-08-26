@@ -16,6 +16,7 @@ import com.aspa.aspa.data.repository.AuthRepository
 import com.aspa.aspa.data.repository.FcmRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +39,8 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
     private val getCredentialRequest: GetCredentialRequest,
-    private val fcmRepository: FcmRepository
+    private val fcmRepository: FcmRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     companion object { private const val TAG = "LoginVM" }
@@ -103,7 +105,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val token = fcmRepository.getToken()
             if(token != null) {
-                fcmRepository.updateFcmToken("test-user-for-web", token)
+                fcmRepository.updateFcmToken(auth.uid!!, token)
             }
         }
     }
