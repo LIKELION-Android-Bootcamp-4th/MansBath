@@ -43,7 +43,7 @@ fun RoadmapListScreen(
             viewModel.generateRoadmap(questionId) { roadmapId ->
                 // 먼저 questionId 없는 목록으로 교체
                 navController.navigate(RoadmapDestinations.roadmapList()) {
-                    popUpTo(RoadmapDestinations.ROADMAP_LIST) { inclusive = true }
+                    popUpTo(0)
                 }
                 // 그 다음에 상세 화면으로 이동
                 navController.navigate(
