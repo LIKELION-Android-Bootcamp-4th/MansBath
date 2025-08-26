@@ -53,7 +53,6 @@ fun LoginScreen(
             authViewModel.signInWithNaver(token)
         },
         onSuccess = {
-            authViewModel.updateFcmToken()
             navController.navigate(MainDestinations.MAIN)
         },
     )

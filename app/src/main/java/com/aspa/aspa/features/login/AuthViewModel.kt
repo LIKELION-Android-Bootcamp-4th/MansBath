@@ -133,7 +133,10 @@ class AuthViewModel @Inject constructor(
     fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
         _loginState.value = LoginState.Loading
         authRepository.signInWithNaver(accessToken)
-            .onSuccess { _loginState.value = LoginState.Success(null) }
+            .onSuccess {
+                _loginState.value = LoginState.Success(null)
+                updateFcmToken()
+            }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
             }
