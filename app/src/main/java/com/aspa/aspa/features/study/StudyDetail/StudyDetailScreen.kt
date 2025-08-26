@@ -65,15 +65,12 @@ fun StudyDetailScreen(
     val study = (uiState as? UiState.Success<Study>)?.data
     val sections = study?.items ?: emptyList()
     val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
-    val context= LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.makeQuizFlow.collect { event ->
             when(event) {
                 MakeQuizState.Waiting -> {
-                    Toast.makeText(context,
-                        "서버에 퀴즈 생성 요청을 보냈습니다.",
-                        Toast.LENGTH_SHORT).show()
+
                 }
                 is MakeQuizState.Navigate -> {
                     navigateToQuiz()
