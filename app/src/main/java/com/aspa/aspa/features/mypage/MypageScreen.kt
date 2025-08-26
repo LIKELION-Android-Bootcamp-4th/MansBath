@@ -3,8 +3,6 @@ package com.aspa.aspa.features.mypage
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.NoAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,7 +41,6 @@ import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.ui.theme.Gray10
-import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,27 +138,6 @@ fun MyPageScreen(
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-
-                Box(
-                    modifier = Modifier
-                        .background(color = Color.White, shape = RoundedCornerShape(5.dp))
-                        .border(
-                            width = 1.dp,
-                            shape = RoundedCornerShape(5.dp),
-                            color = Color.Black.copy(alpha = 0.1f)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Edit,
-                        contentDescription = "수정",
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(20.dp),
-                        tint = Color.Black,
-                    )
-
                 }
             }
         }
