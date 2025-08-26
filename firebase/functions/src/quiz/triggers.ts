@@ -1,7 +1,7 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import {logger} from "firebase-functions";
 import {getQuiz} from "./gen_ai_service";
 import {getConceptDetail, saveQuiz} from "./firestore_service";
-import {logger} from "firebase-functions";
 
 export const quizTrigger = onDocumentCreated(
   {
@@ -9,32 +9,43 @@ export const quizTrigger = onDocumentCreated(
     timeoutSeconds: 300,
   },
   async (event) => {
-    const data = event.data;
+    logger.info("[TRIGGER] 'quizTrigger'가 실행되었습니다!");
 
-    logger.info("[TRIGGER TEST] 'quizTrigger' 함수가 실행되었습니다!");
+    const studySnapshot = event.data;
 
-
-    if (!data) {
-      logger.log(`컬랙션 ${event.params.studyId} 이 삭제되거나 없습니다.`);
+    if (!studySnapshot) {
+      logger.log(`Study 문서(${event.params.studyId})가 삭제되었거나 없습니다.`);
       return;
     }
 
-    const uid = event.params.uid;
-    const studyId = event.params.studyId;
+    const {uid, studyId} = event.params;
+    const studyData = studySnapshot.data();
 
-    // 3. 개념 상세 데이터 조회 (Firestore Service)
-    const conceptDetail = await getConceptDetail(uid, studyId);
+    const sectionId = studyData.sectionId;
+    const roadmapId = studyData.roadmapId;
 
-    // 4. AI 응답 요청 (Gemini Service)
-    const aiResponse = await getQuiz(conceptDetail, studyId);
+    if (!sectionId || !roadmapId) {
+      logger.error(`Study 문서(${studyId})에 'sectionId' 또는 'roadmapId' 필드가 없습니다.`);
+      return;
+    }
 
-    // 5. 퀴즈 내용 저장 (Firestore Service)
-    await saveQuiz(uid, aiResponse);
+    try {
+      const conceptDetail = await getConceptDetail(uid, studyId);
 
-    // 6. 응답 반환
-    return {
-      ...aiResponse,
-      createdAt: new Date().toISOString(),
-    };
+      logger.log(`퀴즈 생성 시작: sectionId=${sectionId}, roadmapId=${roadmapId}`);
+
+      const aiResponse = await getQuiz(conceptDetail, studyId, Number(sectionId));
+
+      await saveQuiz(uid, aiResponse, roadmapId);
+
+      logger.log(`✅ 퀴즈 생성 및 저장 성공: studyId=${studyId}`);
+      return {
+        ...aiResponse,
+        createdAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      logger.error("퀴즈 트리거 처리 중 오류 발생:", {studyId, sectionId, error});
+      throw error;
+    }
   }
 );
