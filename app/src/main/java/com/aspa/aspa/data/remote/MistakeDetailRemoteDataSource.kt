@@ -34,7 +34,7 @@ class MistakeDetailRemoteDataSource @Inject constructor(
         val snap = colRef.get().await()
         val exists = snap.contains("response")
         if (!exists) {
-            val data = hashMapOf(
+            val data = mapOf(
                 "uid" to uid,
                 "docId" to mistakeId
             )
