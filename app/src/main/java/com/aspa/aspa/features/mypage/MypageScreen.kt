@@ -48,13 +48,10 @@ import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.mypage.components.ConfirmDialog
+import com.aspa.aspa.features.mypage.components.DialogType
 import com.aspa.aspa.ui.theme.Gray10
 
-enum class DialogType {
-    LOGOUT,
-    WITHDRAW,
-    NONE
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

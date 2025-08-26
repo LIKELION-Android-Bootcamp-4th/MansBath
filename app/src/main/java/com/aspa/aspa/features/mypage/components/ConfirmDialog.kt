@@ -5,6 +5,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
+enum class DialogType {
+    LOGOUT,
+    WITHDRAW,
+    NONE
+}
+
 @Composable
 fun ConfirmDialog(
     text: String,
