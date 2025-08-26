@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
+import com.aspa.aspa.data.repository.FcmRepository
 import com.aspa.aspa.model.Provider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -58,6 +59,7 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
     private val getCredentialRequest: GetCredentialRequest,
+    private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -400,4 +402,13 @@ class AuthViewModel @Inject constructor(
         _withdrawState.value = WithdrawState.Idle
     }
 
+
+    fun updateFcmToken() {
+        viewModelScope.launch {
+            val token = fcmRepository.getToken()
+            if(token != null) {
+                fcmRepository.updateFcmToken(auth.uid!!, token)
+            }
+        }
+    }
 }
