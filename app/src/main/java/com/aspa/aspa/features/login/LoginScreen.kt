@@ -53,6 +53,7 @@ fun LoginScreen(
             authViewModel.signInWithNaver(token)
         },
         onSuccess = {
+            authViewModel.updateFcmToken()
             navController.navigate(MainDestinations.MAIN)
         },
     )
@@ -109,7 +110,10 @@ fun LoginScreen(
                 SocialButton("Google로 계속하기") {
                     authViewModel.signInWithGoogleCredential(
                         activity = navController.context as Activity,
-                        onSuccess = { navController.navigate("main") },
+                        onSuccess = {
+                            authViewModel.updateFcmToken()
+                            navController.navigate("main")
+                        },
                     ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
@@ -130,7 +134,7 @@ fun LoginScreen(
                     onClick = {
 //                        navController.navigate(LoginDestinations.NICKNAME)
                         // TODO: 로그인 완료 시 파이어베이스에 FCM 토큰 전송 로직. 로그인 정리 후 코드 위치 교체 요망
-                        loginViewModel.updateFcmToken()
+                        // authViewModel.updateFcmToken()
                     },
                     modifier = Modifier
                         .fillMaxWidth(),

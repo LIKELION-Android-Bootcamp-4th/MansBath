@@ -87,7 +87,7 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun getQuizzes(uid: String) {
+    // fun getQuizzes(uid: String) {
     private val _currentRoadmapId = MutableStateFlow<String>("")
     val currentRoadmapId: StateFlow<String> = _currentRoadmapId
 

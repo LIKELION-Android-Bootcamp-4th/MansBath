@@ -6,7 +6,6 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +35,8 @@ import androidx.navigation.NavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -63,7 +64,6 @@ fun QuizScreen(
             )
         }
     )
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         if(roadmapId != null && roadmapId != "") {
             // viewModel.requestQuizFromRoadmap(roadmapId)

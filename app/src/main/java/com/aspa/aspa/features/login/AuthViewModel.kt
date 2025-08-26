@@ -213,6 +213,7 @@ class AuthViewModel @Inject constructor(
                             userDoc.update("lastLogin", FieldValue.serverTimestamp())
                                 .addOnSuccessListener {
                                     Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                                    updateFcmToken()
                                     _loginState.value = LoginState.Success(null)
                                 }
                                 .addOnFailureListener { e ->
@@ -235,6 +236,7 @@ class AuthViewModel @Inject constructor(
                                         .set(userProfile)
                                         .addOnSuccessListener {
                                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                            updateFcmToken()
                                             _loginState.value = LoginState.Success(null)
                                         }
                                         .addOnFailureListener { e ->
