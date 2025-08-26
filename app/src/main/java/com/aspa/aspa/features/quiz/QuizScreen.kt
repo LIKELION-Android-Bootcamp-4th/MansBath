@@ -121,21 +121,6 @@ fun QuizScreen(
                     }
                 }
 
-
-                Text(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    text = "퀴즈",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                )
-
-                Text(
-                    text = "학습한 내용을 확인해 보세요.",
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
                 when(val state = quizListState) {
                     QuizListState.Loading -> {
                         Column(
