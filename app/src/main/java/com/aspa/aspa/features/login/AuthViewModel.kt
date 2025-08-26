@@ -77,6 +77,9 @@ class AuthViewModel @Inject constructor(
     private val _withdrawState = MutableStateFlow<WithdrawState>(WithdrawState.Idle)
     val withdrawState = _withdrawState.asStateFlow()
 
+    private val _nicknameState = MutableStateFlow<String>("조회 중..")
+    val nicknameState: StateFlow<String> = _nicknameState
+
     private val _providerState = MutableStateFlow<String>("조회 중..")
     val providerState: StateFlow<String> = _providerState
 
@@ -422,6 +425,15 @@ class AuthViewModel @Inject constructor(
                         Provider.KAKAO -> "카카오 계정으로 가입"
                         Provider.NAVER -> "네이버 계정으로 가입"
                     }
+                }
+        }
+    }
+
+    fun getNickname() {
+        viewModelScope.launch {
+            authRepository.fetchNickname()
+                .onSuccess { nickname ->
+                    _nicknameState.value = nickname
                 }
         }
     }

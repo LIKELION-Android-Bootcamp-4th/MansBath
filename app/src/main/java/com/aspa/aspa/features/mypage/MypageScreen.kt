@@ -50,11 +50,13 @@ fun MyPageScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val nickname by authViewModel.nicknameState.collectAsState()
     val provider by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
 
     LaunchedEffect(Unit) {
+        authViewModel.getNickname()
         authViewModel.getProvider()
     }
 
@@ -127,7 +129,7 @@ fun MyPageScreen(
                 )
                 Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                     Text(
-                        "닉네임",
+                        nickname,
                         style = MaterialTheme.typography.bodyMedium,
                         fontSize = 15.sp,
                         color = Color.Black
