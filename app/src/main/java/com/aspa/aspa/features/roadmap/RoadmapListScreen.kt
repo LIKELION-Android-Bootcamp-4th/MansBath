@@ -1,5 +1,8 @@
 package com.aspa.aspa.features.roadmap
 
+import android.app.Activity
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.roadmap.components.RoadmapCard
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
+import com.aspa.aspa.features.widget.RoadmapStatusWidgetProvider
 import com.aspa.aspa.ui.theme.AspaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +36,7 @@ import com.aspa.aspa.ui.theme.AspaTheme
 fun RoadmapListScreen(
     navController: NavController,
     questionId: String,
+    fromWidget: Boolean,
     viewModel: RoadmapViewModel = hiltViewModel()
 ) {
     Log.d("MYTAG", "qid: $questionId")
@@ -61,7 +67,7 @@ fun RoadmapListScreen(
         if (questionId.isNotEmpty()) {
             GenerateRoadmapSection(generateState)
         } else {
-            RoadmapListSection(roadmapListState, navController, questionId)
+            RoadmapListSection(roadmapListState, fromWidget, navController)
         }
     }
 }
@@ -78,9 +84,11 @@ private fun GenerateRoadmapSection(generateState: Boolean?) {
 @Composable
 private fun RoadmapListSection(
     state: RoadmapListState,
+    fromWidget: Boolean,
     navController: NavController,
-    questionId: String
 ) {
+    val context = LocalContext.current
+
     when (state) {
         is RoadmapListState.Loading -> LoadingContent("로드맵 조회 중..")
         is RoadmapListState.Empty -> Text("로드맵이 존재하지 않습니다.")
@@ -89,6 +97,21 @@ private fun RoadmapListSection(
                 items(state.roadmaps.size) { index ->
                     val roadmap = state.roadmaps[index]
                     RoadmapCard(roadmap) {
+                        if (fromWidget) {
+                            val intent = Intent(context, RoadmapStatusWidgetProvider::class.java).apply {
+                                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                                putExtra("ROADMAP_TITLE", roadmap.title)
+                                putExtra("ROADMAP_COMPLETED", roadmap.completedSection)
+                                putExtra("ROADMAP_ALL", roadmap.allSection)
+                            }
+
+                            context.sendBroadcast(intent)
+
+                            if (context is Activity) {
+                                context.finish()
+                            }
+                        }
+
                         navController.navigate(
                             RoadmapDestinations.roadmapDetail(
                                 roadmap.id
@@ -129,6 +152,10 @@ fun RoadmapListScreenPreview() {
         /**
          * wYN1b3dA0kGffMXCcv73 : 일본어를 배우고 싶어
          */
-        RoadmapListScreen(questionId = "wYN1b3dA0kGffMXCcv73", navController = nav)
+        RoadmapListScreen(
+            questionId = "wYN1b3dA0kGffMXCcv73",
+            navController = nav,
+            fromWidget = false,
+        )
     }
 }
