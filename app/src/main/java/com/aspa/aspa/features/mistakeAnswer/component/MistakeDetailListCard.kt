@@ -1,4 +1,4 @@
-package com.aspa.aspa.features.mistakeAnswerScreen.component
+package com.aspa.aspa.features.mistakeAnswer.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -47,9 +47,9 @@ fun MistakeDetailListCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(color = Color.Red.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
-                    .border(width = 1.dp, color = Color.Red.copy(alpha = 0.8f),RoundedCornerShape(10.dp)),
+                    .padding(10.dp)
+                    .background(color = Color.Red.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                    .border(width = 1.dp, color = Color.Red.copy(alpha = 0.8f),RoundedCornerShape(4.dp)),
                 contentAlignment = Alignment.CenterStart
             ){
                 Text("$chosen",style = MaterialTheme.typography.bodyMedium, color = Color.Black)
@@ -58,9 +58,9 @@ fun MistakeDetailListCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(color = Color.Green.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
-                    .border(width = 1.dp, color = Color.Green.copy(alpha = 0.8f),RoundedCornerShape(10.dp)),
+                    .padding(10.dp)
+                    .background(color = Color.Green.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                    .border(width = 1.dp, color = Color.Green.copy(alpha = 0.8f),RoundedCornerShape(4.dp)),
                 contentAlignment = Alignment.CenterStart
             ){
                 Text("$answer",style = MaterialTheme.typography.bodyMedium, color = Color.Black)

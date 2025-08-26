@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.main.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
@@ -14,6 +15,7 @@ import com.aspa.aspa.features.home.navigation.HomeDestinations
 import com.aspa.aspa.features.mypage.navigation.MypageDestination
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
+import com.aspa.aspa.ui.components.MistakeNav.MistakeDestinations
 
 @Composable
 fun BottomNavigationBar(
@@ -38,6 +40,12 @@ fun BottomNavigationBar(
             onClick = { onTabSelected(RoadmapDestinations.ROADMAP_GRAPH_ROUTE) },
             icon = { Icon(Icons.Default.Explore, contentDescription = "로드맵") },
             label = { Text("로드맵") }
+        )
+        NavigationBarItem(
+            selected = currentRoute == MistakeDestinations.MISTAKE_ANSWER,
+            onClick = { onTabSelected(MistakeDestinations.MISTAKE_GRAPH_ROUTE) },
+            icon = { Icon(Icons.Default.AssignmentTurnedIn, contentDescription = "오답노트") },
+            label = { Text("오답노트") }
         )
         NavigationBarItem(
             selected = currentRoute == MypageDestination.MYPAGE,

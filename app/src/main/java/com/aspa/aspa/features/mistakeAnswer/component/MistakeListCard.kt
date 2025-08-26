@@ -1,4 +1,4 @@
-package com.aspa.aspa.features.mistakeAnswerScreen.component
+package com.aspa.aspa.features.mistakeAnswer.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.aspa.aspa.ui.theme.Blue
-import com.aspa.aspa.ui.theme.Gray
 import com.aspa.aspa.ui.theme.Gray10
 
 
@@ -31,10 +30,10 @@ fun MistakeListCard(
     quizTitle : String,
     currentAt : String,
     index : Int,
+    modifier: Modifier = Modifier
 ){
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(color = Color.White)
             .padding(10.dp),
         shape = RoundedCornerShape(10.dp),
@@ -47,8 +46,7 @@ fun MistakeListCard(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
+                    .padding(10.dp),
 
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

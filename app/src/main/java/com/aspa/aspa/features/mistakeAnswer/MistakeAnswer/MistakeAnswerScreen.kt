@@ -1,4 +1,4 @@
-package com.aspa.aspa.features.mistakeAnswer
+package com.aspa.aspa.features.mistakeAnswer.MistakeAnswer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,7 +48,7 @@ fun MistakeNoteBookScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("학습 생성중...")
+                        Text("오답 생성중...")
                         Spacer(modifier = Modifier.height(10.dp))
                         CircularProgressIndicator()
                     }

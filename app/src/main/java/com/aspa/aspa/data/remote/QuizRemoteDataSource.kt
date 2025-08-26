@@ -6,11 +6,16 @@ import com.aspa.aspa.data.dto.QuizDto
 import com.aspa.aspa.data.dto.QuizzesDto
 import com.aspa.aspa.model.QuizInfo
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class QuizRemoteDataSource @Inject constructor(
@@ -178,10 +183,17 @@ class QuizRemoteDataSource @Inject constructor(
                 batch.delete(it.reference)
             }
             val target = mistakeCol.document()
+            val KST = TimeZone.getTimeZone("Asia/Seoul")
+            val KST_FMT = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA).apply {
+                timeZone = KST
+            }
+
+            val currentAtText: String = KST_FMT.format(Date())
 
             val data = hashMapOf(
                 "roadmapId" to roadmapId,
                 "quizTitle" to quizTitle,
+                "currentAt" to  currentAtText,
                 "items" to mistakeAnswer,
             )
 

@@ -1,34 +1,40 @@
 package com.aspa.aspa.data.remote
 
+import com.aspa.aspa.data.dto.MistakeSummary
 import com.aspa.aspa.data.remote.dto.QuestionResponseDto
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.HttpsCallableResult
+import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class MistakeNotebookDataSource @Inject constructor(
-    private val functions: FirebaseFunctions
+    private val fireStore : FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
 ) {
+    val uid = firebaseAuth.uid!!
 
-    suspend fun sendQuestion(question: String, questionId: String?): QuestionResponseDto? {
-        val data = hashMapOf(
-            "question" to question,
-            "questionId" to questionId
-        )
-
-        val result: HttpsCallableResult = functions
-            .getHttpsCallable("question")
-            .call(data)
+    private val colRef
+        get() = fireStore.collection("users")
+            .document(uid)
+            .collection("mistakeAnswer")
+    suspend fun fetchMistakeList(): List<MistakeSummary>{
+        val snap = colRef
+            .orderBy("currentAt", Query.Direction.DESCENDING)
+            .get()
             .await()
+        return snap.documents.map { d ->
+            val itemsCount = (d.get("items") as? List<*>)?.size ?: 0
+            MistakeSummary(
+                id = d.id,
+                quizTitle = d.getString("quizTitle").orEmpty(),
+                itemsCount = itemsCount,
+                currentAt = d.getString("currentAt").orEmpty()
+            )
+        }
 
-        val resultMap = result.getData() as? Map<String, Any> ?: return null
-
-        return QuestionResponseDto(
-            questionId = resultMap["questionId"] as String,
-            message = resultMap["message"] as? String,
-            choices = resultMap["choices"] as? List<String>,
-            result = resultMap["result"] as? Map<String, String>,
-            createdAt = resultMap["createdAt"] as? String
-        )
     }
 }
