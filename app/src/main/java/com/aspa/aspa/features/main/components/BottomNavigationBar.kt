@@ -10,6 +10,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.aspa.aspa.features.home.navigation.HomeDestinations
+import com.aspa.aspa.features.mypage.navigation.MypageDestination
+import com.aspa.aspa.features.quiz.navigation.QuizDestinations
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 
 @Composable
 fun BottomNavigationBar(
@@ -18,26 +22,26 @@ fun BottomNavigationBar(
 ) {
     NavigationBar {
         NavigationBarItem(
-            selected = currentRoute == "home",
-            onClick = { onTabSelected("home") },
+            selected = currentRoute == HomeDestinations.HOME,
+            onClick = { onTabSelected(HomeDestinations.HOME_GRAPH_ROUTE) },
             icon = { Icon(Icons.Default.Home, contentDescription = "홈") },
             label = { Text("홈") }
         )
         NavigationBarItem(
-            selected = currentRoute == "quiz",
-            onClick = { onTabSelected("quiz") },
+            selected = currentRoute == QuizDestinations.QUIZ,
+            onClick = { onTabSelected(QuizDestinations.QUIZ_GRAPH_ROUTE) },
             icon = { Icon(Icons.Default.Checklist, contentDescription = "퀴즈") },
             label = { Text("퀴즈") }
         )
         NavigationBarItem(
-            selected = currentRoute?.startsWith("roadmap") == true,
-            onClick = { onTabSelected("roadmap?questionId=${""}") },
+            selected = currentRoute == RoadmapDestinations.ROADMAP_LIST,
+            onClick = { onTabSelected(RoadmapDestinations.ROADMAP_GRAPH_ROUTE) },
             icon = { Icon(Icons.Default.Explore, contentDescription = "로드맵") },
             label = { Text("로드맵") }
         )
         NavigationBarItem(
-            selected = currentRoute == "mypage",
-            onClick = { onTabSelected("mypage") },
+            selected = currentRoute == MypageDestination.MYPAGE,
+            onClick = { onTabSelected(MypageDestination.MYPAGE_GRAPH_ROUTE) },
             icon = { Icon(Icons.Default.Person, contentDescription = "마이페이지") },
             label = { Text("마이페이지") }
         )

@@ -1,11 +1,9 @@
 package com.aspa.aspa.data.repository
 
+import android.util.Log
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizDtoAlpha
-import com.aspa.aspa.data.dto.QuizzesDto
-import com.aspa.aspa.data.dto.RoadmapDto
-import com.aspa.aspa.data.dto.RoadmapDtoAlpha
 import com.aspa.aspa.data.remote.QuizRemoteDataSource
+import com.aspa.aspa.model.QuizInfo
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
@@ -13,7 +11,7 @@ import javax.inject.Inject
 class QuizRepository @Inject constructor(
     private val remoteDataSource: QuizRemoteDataSource
 ) {
-    suspend fun getQuizzes(uid: String): Result<List<QuizzesDto>> {
+    suspend fun getQuizzes(uid: String): Result<List<QuizInfo>> {
         return try {
             val quizzes = remoteDataSource.getQuizzes(uid)
             Result.success(quizzes)
@@ -53,9 +51,21 @@ class QuizRepository @Inject constructor(
         }
     }
 
-    suspend fun sendToMakeQuiz(studyId: String): Result<QuizDto> {
+    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String, sectionId: Int): Result<QuizDto> {
         return try {
-            val data = remoteDataSource.sendToMakeQuiz(studyId)
+            val data = remoteDataSource.sendToMakeQuiz(roadmapId, studyId, sectionId)
+            Log.d("QuizRepository", "퀴즈 생성 성공!")
+            Result.success(data)
+        }
+        catch (e: Exception) {
+            Log.e("QuizRepository", "퀴즈 생성 실패: ", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String, sectionId: Int): Result<QuizDto> {
+        return try {
+            val data = remoteDataSource.makeQuizFromRoadmap(uid, roadmapId, sectionId)
             Result.success(data)
         }
         catch (e: Exception) {
