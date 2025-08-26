@@ -68,7 +68,8 @@ fun NavGraphBuilder.homeGraph(
                     },
                     onGoToRoadmapClicked = {
                         uiState.roadmapId?.let { roadmapId ->
-                            navController.navigate(RoadmapDestinations.roadmapListByRoadmapId(roadmapId))
+                            navController.navigate(RoadmapDestinations.roadmapList()) { popUpTo(0) } // 백스택을 위해 목록으로 진입 후  // 기존의 질문화면은 백스택에서 제거
+                            navController.navigate(RoadmapDestinations.roadmapDetail(roadmapId))  // 바로 로드맵 상세 화면 진입
                         }
                     }
                 )

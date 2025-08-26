@@ -19,9 +19,6 @@ object RoadmapDestinations {
     fun roadmapList(questionId: String = "") =
         "roadmap?questionId=$questionId"
 
-    fun roadmapListByRoadmapId(roadmapId: String = "") =
-        "roadmap?roadmapId=$roadmapId"
-
     fun roadmapDetail(roadmapId: String) =
         "roadmap/$roadmapId"
 
