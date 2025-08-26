@@ -7,7 +7,7 @@ import {Roadmap} from "../type/roadmap_types";
 import {formatFirestoreMapToString} from "../util/formatter";
 import {cleanAndParseAiResponse} from "../util/parser";
 import {validateBody} from "../util/uid_validator";
-import {getQuestionResult, saveRoadmap} from "./firestore_service";
+import {addRoadmapIdToQuestion, getQuestionResult, saveRoadmap} from "./firestore_service";
 
 /**
  * 사용자 질문 분석서를 토대로 AI를 통해 로드맵을 생성합니다.
@@ -35,6 +35,8 @@ export const generateRoadmap = onCall(async (request) => {
     const roadmap = cleanAndParseAiResponse<Roadmap>(rawAiOutput);
 
     const roadmapRefId = await saveRoadmap(uid, questionId, roadmap);
+
+    await addRoadmapIdToQuestion(uid, questionId, roadmapRefId);
 
     console.log(`roadmapRefId: ${roadmapRefId}`); // 예: "4z8QJXyBcM7n2Jgf1ZpA"
 

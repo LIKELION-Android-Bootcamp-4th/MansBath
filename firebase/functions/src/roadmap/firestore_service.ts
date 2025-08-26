@@ -70,3 +70,31 @@ export async function saveRoadmap(
     throw new Error("로드맵 저장 중 서버 오류가 발생했습니다.");
   }
 }
+
+/**
+ * 특정 사용자의 Question 문서에 roadmapId 필드를 추가하거나 업데이트합니다.
+ *
+ * @param {string} uid - Firestore 상위 users 컬렉션의 사용자 UID
+ * @param {string} questionId - 업데이트할 Question 문서의 ID
+ * @param {string} roadmapId - Question 문서에 저장할 Roadmap 문서 ID
+ * @return {Promise<void>} - 업데이트 완료 시 resolve, 실패 시 에러 throw
+ *
+ * @example
+ * await addRoadmapIdToQuestion("user123", "question456", "roadmap789");
+ * // 결과: users/user123/question/question456 문서에 { roadmapId: "roadmap789" } 추가
+ */
+export async function addRoadmapIdToQuestion(
+  uid:string, questionId: string, roadmapId: string
+) {
+  try {
+    await getFirestore()
+      .collection(`users/${uid}/question`)
+      .doc(questionId)
+      .set({roadmapId: roadmapId}, {merge: true});
+
+    console.log(`✅ Question(${questionId})에 roadmapId(${roadmapId}) 추가 완료`);
+  } catch (err) {
+    console.error(`❌ Question의 roadmapId 부여 중 실패 (uid: ${uid}, questionId: ${questionId})`, err);
+    throw new Error("Question의 roadmapId 부여 중 서버 오류가 발생했습니다.");
+  }
+}
