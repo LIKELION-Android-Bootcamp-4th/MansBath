@@ -28,6 +28,7 @@ class StudyFireStoreDataSource @Inject constructor(
         try {
             val snap = response
                 .whereEqualTo("roadmapId", roadmapId)
+                .whereEqualTo("sectionId", sectionId)
                 .get()
                 .await()
             if (!snap.isEmpty) {
@@ -49,7 +50,7 @@ class StudyFireStoreDataSource @Inject constructor(
                     .call(sendData)
                     .await()
                 Log.d("Data", "생성 성공")
-                val responseData = functions.getData() as? Map<*, *> 
+                val responseData = functions.getData() as? Map<*, *>
                     ?: error("Cloud Functions 응답 데이터가 없습니다.")
                 val studyDataMap = responseData["study"] as? Map<*, *>
                     ?: error("Cloud Functions 응답에 'study' 데이터가 없습니다.")
@@ -66,5 +67,33 @@ class StudyFireStoreDataSource @Inject constructor(
             throw e
         }
 
+    }
+
+    suspend fun updateStatus(roadmapId: String?,sectionId: Int?){
+        val docRef = fireStore.collection("users")
+            .document(uid)
+            .collection("roadmap")
+            .document(roadmapId ?:"")
+        try {
+            val snap = docRef.get().await()
+            val roadmap = snap.get("roadmap") as? Map<*, *>
+            val raw = roadmap?.get("stages")
+            if(raw == null){
+                Log.d("stages","스테이지 빈값입니다")
+                return
+            }
+            val stages = (raw as? List<*>)?.map { (it as Map<*, *>).toMutableMap() as MutableMap<String, Any?> }?.toMutableList()
+                ?: run { Log.d("stages","roadmap.stages 형식이 배열이 아님"); return }
+            val id = sectionId?: -1
+            val update = stages[id].toMutableMap().apply {
+                this["status"] = true
+            }
+            stages[id] = update
+            docRef.update(com.google.firebase.firestore.FieldPath.of("roadmap", "stages"), stages).await()
+
+            Log.d("FireStore","상태변경완료")
+        }catch (e : Exception){
+            Log.e("FireStore","에러발생: $e")
+        }
     }
 }

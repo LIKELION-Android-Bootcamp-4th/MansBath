@@ -10,6 +10,7 @@ export interface Stage {
   description: string;
   learning_curve: string;
   concept: string;
+  status: boolean;
 }
 
 export interface RoadmapBody {

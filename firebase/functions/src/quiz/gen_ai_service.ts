@@ -9,11 +9,13 @@ import {HttpsError} from "firebase-functions/v2/https";
  * Gemini AI에게 퀴즈 생성을 요청하고 결과를 파싱합니다.
  * @param {ConceptDetail} conceptDetail - 퀴즈 생성 시 필요한 개념 상세 파일입니다.
  * @param {string} studyId - studyId
+ * @param {number} sectionId - sectionId
  * @return {Promise<Quiz>} 파싱된 AI 응답입니다.
  */
 export async function getQuiz(
   conceptDetail: ConceptDetail,
   studyId: string,
+  sectionId: number
 ): Promise<Quiz> {
   const model = getAiModel();
   const chat = model.startChat();
@@ -28,6 +30,7 @@ export async function getQuiz(
       return {
         ...JSON.parse(match[0]),
         studyId: studyId,
+        sectionId: sectionId,
         createdAt: FieldValue.serverTimestamp(),
         status: false,
       } as Quiz;

@@ -14,16 +14,20 @@ fun RoadmapDto.toRoadmap(roadmapId: String, questionId: String, createdAt: Times
             description = s.description,
             concept = s.concept,
             duration = s.learning_curve,
-            status = false,
+            status = s.status,
+            isSolved = s.isSolved,
             quiz = Quiz()
         )
     }
+
+    // status == true 인 section 개수 계산
+    val completedSection = sections.count { it.status }
 
     return Roadmap(
         id = roadmapId,
         title = title,
         description = description,
-        completedSection = 0,
+        completedSection = completedSection,
         allSection = sections.size,
         sections = sections,
         questionId = questionId,

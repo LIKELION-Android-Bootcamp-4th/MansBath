@@ -7,5 +7,7 @@ class StudyFireStoreRepository @Inject constructor(
     private val dataSource: StudyFireStoreDataSource
 ){
     suspend fun fetchStudy(roadmapId: String?,questionId : String?, sectionId : Int?) = runCatching {
-        dataSource.getStudyFireStore(roadmapId,questionId, sectionId) }
+        dataSource.getStudyFireStore(roadmapId,questionId, sectionId)
+    }
+    suspend fun updateStatus(roadmapId: String?,sectionId: Int?) = runCatching { dataSource.updateStatus(roadmapId,sectionId) }
 }

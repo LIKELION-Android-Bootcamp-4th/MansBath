@@ -1,15 +1,17 @@
 package com.aspa.aspa.ui.components.StudyNav
 
+import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.features.study.StudyDetail.StudyDetailScreen
 import com.aspa.aspa.features.study.StudyScreen
 import com.aspa.aspa.features.study.StudyViewModel
@@ -27,7 +29,7 @@ sealed class StudyScreenRoute(val route: String) {
 }
 
 
-fun NavGraphBuilder.studyGraph(navController: NavHostController) {
+fun NavGraphBuilder.studyGraph(navController: NavController) {
     navigation(
         startDestination = StudyScreenRoute.Study.route,
         route = Graph.Study
@@ -41,13 +43,19 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
             )
         ) { backStackEntry ->
 
-            val parentEntry = remember(backStackEntry) {
+            val parentEntry = remember(navController) {
                 navController.getBackStackEntry(Graph.Study)
             }
             val vm: StudyViewModel = hiltViewModel(parentEntry)
             val roadmapId = backStackEntry.arguments?.getString("roadmapId")
             val sectionId = backStackEntry.arguments?.getInt("sectionId")
             val questionId = backStackEntry.arguments?.getString("questionId")
+            Log.d("roadmapId",roadmapId?:"")
+
+
+            parentEntry.savedStateHandle["roadmapId"] = roadmapId
+            parentEntry.savedStateHandle["questionId"] = questionId
+            parentEntry.savedStateHandle["sectionId"] = sectionId
 
             LaunchedEffect(roadmapId,questionId,sectionId) {
                 if(roadmapId != null && questionId != null){
@@ -68,7 +76,27 @@ fun NavGraphBuilder.studyGraph(navController: NavHostController) {
 
             StudyDetailScreen(
                 uiState = vm.uiState.collectAsStateWithLifecycle().value,
-                onRetry = { vm.fetchStudy() }
+                onRetry = {vm.fetchStudy()},
+                navigateRoadmap = {
+                    val roadmapId = vm.roadmapId
+
+                    vm.updateStatus()
+
+                    // reload 플래그 세팅
+                    navController.getBackStackEntry(RoadmapDestinations.ROADMAP_DETAIL)
+                        .savedStateHandle["reload"] = true
+
+                    // 로드맵 상세 화면만 남기고 복귀
+                    navController.popBackStack(RoadmapDestinations.ROADMAP_DETAIL, false)
+
+                },
+                navigateToQuiz = {
+                    navController.navigate("quiz") {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                viewModel = vm
             )
         }
     }
