@@ -1,6 +1,6 @@
 export interface Roadmap {
   title: string;
-  from: string;
+  questionId: string;
   description: string;
   stages: Stage[];
 }
@@ -11,7 +11,6 @@ export interface Stage {
   description: string;
   learning_curve: string;
   concept: string;
-  status: boolean;
 }
 
 export interface RoadmapBody {
