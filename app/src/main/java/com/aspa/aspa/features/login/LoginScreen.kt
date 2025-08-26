@@ -109,7 +109,10 @@ fun LoginScreen(
                 SocialButton("Google로 계속하기") {
                     authViewModel.signInWithGoogleCredential(
                         activity = navController.context as Activity,
-                        onSuccess = { navController.navigate("main") },
+                        onSuccess = {
+                            authViewModel.updateFcmToken()
+                            navController.navigate("main")
+                        },
                     ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
@@ -122,23 +125,6 @@ fun LoginScreen(
                         context = context,
                         launcher = naverLauncher
                     )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-//                        navController.navigate(LoginDestinations.NICKNAME)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("로그인")
                 }
             }
         }

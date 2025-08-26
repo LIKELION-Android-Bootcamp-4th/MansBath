@@ -96,4 +96,15 @@ class StudyFireStoreDataSource @Inject constructor(
             Log.e("FireStore","에러발생: $e")
         }
     }
+
+    suspend fun quizExists(roadmapId: String, sectionId: Int): Boolean {
+        val doc = fireStore.collection("users")
+            .document(uid)
+            .collection("quizzes")
+            .document(roadmapId)
+            .collection("quiz")
+            .whereEqualTo("sectionId", sectionId)
+            .get().await()
+        return !doc.isEmpty
+    }
 }

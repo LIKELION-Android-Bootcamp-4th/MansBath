@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
+import com.aspa.aspa.data.repository.FcmRepository
 import com.aspa.aspa.model.Provider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -58,6 +59,7 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
     private val getCredentialRequest: GetCredentialRequest,
+    private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -131,7 +133,10 @@ class AuthViewModel @Inject constructor(
     fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
         _loginState.value = LoginState.Loading
         authRepository.signInWithNaver(accessToken)
-            .onSuccess { _loginState.value = LoginState.Success(null) }
+            .onSuccess {
+                _loginState.value = LoginState.Success(null)
+                updateFcmToken()
+            }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
             }
@@ -211,6 +216,7 @@ class AuthViewModel @Inject constructor(
                             userDoc.update("lastLogin", FieldValue.serverTimestamp())
                                 .addOnSuccessListener {
                                     Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                                    updateFcmToken()
                                     _loginState.value = LoginState.Success(null)
                                 }
                                 .addOnFailureListener { e ->
@@ -233,6 +239,7 @@ class AuthViewModel @Inject constructor(
                                         .set(userProfile)
                                         .addOnSuccessListener {
                                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                            updateFcmToken()
                                             _loginState.value = LoginState.Success(null)
                                         }
                                         .addOnFailureListener { e ->
@@ -400,4 +407,13 @@ class AuthViewModel @Inject constructor(
         _withdrawState.value = WithdrawState.Idle
     }
 
+
+    fun updateFcmToken() {
+        viewModelScope.launch {
+            val token = fcmRepository.getToken()
+            if(token != null) {
+                fcmRepository.updateFcmToken(auth.uid!!, token)
+            }
+        }
+    }
 }

@@ -1,11 +1,15 @@
 package com.aspa.aspa.di
 
+import android.app.NotificationManager
+import android.content.Context
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -25,8 +29,10 @@ object FirebaseModule {
     @Singleton
     fun provideFirebaseFunctions() : FirebaseFunctions = FirebaseFunctions.getInstance("asia-northeast3")
 
-
-
-
-
+    @Singleton
+    @Provides
+    fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
+        return ContextCompat.getSystemService(context, NotificationManager::class.java)
+                as NotificationManager
+    }
 }

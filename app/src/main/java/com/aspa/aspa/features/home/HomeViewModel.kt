@@ -32,7 +32,8 @@ data class HomeUiState(
     val messages: List<UiChatMessage> = emptyList(),
     val isLoading: Boolean = false,
     val isReportFinished: Boolean = false,
-    val activeConversationId: String? = null
+    val roadmapId: String? = null,
+    val questionId: String? = null,
 )
 
 @HiltViewModel
@@ -109,7 +110,7 @@ class HomeViewModel @Inject constructor(
     }
     fun createNewChat() {
         _uiState.update {
-            it.copy(messages = emptyList(), activeConversationId = null, isReportFinished = false)
+            it.copy(messages = emptyList(), questionId = null, isReportFinished = false, roadmapId = null)
         }
     }
 
@@ -126,12 +127,15 @@ class HomeViewModel @Inject constructor(
                 val history = snapshot.get("history") as? List<Map<String, Any>> ?: emptyList()
                 val mappedMessages = mapFirestoreHistoryToUiMessages(history, questionId)
                 val isReportFinished = mappedMessages.any { it is UiAnalysisReport }
+                val roadmapId = snapshot.getString("roadmapId")
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         messages = mappedMessages,
-                        activeConversationId = questionId,
-                        isReportFinished = isReportFinished
+                        questionId = questionId,
+                        isReportFinished = isReportFinished,
+                        roadmapId = roadmapId
                     )
                 }
             }
@@ -142,11 +146,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectOption(optionText: String) {
-        sendMessage(optionText, _uiState.value.activeConversationId)
+        sendMessage(optionText, _uiState.value.questionId)
     }
 
     fun handleFollowUpQuestion(question: String) {
-        sendMessage(question, _uiState.value.activeConversationId)
+        sendMessage(question, _uiState.value.questionId)
     }
 
     private fun sendMessage(text: String, questionId: String?) {
@@ -188,29 +192,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun mapResponseDtoToUiMessage(response: QuestionResponseDto): UiChatMessage {
-        return if (response.result != null) {
-            UiAnalysisReport(
-                id = "report_${response.questionId}",
-                date = response.createdAt,
-                title = "[ 사용자 분석 결과 ]",
-                items = response.result
-            )
-        } else {
-            UiAssistantMessage(
-                id = "asst_${response.questionId}",
-                date = response.createdAt,
-                text = response.message ?: "내용이 없습니다.",
-                options = response.choices
-            )
-        }
-    }
-
     @Suppress("UNCHECKED_CAST")
     private fun mapFirestoreHistoryToUiMessages(history: List<Map<String, Any>>, baseId: String): List<UiChatMessage> {
         return history.mapIndexedNotNull { index, item ->
             val role = item["role"] as? String ?: return@mapIndexedNotNull null
             val messageData = item["message"] ?: return@mapIndexedNotNull null
+            val roadmapId = item["roadmapId"] as? String
+
             when (role) {
                 "user" -> UiUserMessage(id = "${baseId}_user_$index", date = null, text = messageData as String)
                 "model" -> {
@@ -221,7 +209,7 @@ class HomeViewModel @Inject constructor(
                     if (result != null) {
                         UiAnalysisReport(id = "${baseId}_report_$index", date = null, title = "[ 사용자 분석 결과 ]", items = result)
                     } else {
-                        UiAssistantMessage(id = "${baseId}_asst_$index", date = null, text = message, options = choices)
+                        UiAssistantMessage(id = "${baseId}_asst_$index", date = null, text = message, options = choices, roadmapId = roadmapId)
                     }
                 }
                 else -> null
