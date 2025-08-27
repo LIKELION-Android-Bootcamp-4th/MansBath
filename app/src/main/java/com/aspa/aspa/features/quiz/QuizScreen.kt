@@ -41,10 +41,10 @@ fun QuizScreen(
     navController: NavController,
     viewModel: QuizViewModel
 ) {
-    val expandedIndex = remember { mutableStateOf(-1) }
     val quizListState by viewModel.quizListState.collectAsState()
     val context = LocalContext.current
     val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
+    val expandedIndexState by viewModel.expandedIndex.collectAsState()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -111,8 +111,8 @@ fun QuizScreen(
                                 QuizListCard(
                                     index = index,
                                     item = item,
-                                    expandedIndex = expandedIndex.value,
-                                    onClick = { expandedIndex.value = it },
+                                    expandedIndex = expandedIndexState,
+                                    onClick = { viewModel.changeExpandedIndex(it) },
                                     navController = navController,
                                     viewModel = viewModel
                                 )

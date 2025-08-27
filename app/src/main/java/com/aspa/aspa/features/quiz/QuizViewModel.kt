@@ -71,6 +71,14 @@ class QuizViewModel @Inject constructor(
     private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
     val permissionState = _permissionState.asStateFlow()
 
+    private val _expandedIndex = MutableStateFlow<Int>(-1)
+    val expandedIndex: StateFlow<Int> = _expandedIndex
+
+    private val _currentRoadmapId = MutableStateFlow<String>("")
+    val currentRoadmapId: StateFlow<String> = _currentRoadmapId
+
+    private val userUid = auth.currentUser!!.uid
+
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val isGranted = ContextCompat.checkSelfPermission(
@@ -86,12 +94,6 @@ class QuizViewModel @Inject constructor(
             }
         }
     }
-
-    // fun getQuizzes(uid: String) {
-    private val _currentRoadmapId = MutableStateFlow<String>("")
-    val currentRoadmapId: StateFlow<String> = _currentRoadmapId
-
-    private val userUid = auth.currentUser!!.uid
 
     fun getQuizzes() {
         viewModelScope.launch {
@@ -130,22 +132,9 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    /*fun getRoadmap(roadmapId: String) {
-        viewModelScope.launch {
-            roadmapRepository.fetchRoadmap(roadmapId)
-                .onSuccess {
-                    if(it != null) {
-                        it.title
-                    }
-                    else
-
-                }
-                .onFailure { e ->
-
-                }
-        }
-    }*/
-
+    fun changeExpandedIndex(index: Int) {
+        _expandedIndex.value = index
+    }
 
     fun deleteQuiz(roadmapId: String, quizTitle: String) {
         viewModelScope.launch {
