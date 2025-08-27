@@ -30,6 +30,7 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -75,6 +76,12 @@ class AuthViewModel @Inject constructor(
 
     private val _withdrawState = MutableStateFlow<WithdrawState>(WithdrawState.Idle)
     val withdrawState = _withdrawState.asStateFlow()
+
+    private val _nicknameState = MutableStateFlow<String>("조회 중..")
+    val nicknameState: StateFlow<String> = _nicknameState
+
+    private val _providerState = MutableStateFlow<String>("조회 중..")
+    val providerState: StateFlow<String> = _providerState
 
     fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
@@ -387,7 +394,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun withdrawNaver() {
-        NidOAuthLogin().callDeleteTokenApi(object: OAuthLoginCallback {
+        NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
             }
@@ -407,11 +414,34 @@ class AuthViewModel @Inject constructor(
         _withdrawState.value = WithdrawState.Idle
     }
 
+    // =================================================================================
+
+    fun getProvider() {
+        viewModelScope.launch {
+            authRepository.fetchProvider()
+                .onSuccess { provider ->
+                    _providerState.value = when (provider) {
+                        Provider.GOOGLE -> "구글 계정으로 가입"
+                        Provider.KAKAO -> "카카오 계정으로 가입"
+                        Provider.NAVER -> "네이버 계정으로 가입"
+                    }
+                }
+        }
+    }
+
+    fun getNickname() {
+        viewModelScope.launch {
+            authRepository.fetchNickname()
+                .onSuccess { nickname ->
+                    _nicknameState.value = nickname
+                }
+        }
+    }
 
     fun updateFcmToken() {
         viewModelScope.launch {
             val token = fcmRepository.getToken()
-            if(token != null) {
+            if (token != null) {
                 fcmRepository.updateFcmToken(auth.uid!!, token)
             }
         }
