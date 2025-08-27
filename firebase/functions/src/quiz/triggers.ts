@@ -24,7 +24,7 @@ export const quizTrigger = onDocumentCreated(
     const sectionId = studyData.sectionId;
     const roadmapId = studyData.roadmapId;
 
-    if (!sectionId || !roadmapId) {
+    if (sectionId === undefined || !roadmapId) {
       logger.error(`Study 문서(${studyId})에 'sectionId' 또는 'roadmapId' 필드가 없습니다.`);
       return;
     }
