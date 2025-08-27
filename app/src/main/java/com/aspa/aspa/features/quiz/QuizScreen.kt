@@ -33,19 +33,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizScreen(
     navController: NavController,
-    viewModel: QuizViewModel,
-    roadmapId: String?
+    viewModel: QuizViewModel
 ) {
     val expandedIndex = remember { mutableStateOf(-1) }
     val quizListState by viewModel.quizListState.collectAsState()
@@ -65,33 +59,11 @@ fun QuizScreen(
         }
     )
     LaunchedEffect(Unit) {
-        if(roadmapId != null && roadmapId != "") {
-            // viewModel.requestQuizFromRoadmap(roadmapId)
-            Toast.makeText(context, "퀴즈 생성중입니다. 기다려주세요..", Toast.LENGTH_SHORT).show()
-        }
-        else {
-            viewModel.getQuizzes()
-        }
+        viewModel.getQuizzes()
     }
 
 
     Scaffold(
-        /*topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = "Aspa"
-                        )
-                    }
-
-                },
-            )
-        },*/
         containerColor = Color.White,
         content = { padding ->
             Column(
