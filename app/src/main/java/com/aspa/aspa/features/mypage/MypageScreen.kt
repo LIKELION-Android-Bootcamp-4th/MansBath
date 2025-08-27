@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +44,7 @@ import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.ui.theme.Gray10
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,11 +54,16 @@ fun MyPageScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val provider by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        authViewModel.getProvider()
+    }
+
     LaunchedEffect(logoutState, withdrawState) {
-        when(logoutState) {
+        when (logoutState) {
             LogoutState.Idle -> {}
 
             LogoutState.Success -> {
@@ -66,13 +71,18 @@ fun MyPageScreen(
                     popUpTo(0)
                 }
             }
+
             is LogoutState.Error -> {
-                Toast.makeText(context, (logoutState as LogoutState.Error).message, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    (logoutState as LogoutState.Error).message,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
 
-        when(withdrawState) {
+        when (withdrawState) {
             WithdrawState.Idle -> {}
 
             WithdrawState.Success -> {
@@ -84,141 +94,139 @@ fun MyPageScreen(
             }
 
             is WithdrawState.Error -> {
-                Toast.makeText(context, (withdrawState as WithdrawState.Error).message, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    (withdrawState as WithdrawState.Error).message,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
 
         }
     }
 
-    Scaffold(  // todo: Scaffold 제거 필요
-        content = { padding ->
-            Column(
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize()
+    ) {
+        //프로필 설정
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 12.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, Gray10),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+        ) {
+            Row(
                 modifier = Modifier
-//                    .padding(padding)
-                    .background(Color.White)
-                    .fillMaxSize()
+                    .padding(horizontal = 15.dp, vertical = 15.dp)
             ) {
-                //프로필 설정
-                Card(
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "이미지 아이콘",
+                    modifier = Modifier.size(60.dp),
+                    tint = Color.Black
+                )
+                Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text(
+                        "닉네임",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        provider,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp, horizontal = 12.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Gray10),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                        .background(color = Color.White, shape = RoundedCornerShape(5.dp))
+                        .border(
+                            width = 1.dp,
+                            shape = RoundedCornerShape(5.dp),
+                            color = Color.Black.copy(alpha = 0.1f)
+                        )
                 ) {
-                    Row(
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "수정",
                         modifier = Modifier
-                            .padding(horizontal = 15.dp, vertical = 15.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "이미지 아이콘",
-                            modifier = Modifier.size(60.dp),
-                            tint = Color.Black
-                        )
-                        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                            Text(
-                                "닉네임",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
-                                color = Color.Black
-                            )
-                            Text(
-                                "닉네임 설정해주세요",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
-                                color = Color.Gray
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
+                            .padding(8.dp)
+                            .size(20.dp),
+                        tint = Color.Black,
+                    )
 
-                        Box(
-                            modifier = Modifier
-                                .background(color = Color.White, shape = RoundedCornerShape(5.dp))
-                                .border(
-                                    width = 1.dp,
-                                    shape = RoundedCornerShape(5.dp),
-                                    color = Color.Black.copy(alpha = 0.1f)
-                                )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Edit,
-                                contentDescription = "수정",
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .size(20.dp),
-                                tint = Color.Black,
-                            )
-
-                        }
-                    }
-                }
-                // 로그아웃 버튼
-                Button(
-                    onClick = {
-                        authViewModel.signOut(context)
-                        authViewModel.resetLogoutState()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 15.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.Logout,
-                            contentDescription = "로그아웃",
-                            modifier = Modifier.size(20.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = "로그아웃",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = {
-                        authViewModel.withdraw(context)
-                        authViewModel.resetWithdrawState()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 15.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Magenta,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.NoAccounts,
-                            contentDescription = "회원탈퇴",
-                            modifier = Modifier.size(20.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = "회원탈퇴",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
                 }
             }
         }
-    )
+        // 로그아웃 버튼
+        Button(
+            onClick = {
+                authViewModel.signOut(context)
+                authViewModel.resetLogoutState()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red,
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(5.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.Logout,
+                    contentDescription = "로그아웃",
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = "로그아웃",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
 
+        Button(
+            onClick = {
+                authViewModel.withdraw(context)
+                authViewModel.resetWithdrawState()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Magenta,
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(5.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.NoAccounts,
+                    contentDescription = "회원탈퇴",
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = "회원탈퇴",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
 }
