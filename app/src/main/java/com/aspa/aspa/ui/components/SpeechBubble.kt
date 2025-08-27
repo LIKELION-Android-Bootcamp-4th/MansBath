@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.aspa.aspa.R
 
 @Composable
@@ -39,12 +39,12 @@ fun SpeechBubble(
                     color = backgroundColor,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .padding(horizontal = 8.dp, vertical = 5.dp)
         ) {
             Text(
                 text = text,
                 color = textColor,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.labelSmall
             )
         }
 

@@ -37,6 +37,7 @@ import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
+import com.aspa.aspa.model.Provider
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
@@ -51,12 +52,11 @@ fun LoginScreen(
         onAccessToken = { token ->
             authViewModel.signInWithNaver(token)
         },
-        onSuccess = {
-            navController.navigate(MainDestinations.MAIN)
-        },
+        onSuccess = {},
     )
     val loginState by authViewModel.loginState.collectAsState()
     val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
+    val lastLoginProvider by dataStoreManager.lastLoginProvider.collectAsState(initial = null)
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
@@ -117,26 +117,44 @@ fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        SocialButton("Google로 계속하기") {
-                            authViewModel.signInWithGoogleCredential(
-                                activity = navController.context as Activity,
-                                onSuccess = {
-                                    authViewModel.updateFcmToken()
-                                    navController.navigate("main")
-                                            },
-                            )
+                        val buttons: List<Pair<Provider, @Composable (Boolean) -> Unit>> = listOf(
+                            Provider.GOOGLE to {isLastLogin ->
+                                SocialButton(
+                                    text = "Google로 계속하기",
+                                    isLastLogin = isLastLogin
+                                ) {
+                                    authViewModel.signInWithGoogleCredential(
+                                        activity = navController.context as Activity,
+                                        onSuccess = {}
+                                    )
+                                }
+                            },
+                            Provider.KAKAO to { isLastLogin ->
+                                SocialButton(
+                                    text = "카카오톡으로 계속하기",
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    authViewModel.signInWithKakao(context)
+                                }
+                            },
+                            Provider.NAVER to { isLastLogin ->
+                                SocialButton(
+                                    text = "네이버로 계속하기",
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    NaverIdLoginSDK.authenticate(
+                                        context = context,
+                                        launcher = naverLauncher
+                                    )
+                                }
+                            }
+                        )
+
+                        buttons.forEach { (provider, buttonContent) ->
+                            buttonContent( lastLoginProvider == provider )
                         }
 
-                        SocialButton("카카오톡으로 계속하기") {
-                            authViewModel.signInWithKakao(context)
-                        }
-
-                        SocialButton("네이버로 계속하기") {
-                            NaverIdLoginSDK.authenticate(
-                                context = context,
-                                launcher = naverLauncher
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }
