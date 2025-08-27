@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,24 +34,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizScreen(
     navController: NavController,
-    viewModel: QuizViewModel,
-    roadmapId: String?
+    viewModel: QuizViewModel
 ) {
-    val expandedIndex = remember { mutableStateOf(-1) }
     val quizListState by viewModel.quizListState.collectAsState()
     val context = LocalContext.current
     val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
+    val expandedIndexState by viewModel.expandedIndex.collectAsState()
+    val lazyListState = rememberLazyListState()
+    val lazyListStateIndex by viewModel.lazyListStateIndex.collectAsState()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -65,33 +62,12 @@ fun QuizScreen(
         }
     )
     LaunchedEffect(Unit) {
-        if(roadmapId != null && roadmapId != "") {
-            // viewModel.requestQuizFromRoadmap(roadmapId)
-            Toast.makeText(context, "퀴즈 생성중입니다. 기다려주세요..", Toast.LENGTH_SHORT).show()
-        }
-        else {
-            viewModel.getQuizzes()
-        }
+        viewModel.getQuizzes()
+        lazyListState.animateScrollToItem(index = lazyListStateIndex)
     }
 
 
     Scaffold(
-        /*topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = "Aspa"
-                        )
-                    }
-
-                },
-            )
-        },*/
         containerColor = Color.White,
         content = { padding ->
             Column(
@@ -134,13 +110,13 @@ fun QuizScreen(
                         }
                     }
                     is QuizListState.Success ->
-                        LazyColumn {
+                        LazyColumn(state = lazyListState) {
                             itemsIndexed(state.quizzes) { index, item ->
                                 QuizListCard(
                                     index = index,
                                     item = item,
-                                    expandedIndex = expandedIndex.value,
-                                    onClick = { expandedIndex.value = it },
+                                    expandedIndex = expandedIndexState,
+                                    onClick = { viewModel.changeExpandedIndex(it) },
                                     navController = navController,
                                     viewModel = viewModel
                                 )
