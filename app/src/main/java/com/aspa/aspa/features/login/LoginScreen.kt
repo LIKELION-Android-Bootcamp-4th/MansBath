@@ -43,6 +43,7 @@ import com.aspa.aspa.R
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.main.navigation.MainDestinations
+import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
@@ -53,12 +54,8 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val naverLauncher = rememberNaverLoginLauncher(
-        onAccessToken = { token ->
-            authViewModel.signInWithNaver(token)
-        },
-        onSuccess = {
-            navController.navigate(MainDestinations.MAIN)
-        },
+        onAccessToken = { token -> authViewModel.signInWithNaver(token) },
+        onSuccess = { navController.navigate(MainDestinations.MAIN) },
     )
     val loginState by authViewModel.loginState.collectAsState()
 
@@ -76,23 +73,21 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD4D4D4)), // 배경 회색
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface
             ),
-            shape = RoundedCornerShape(12.75.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
+            shape = MaterialTheme.shapes.large,
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+            modifier = Modifier.fillMaxWidth(0.85f)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .padding(24.dp)
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+                modifier = Modifier.padding(AppSpacing.xl)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.aspalogo),
@@ -100,14 +95,13 @@ fun LoginScreen(
                     modifier = Modifier.size(120.dp)
                 )
 
-                // 부제
                 Text(
                     text = "AI와 함께하는 개인 맞춤 학습",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.sm))
 
                 SocialButton("Google로 계속하기") {
                     authViewModel.signInWithGoogleCredential(
@@ -116,7 +110,7 @@ fun LoginScreen(
                             authViewModel.updateFcmToken()
                             navController.navigate("main")
                         },
-                    ) // TODO : 구글 로그인 성공 응답 처리
+                    )
                 }
 
                 SocialButton("카카오톡으로 계속하기") {
