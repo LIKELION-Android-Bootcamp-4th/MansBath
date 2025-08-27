@@ -28,6 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +43,11 @@ import com.aspa.aspa.features.login.AuthViewModel
 import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
+import com.aspa.aspa.features.mypage.components.ConfirmDialog
+import com.aspa.aspa.features.mypage.components.DialogType
 import com.aspa.aspa.ui.theme.Gray10
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +57,7 @@ fun MyPageScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    var dialogType by remember { mutableStateOf(DialogType.NONE) }
     val nickname by authViewModel.nicknameState.collectAsState()
     val provider by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
@@ -68,6 +76,8 @@ fun MyPageScreen(
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
+                Toast.makeText(context, "로그아웃 완료", Toast.LENGTH_SHORT)
+                    .show()
             }
 
             is LogoutState.Error -> {
@@ -87,7 +97,7 @@ fun MyPageScreen(
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
-                Toast.makeText(context, "회원탈퇴 성공", Toast.LENGTH_SHORT)
+                Toast.makeText(context, "회원탈퇴 완료", Toast.LENGTH_SHORT)
                     .show()
             }
 
@@ -140,6 +150,32 @@ fun MyPageScreen(
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
+                }
+
+                when (dialogType) {
+                    DialogType.LOGOUT -> {
+                        ConfirmDialog(
+                            text = "로그아웃",
+                            onDismiss = { dialogType = DialogType.NONE },
+                            onConfirm = {
+                                authViewModel.signOut(context)
+                                authViewModel.resetLogoutState()
+                            },
+                        )
+                    }
+
+                    DialogType.WITHDRAW -> {
+                        ConfirmDialog(
+                            text = "회원탈퇴",
+                            onDismiss = { dialogType = DialogType.NONE },
+                            onConfirm = {
+                                authViewModel.withdraw(context)
+                                authViewModel.resetWithdrawState()
+                            },
+                        )
+                    }
+
+                    DialogType.NONE -> {}
                 }
             }
         }
