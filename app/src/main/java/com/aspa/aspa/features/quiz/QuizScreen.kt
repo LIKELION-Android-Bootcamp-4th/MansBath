@@ -109,19 +109,33 @@ fun QuizScreen(
                             CircularProgressIndicator()
                         }
                     }
-                    is QuizListState.Success ->
-                        LazyColumn(state = lazyListState) {
-                            itemsIndexed(state.quizzes) { index, item ->
-                                QuizListCard(
-                                    index = index,
-                                    item = item,
-                                    expandedIndex = expandedIndexState,
-                                    onClick = { viewModel.changeExpandedIndex(it) },
-                                    navController = navController,
-                                    viewModel = viewModel
-                                )
+
+                    is QuizListState.Success -> {
+                        if (state.quizzes.isEmpty()) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("생성된 퀴즈가 없습니다.")
                             }
                         }
+                        else {
+                            LazyColumn {
+                                itemsIndexed(state.quizzes) { index, item ->
+                                    QuizListCard(
+                                        index = index,
+                                        item = item,
+                                        expandedIndex = expandedIndex.value,
+                                        onClick = { expandedIndex.value = it },
+                                        navController = navController,
+                                        viewModel = viewModel
+                                    )
+                                }
+
+                            }
+                        }
+                    }
                     is QuizListState.Error -> Text("에러 발생: ${state.error}")
                 }
 
