@@ -121,18 +121,17 @@ fun QuizScreen(
                             }
                         }
                         else {
-                            LazyColumn {
+                            LazyColumn(state = lazyListState) {
                                 itemsIndexed(state.quizzes) { index, item ->
                                     QuizListCard(
                                         index = index,
                                         item = item,
-                                        expandedIndex = expandedIndex.value,
-                                        onClick = { expandedIndex.value = it },
+                                        expandedIndex = expandedIndexState,
+                                        onClick = { viewModel.changeExpandedIndex(it) },
                                         navController = navController,
                                         viewModel = viewModel
                                     )
                                 }
-
                             }
                         }
                     }
