@@ -1,8 +1,11 @@
 package com.aspa.aspa.features.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.R
@@ -62,11 +67,30 @@ fun LoginScreen(
     )
     val loginState by authViewModel.loginState.collectAsState()
 
-    LaunchedEffect(loginState) {
+    val permissionState by authViewModel.permissionState.collectAsStateWithLifecycle()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            // shouldShowRationale 값을 얻기 위해 Activity context가 필요합니다.
+            val activity = context as? Activity
+            val shouldShowRationale = activity?.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) ?: false
+            authViewModel.onPermissionResult(
+                isGranted = isGranted,
+                shouldShowRationale = shouldShowRationale
+            )
+        }
+    )
+
+    LaunchedEffect(loginState, permissionState) {
         if (loginState is LoginState.Success) {
             navController.navigate(MainDestinations.MAIN) {
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true
+            }
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(permissionState is PermissionState.Idle) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
@@ -79,6 +103,19 @@ fun LoginScreen(
             .background(Color(0xFFD4D4D4)), // 배경 회색
         contentAlignment = Alignment.Center
     ) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(permissionState is PermissionState.Denied && (permissionState as PermissionState.Denied).shouldShowRationale) {
+                RationaleDialog(
+                    onConfirm = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) },
+                    onDismiss = {
+                        Toast.makeText(context,
+                            "퀴즈 알림 권한이 거부되었습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                )
+            }
+        }
+
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -162,6 +199,20 @@ fun rememberNaverLoginLauncher(
     }
 }
 
+@Composable
+fun RationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("권한 필요") },
+        text = { Text("Aspa에서는 안 푼 퀴즈가 있다면 지속적으로 알림을 보내드립니다. 허용해주시겠어요?") },
+        confirmButton = {
+            Button(onClick = onConfirm) { Text("허용") }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) { Text("거부") }
+        }
+    )
+}
 
 @Preview(showBackground = true)
 @Composable

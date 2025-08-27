@@ -1,11 +1,6 @@
 package com.aspa.aspa.features.quiz
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.QuizDto
@@ -15,10 +10,8 @@ import com.aspa.aspa.model.QuizInfo
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -37,12 +30,6 @@ sealed interface QuizState {
     data class Error(val error: String) : QuizState
 }
 
-sealed class PermissionState {
-    object Idle : PermissionState() // 초기 상태
-    object Granted : PermissionState() // 권한 허용
-    data class Denied(val shouldShowRationale: Boolean) : PermissionState() // 권한 거부
-}
-
 enum class SolvingState {
     NEXT,
     PREVIOUS
@@ -51,7 +38,6 @@ enum class SolvingState {
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val repository: QuizRepository,
-    @ApplicationContext private val context: Context,
     private val auth: FirebaseAuth,
     private val roadmapRepository: RoadmapRepository,
 ) : ViewModel() {
@@ -68,9 +54,6 @@ class QuizViewModel @Inject constructor(
     private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
     val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
 
-    private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
-    val permissionState = _permissionState.asStateFlow()
-
     private val _expandedIndex = MutableStateFlow<Int>(-1)
     val expandedIndex: StateFlow<Int> = _expandedIndex
 
@@ -81,22 +64,6 @@ class QuizViewModel @Inject constructor(
     val lazyListStateIndex: StateFlow<Int> = _lazyListStateIndex
 
     private val userUid = auth.currentUser!!.uid
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isGranted = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if (isGranted) {
-                _permissionState.update { PermissionState.Granted }
-            } else {
-                // 아직 권한이 없다면 초기 상태(Idle)를 유지
-                _permissionState.update { PermissionState.Idle }
-            }
-        }
-    }
 
     fun getQuizzes() {
         viewModelScope.launch {
@@ -179,27 +146,6 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun requestQuizFromRoadmap(roadmapId: String, sectionId: Int) {
-        viewModelScope.launch {
-            _quizListState.value = QuizListState.Loading
-            Log.d("QuizViewModel", "로드맵을 통한 퀴즈 생성 중: $roadmapId")
-            repository.makeQuizFromRoadmap(userUid, roadmapId, sectionId)
-                .onSuccess { quiz ->
-                    Log.d("QuizViewModel", "퀴즈 생성 성공")
-                    if (quiz.quizTitle != "") {
-                        getQuizzes()
-                    } else {
-                        _quizListState.value = QuizListState.Error("요청한 스터디 데이터가 잘못되었습니다.")
-                    }
-                }
-                .onFailure { e ->
-                    Log.e("QuizViewModel", "퀴즈 생성 실패", e)
-                    _quizListState.value = QuizListState.Error(e.message ?: "알 수 없는 오륲")
-                }
-
-        }
-    }
-
     fun changeSolvingValue(state: SolvingState) {
         when (state) {
             SolvingState.NEXT -> _solvingValue.update { it + 1 }
@@ -249,14 +195,6 @@ class QuizViewModel @Inject constructor(
             _quizState.value = currentState.copy(
                 quiz = currentState.quiz.copy(questions = updatedQuestions)
             )
-        }
-    }
-
-    fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
-        if (isGranted) {
-            _permissionState.update { PermissionState.Granted }
-        } else {
-            _permissionState.update { PermissionState.Denied(shouldShowRationale) }
         }
     }
 
