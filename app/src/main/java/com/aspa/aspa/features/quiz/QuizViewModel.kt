@@ -1,21 +1,33 @@
 package com.aspa.aspa.features.quiz
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.QuizDto
-import com.aspa.aspa.data.dto.QuizzesDto
 import com.aspa.aspa.data.repository.QuizRepository
+import com.aspa.aspa.data.repository.RoadmapRepository
+import com.aspa.aspa.model.QuizInfo
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 sealed interface QuizListState {
     data object Loading : QuizListState
-    data class Success(val quizzes: List<QuizzesDto>) : QuizListState
+    data class Success(val quizzes: List<QuizInfo>) : QuizListState
     data class Error(val error: String) : QuizListState
 }
 
@@ -25,6 +37,12 @@ sealed interface QuizState {
     data class Error(val error: String) : QuizState
 }
 
+sealed class PermissionState {
+    object Idle : PermissionState() // 초기 상태
+    object Granted : PermissionState() // 권한 허용
+    data class Denied(val shouldShowRationale: Boolean) : PermissionState() // 권한 거부
+}
+
 enum class SolvingState {
     NEXT,
     PREVIOUS
@@ -32,7 +50,10 @@ enum class SolvingState {
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val repository: QuizRepository
+    private val repository: QuizRepository,
+    @ApplicationContext private val context: Context,
+    private val auth: FirebaseAuth,
+    private val roadmapRepository: RoadmapRepository,
 ) : ViewModel() {
 
     private val _quizListState = MutableStateFlow<QuizListState>(QuizListState.Loading)
@@ -47,19 +68,38 @@ class QuizViewModel @Inject constructor(
     private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
     val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
 
-    fun getQuizzes(uid: String) {
+    private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
+    val permissionState = _permissionState.asStateFlow()
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (isGranted) {
+                _permissionState.update { PermissionState.Granted }
+            } else {
+                // 아직 권한이 없다면 초기 상태(Idle)를 유지
+                _permissionState.update { PermissionState.Idle }
+            }
+        }
+    }
+
+    // fun getQuizzes(uid: String) {
+    private val _currentRoadmapId = MutableStateFlow<String>("")
+    val currentRoadmapId: StateFlow<String> = _currentRoadmapId
+
+    private val userUid = auth.currentUser!!.uid
+
+    fun getQuizzes() {
         viewModelScope.launch {
             _quizListState.value = QuizListState.Loading
-            repository.getQuizzes(uid)
+            repository.getQuizzes(userUid)
                 .onSuccess { quizzes ->
                     Log.d("QuizViewModel", "퀴즈 리스트 불러오기 성공")
                     _quizListState.value = QuizListState.Success(quizzes)
-                    quizzes.forEach {
-                        Log.d("QuizViewModel", it.toString())
-                        it.quiz.forEach {
-                            Log.d("QuizViewModel", it.quizTitle)
-                        }
-                    }
 
                 }
                 .onFailure { e ->
@@ -69,14 +109,15 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun getQuiz(uid: String, roadmapId: String, quizTitle: String) {
+    fun getQuiz(roadmapId: String, quizTitle: String) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
-            repository.getQuiz(uid, roadmapId, quizTitle)
+            repository.getQuiz(userUid, roadmapId, quizTitle)
                 .onSuccess { quiz ->
                     Log.d("QuizViewModel", "퀴즈 불러오기 성공")
                     if (quiz != null) {
                         _quizState.value = QuizState.Success(quiz)
+                        _currentRoadmapId.value = roadmapId
                     } else {
                         _quizState.value = QuizState.Error("요청한 퀴즈 데이터가 잘못되었습니다.")
                     }
@@ -89,9 +130,26 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun deleteQuiz(uid: String, roadmapId: String, quizTitle: String) {
+    /*fun getRoadmap(roadmapId: String) {
         viewModelScope.launch {
-            repository.deleteQuiz(uid, roadmapId, quizTitle)
+            roadmapRepository.fetchRoadmap(roadmapId)
+                .onSuccess {
+                    if(it != null) {
+                        it.title
+                    }
+                    else
+
+                }
+                .onFailure { e ->
+
+                }
+        }
+    }*/
+
+
+    fun deleteQuiz(roadmapId: String, quizTitle: String) {
+        viewModelScope.launch {
+            repository.deleteQuiz(userUid, roadmapId, quizTitle)
                 .onSuccess { success ->
                     if (success) {
                         Log.d("QuizViewModel", "퀴즈 삭제 성공")
@@ -106,10 +164,10 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun requestQuiz(studyId: String) {
+    fun requestQuiz(roadmapId: String, studyId: String, sectionId: Int) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
-            repository.sendToMakeQuiz(studyId)
+            repository.sendToMakeQuiz(roadmapId, studyId, sectionId)
                 .onSuccess { quiz ->
                     Log.d("QuizViewModel", "퀴즈 생성 성공")
                     if (quiz.quizTitle != "") {
@@ -125,6 +183,26 @@ class QuizViewModel @Inject constructor(
         }
     }
 
+    fun requestQuizFromRoadmap(roadmapId: String, sectionId: Int) {
+        viewModelScope.launch {
+            _quizListState.value = QuizListState.Loading
+            Log.d("QuizViewModel", "로드맵을 통한 퀴즈 생성 중: $roadmapId")
+            repository.makeQuizFromRoadmap(userUid, roadmapId, sectionId)
+                .onSuccess { quiz ->
+                    Log.d("QuizViewModel", "퀴즈 생성 성공")
+                    if (quiz.quizTitle != "") {
+                        getQuizzes()
+                    } else {
+                        _quizListState.value = QuizListState.Error("요청한 스터디 데이터가 잘못되었습니다.")
+                    }
+                }
+                .onFailure { e ->
+                    Log.e("QuizViewModel", "퀴즈 생성 실패", e)
+                    _quizListState.value = QuizListState.Error(e.message ?: "알 수 없는 오륲")
+                }
+
+        }
+    }
 
     fun changeSolvingValue(state: SolvingState) {
         when (state) {
@@ -148,9 +226,9 @@ class QuizViewModel @Inject constructor(
         _chosenAnswerList.value = newList*/
     }
 
-    fun saveSolvedChosen(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>) {
+    fun saveSolvedChosen(roadmapId: String, quizTitle: String, chosenList: List<String>) {
         viewModelScope.launch {
-            repository.updateQuizSolveResult(uid, roadmapId, quizTitle, chosenList)
+            repository.updateQuizSolveResult(userUid, roadmapId, quizTitle, chosenList)
                 .onSuccess {
                     Log.d("QuizViewModel", "퀴즈 풀이 데이터 저장 성공")
                 }
@@ -176,5 +254,20 @@ class QuizViewModel @Inject constructor(
                 quiz = currentState.quiz.copy(questions = updatedQuestions)
             )
         }
+    }
+
+    fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
+        if (isGranted) {
+            _permissionState.update { PermissionState.Granted }
+        } else {
+            _permissionState.update { PermissionState.Denied(shouldShowRationale) }
+        }
+    }
+
+    fun formatTimestamp(timestamp: Timestamp?): String {
+        if (timestamp == null) return "시간 정보 없음"
+        val date = timestamp.toDate()
+        val sdf = SimpleDateFormat("yyyy. M. d.", Locale.getDefault())
+        return sdf.format(date)
     }
 }

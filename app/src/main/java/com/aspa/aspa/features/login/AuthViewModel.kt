@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.repository.AuthRepository
+import com.aspa.aspa.data.repository.FcmRepository
 import com.aspa.aspa.model.Provider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -25,8 +26,11 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,12 +48,19 @@ sealed interface LogoutState {
     data class Error(val message: String?) : LogoutState
 }
 
+sealed interface WithdrawState {
+    object Idle : WithdrawState
+    object Success : WithdrawState
+    data class Error(val message: String?) : WithdrawState
+}
+
 
 @HiltViewModel //viewModel 등록 및 생성
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
     private val getCredentialRequest: GetCredentialRequest,
+    private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -62,6 +73,15 @@ class AuthViewModel @Inject constructor(
 
     private val _logoutState = MutableStateFlow<LogoutState>(LogoutState.Idle)
     val logoutState = _logoutState.asStateFlow()
+
+    private val _withdrawState = MutableStateFlow<WithdrawState>(WithdrawState.Idle)
+    val withdrawState = _withdrawState.asStateFlow()
+
+    private val _nicknameState = MutableStateFlow<String>("조회 중..")
+    val nicknameState: StateFlow<String> = _nicknameState
+
+    private val _providerState = MutableStateFlow<String>("조회 중..")
+    val providerState: StateFlow<String> = _providerState
 
     fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
@@ -120,7 +140,10 @@ class AuthViewModel @Inject constructor(
     fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
         _loginState.value = LoginState.Loading
         authRepository.signInWithNaver(accessToken)
-            .onSuccess { _loginState.value = LoginState.Success(null) }
+            .onSuccess {
+                _loginState.value = LoginState.Success(null)
+                updateFcmToken()
+            }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
             }
@@ -200,6 +223,7 @@ class AuthViewModel @Inject constructor(
                             userDoc.update("lastLogin", FieldValue.serverTimestamp())
                                 .addOnSuccessListener {
                                     Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                                    updateFcmToken()
                                     _loginState.value = LoginState.Success(null)
                                 }
                                 .addOnFailureListener { e ->
@@ -222,6 +246,7 @@ class AuthViewModel @Inject constructor(
                                         .set(userProfile)
                                         .addOnSuccessListener {
                                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                            updateFcmToken()
                                             _loginState.value = LoginState.Success(null)
                                         }
                                         .addOnFailureListener { e ->
@@ -315,4 +340,110 @@ class AuthViewModel @Inject constructor(
         _logoutState.value = LogoutState.Idle
     }
 
+    fun withdraw(context: Context) {
+        viewModelScope.launch {
+            // 소셜 unlink
+            authRepository.fetchProvider()
+                .onSuccess { provider ->
+                    when (provider) {
+                        Provider.GOOGLE -> withdrawGoogle(context)
+                        Provider.KAKAO -> withdrawKakao()
+                        Provider.NAVER -> withdrawNaver()
+                    }
+                    // Firebase 계정 회원탈퇴  // 자동으로 onDelete 트리거를 통한 functions 호출
+                    auth.currentUser?.delete()
+                        ?.addOnSuccessListener {
+                            Log.i("WITHDRAW", "✅ 파이어베이스 계정 삭제 완료")
+                            _withdrawState.value = WithdrawState.Success
+
+                        }
+                        ?.addOnFailureListener { e ->
+                            Log.i("WITHDRAW", "❌ 파이어베이스 계정 삭제 실패")
+                            _withdrawState.value = WithdrawState.Error(e.message)
+                        }
+                }
+                .onFailure { e ->
+                    _withdrawState.value = WithdrawState.Error(e.message)
+                }
+        }
+    }
+
+    private fun withdrawGoogle(context: Context) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+        googleSignInClient.revokeAccess()
+            .addOnCompleteListener {
+                Log.i("WITHDRAW", "✅ 구글 계정 연동 해제 완료")
+            }
+            .addOnFailureListener { e ->
+                Log.d("WITHDRAW", "❌ 구글 계정 연동 해제 실패")
+                throw e
+            }
+    }
+
+    private fun withdrawKakao() {
+        UserApiClient.instance.unlink { e ->
+            if (e == null) {
+                Log.i("WITHDRAW", "✅ 카카오 계정 연동 해제 성공")
+            } else {
+                Log.e("WITHDRAW", "❌ 카카오 계정 연동 해제 실패", e)
+                throw e
+            }
+        }
+    }
+
+    private fun withdrawNaver() {
+        NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
+            override fun onError(errorCode: Int, message: String) {
+                onFailure(errorCode, message)
+            }
+
+            override fun onFailure(httpStatus: Int, message: String) {
+                Log.e("WITHDRAW", "❌ 네이버 계정 연동 해제 실패: $httpStatus $message")
+            }
+
+            override fun onSuccess() {
+                Log.d("WITHDRAW", "✅ 네이버 계정 연동 해제 성공")
+            }
+        })
+        Log.i("WITHDRAW", "✅ 네이버 계정 연동 해제 성공")
+    }
+
+    fun resetWithdrawState() {
+        _withdrawState.value = WithdrawState.Idle
+    }
+
+    // =================================================================================
+
+    fun getProvider() {
+        viewModelScope.launch {
+            authRepository.fetchProvider()
+                .onSuccess { provider ->
+                    _providerState.value = when (provider) {
+                        Provider.GOOGLE -> "구글 계정으로 가입"
+                        Provider.KAKAO -> "카카오 계정으로 가입"
+                        Provider.NAVER -> "네이버 계정으로 가입"
+                    }
+                }
+        }
+    }
+
+    fun getNickname() {
+        viewModelScope.launch {
+            authRepository.fetchNickname()
+                .onSuccess { nickname ->
+                    _nicknameState.value = nickname
+                }
+        }
+    }
+
+    fun updateFcmToken() {
+        viewModelScope.launch {
+            val token = fcmRepository.getToken()
+            if (token != null) {
+                fcmRepository.updateFcmToken(auth.uid!!, token)
+            }
+        }
+    }
 }
