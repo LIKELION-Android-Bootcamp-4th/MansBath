@@ -225,9 +225,11 @@ fun QuizListCard(
                                 .clickable {
                                     if (it.status == true) {
                                         viewModel.getQuiz(roadmapId, it.quizTitle)
+                                        viewModel.saveLazyListStateIndex(index)
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     } else {
                                         viewModel.getQuiz(roadmapId, it.quizTitle)
+                                        viewModel.saveLazyListStateIndex(index)
                                         navController.navigate(QuizDestinations.SOLVE_QUIZ)
                                     }
                                 },

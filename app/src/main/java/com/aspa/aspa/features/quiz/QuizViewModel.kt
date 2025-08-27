@@ -77,6 +77,9 @@ class QuizViewModel @Inject constructor(
     private val _currentRoadmapId = MutableStateFlow<String>("")
     val currentRoadmapId: StateFlow<String> = _currentRoadmapId
 
+    private val _lazyListStateIndex = MutableStateFlow<Int>(0)
+    val lazyListStateIndex: StateFlow<Int> = _lazyListStateIndex
+
     private val userUid = auth.currentUser!!.uid
 
     init {
@@ -134,6 +137,10 @@ class QuizViewModel @Inject constructor(
 
     fun changeExpandedIndex(index: Int) {
         _expandedIndex.value = index
+    }
+
+    fun saveLazyListStateIndex(index: Int) {
+        _lazyListStateIndex.value = index
     }
 
     fun deleteQuiz(roadmapId: String, quizTitle: String) {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +46,8 @@ fun QuizScreen(
     val context = LocalContext.current
     val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
     val expandedIndexState by viewModel.expandedIndex.collectAsState()
+    val lazyListState = rememberLazyListState()
+    val lazyListStateIndex by viewModel.lazyListStateIndex.collectAsState()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -60,6 +63,7 @@ fun QuizScreen(
     )
     LaunchedEffect(Unit) {
         viewModel.getQuizzes()
+        lazyListState.animateScrollToItem(index = lazyListStateIndex)
     }
 
 
@@ -106,7 +110,7 @@ fun QuizScreen(
                         }
                     }
                     is QuizListState.Success ->
-                        LazyColumn {
+                        LazyColumn(state = lazyListState) {
                             itemsIndexed(state.quizzes) { index, item ->
                                 QuizListCard(
                                     index = index,
