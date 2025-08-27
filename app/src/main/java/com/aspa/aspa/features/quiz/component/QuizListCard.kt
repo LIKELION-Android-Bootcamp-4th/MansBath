@@ -226,6 +226,7 @@ fun QuizListCard(
                                     if (it.status == true) {
                                         viewModel.getQuiz(roadmapId, it.quizTitle)
                                         viewModel.saveLazyListStateIndex(index)
+                                        viewModel.clearChosen()
                                         navController.navigate(QuizDestinations.QUIZ_RESULT)
                                     } else {
                                         viewModel.getQuiz(roadmapId, it.quizTitle)
