@@ -157,39 +157,12 @@ fun MyPageScreen(
                         color = Color.Gray
                     )
                 }
-
-                when (dialogType) {
-                    DialogType.LOGOUT -> {
-                        ConfirmDialog(
-                            text = "로그아웃",
-                            onDismiss = { dialogType = DialogType.NONE },
-                            onConfirm = {
-                                authViewModel.signOut(context)
-                                authViewModel.resetLogoutState()
-                            },
-                        )
-                    }
-
-                    DialogType.WITHDRAW -> {
-                        ConfirmDialog(
-                            text = "회원탈퇴",
-                            onDismiss = { dialogType = DialogType.NONE },
-                            onConfirm = {
-                                authViewModel.withdraw(context)
-                                authViewModel.resetWithdrawState()
-                            },
-                        )
-                    }
-
-                    DialogType.NONE -> {}
-                }
             }
         }
         // 로그아웃 버튼
         Button(
             onClick = {
-                authViewModel.signOut(context)
-                authViewModel.resetLogoutState()
+                dialogType = DialogType.LOGOUT
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -216,11 +189,10 @@ fun MyPageScreen(
                 )
             }
         }
-
+        // 회원탈퇴 버튼
         Button(
             onClick = {
-                authViewModel.withdraw(context)
-                authViewModel.resetWithdrawState()
+                dialogType = DialogType.WITHDRAW
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -247,5 +219,31 @@ fun MyPageScreen(
                 )
             }
         }
+    }
+
+    when (dialogType) {
+        DialogType.LOGOUT -> {
+            ConfirmDialog(
+                text = "로그아웃",
+                onDismiss = { dialogType = DialogType.NONE },
+                onConfirm = {
+                    authViewModel.signOut(context)
+                    authViewModel.resetLogoutState()
+                },
+            )
+        }
+
+        DialogType.WITHDRAW -> {
+            ConfirmDialog(
+                text = "회원탈퇴",
+                onDismiss = { dialogType = DialogType.NONE },
+                onConfirm = {
+                    authViewModel.withdraw(context)
+                    authViewModel.resetWithdrawState()
+                },
+            )
+        }
+
+        DialogType.NONE -> {}
     }
 }
