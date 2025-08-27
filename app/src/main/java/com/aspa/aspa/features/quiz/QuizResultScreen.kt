@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,15 +62,20 @@ fun QuizResultScreen(
             .padding(vertical = 8.dp, horizontal = 24.dp)
 
     ) {
+        BackHandler {
+            navController.navigate(QuizDestinations.QUIZ) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    inclusive = true
+                }
+            }
+        }
         // 상단 내비게이션
         Text(
             text = "← 퀴즈 목록",
             modifier = Modifier
                 .clickable {
                     navController.navigate(QuizDestinations.QUIZ) {
-                        // popUpTo에 현재 그래프의 시작점을 지정
                         popUpTo(navController.graph.findStartDestination().id) {
-                            // inclusive = true로 설정하여 시작점까지 모두 제거
                             inclusive = true
                         }
                     }
