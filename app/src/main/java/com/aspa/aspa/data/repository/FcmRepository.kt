@@ -18,5 +18,15 @@ class FcmRepository @Inject constructor(
         }
     }
 
+    suspend fun  deleteFcmToken(uid: String): Result<Boolean> {
+        return try {
+            val bool = userRemoteDataSource.deleteFcmToken(uid)
+            Result.success(bool)
+        }
+        catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun getToken(): String? = sharedPreferences.getString("fcm_token", null)
 }

@@ -325,6 +325,8 @@ class AuthViewModel @Inject constructor(
 
     fun signOut(context: Context) {
         viewModelScope.launch {
+            // fcm 토큰 삭제
+            deleteFcmToken()
             // 소셜 로그아웃
             authRepository.fetchProvider()
                 .onSuccess { provider ->
@@ -495,7 +497,13 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
+    
+    fun deleteFcmToken() {
+        viewModelScope.launch {
+            fcmRepository.deleteFcmToken(auth.uid!!)
+        }
+    }
+    
     fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
         if (isGranted) {
             _permissionState.update { PermissionState.Granted }

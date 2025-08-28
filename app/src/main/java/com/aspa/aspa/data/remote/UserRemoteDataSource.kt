@@ -40,6 +40,20 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun deleteFcmToken(uid: String): Boolean {
+        return try {
+            firestore.collection("users").document(uid)
+                .update("fcmToken", FieldValue.delete()) // 🔥 필드 삭제
+                .await()
+            Log.d("UserInfo", "FCM 토큰 정보 삭제 완료")
+            true
+        } catch (e: Exception) {
+            Log.e("UserInfo", "FCM 토큰 정보 삭제 중 문제 발생", e)
+            false
+        }
+    }
+
+
     suspend fun fecthProvider(): String {
         val snapshot = firestore.collection("users").document(auth.uid!!).get().await()
 
