@@ -15,7 +15,7 @@ import com.aspa.aspa.features.quiz.SolveQuizScreen
 
 object QuizDestinations {
     const val QUIZ_GRAPH_ROUTE = "quiz_graph"
-    const val QUIZ = "quiz?roadmapId={roadmapId}"
+    const val QUIZ = "quiz"
     const val SOLVE_QUIZ = "quiz_solve"
     const val QUIZ_RESULT = "quiz_result"
 
@@ -32,11 +32,6 @@ fun NavGraphBuilder.quizGraph(navController: NavController) {
     ) {
         composable(
             route = QuizDestinations.QUIZ,
-            arguments = listOf(navArgument("roadmapId") {
-                type = NavType.StringType
-                nullable = true
-                defaultValue = null
-            })
         ) { backStackEntry ->
             // navController에서 부모 그래프('quizGraph')의 BackStackEntry를 가져옵니다.
             val parentEntry = remember(backStackEntry) {
@@ -44,9 +39,8 @@ fun NavGraphBuilder.quizGraph(navController: NavController) {
             }
             // 부모 Entry를 기준으로 ViewModel을 생성하여 공유 인스턴스를 사용합니다.
             val viewModel: QuizViewModel = hiltViewModel(parentEntry)
-            val roadmapId = backStackEntry.arguments?.getString("roadmapId")
 
-            QuizScreen(navController, viewModel, roadmapId)
+            QuizScreen(navController, viewModel)
         }
 
         composable(QuizDestinations.SOLVE_QUIZ) { backStackEntry ->

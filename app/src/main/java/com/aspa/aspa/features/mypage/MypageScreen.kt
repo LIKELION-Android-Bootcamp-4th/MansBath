@@ -3,40 +3,17 @@ package com.aspa.aspa.features.mypage
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.NoAccounts
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aspa.aspa.features.login.AuthViewModel
@@ -46,9 +23,7 @@ import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.mypage.components.ConfirmDialog
 import com.aspa.aspa.features.mypage.components.DialogType
 import com.aspa.aspa.model.Provider
-import com.aspa.aspa.ui.theme.Gray10
-
-
+import com.aspa.aspa.ui.theme.AppSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,78 +47,60 @@ fun MyPageScreen(
     LaunchedEffect(logoutState, withdrawState) {
         when (logoutState) {
             LogoutState.Idle -> {}
-
             LogoutState.Success -> {
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
-                Toast.makeText(context, "로그아웃 완료", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, "로그아웃 완료", Toast.LENGTH_SHORT).show()
             }
-
             is LogoutState.Error -> {
-                Toast.makeText(
-                    context,
-                    (logoutState as LogoutState.Error).message,
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                Toast.makeText(context, (logoutState as LogoutState.Error).message, Toast.LENGTH_SHORT).show()
             }
         }
 
         when (withdrawState) {
             WithdrawState.Idle -> {}
-
             WithdrawState.Success -> {
                 rootNavController.navigate(LoginDestinations.LOGIN_GRAPH_ROUTE) {
                     popUpTo(0)
                 }
-                Toast.makeText(context, "회원탈퇴 완료", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, "회원탈퇴 완료", Toast.LENGTH_SHORT).show()
             }
-
             is WithdrawState.Error -> {
-                Toast.makeText(
-                    context,
-                    (withdrawState as WithdrawState.Error).message,
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                Toast.makeText(context, (withdrawState as WithdrawState.Error).message, Toast.LENGTH_SHORT).show()
             }
-
         }
     }
 
     Column(
         modifier = Modifier
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         //프로필 설정
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 12.dp),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, Gray10),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+                .padding(vertical = AppSpacing.md, horizontal = AppSpacing.md),
+            shape = MaterialTheme.shapes.large,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         ) {
             Row(
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 15.dp)
+                modifier = Modifier.padding(horizontal = AppSpacing.lg, vertical = AppSpacing.lg),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "이미지 아이콘",
+                    contentDescription = "프로필",
                     modifier = Modifier.size(60.dp),
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                Column(modifier = Modifier.padding(horizontal = AppSpacing.md)) {
                     Text(
-                        nickname,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 15.sp,
-                        color = Color.Black
+                        text = nickname,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         when(providerState) {
@@ -152,9 +109,8 @@ fun MyPageScreen(
                             Provider.NAVER -> "네이버 계정으로 가입"
                             null ->"조회 중.."
                         },
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -166,26 +122,24 @@ fun MyPageScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 15.dp),
+                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             ),
-            shape = RoundedCornerShape(5.dp)
+            shape = MaterialTheme.shapes.medium
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.Logout,
                     contentDescription = "로그아웃",
                     modifier = Modifier.size(20.dp),
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onError
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.sm))
                 Text(
                     text = "로그아웃",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }
@@ -196,26 +150,24 @@ fun MyPageScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 15.dp),
+                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Magenta,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             ),
-            shape = RoundedCornerShape(5.dp)
+            shape = MaterialTheme.shapes.medium
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Outlined.NoAccounts,
                     contentDescription = "회원탈퇴",
                     modifier = Modifier.size(20.dp),
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onError
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.sm))
                 Text(
                     text = "회원탈퇴",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }

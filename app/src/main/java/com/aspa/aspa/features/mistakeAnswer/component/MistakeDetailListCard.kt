@@ -3,76 +3,84 @@ package com.aspa.aspa.features.mistakeAnswer.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.aspa.aspa.ui.theme.AppSpacing
 
 @Composable
 fun MistakeDetailListCard(
-    question : String,
-    chosen : String,
-    answer : String,
-    description : String,
-
-){
+    question: String,
+    chosen: String,
+    answer: String,
+    description: String,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f))
+            .padding(AppSpacing.md),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
         ) {
-            Text("문제", style = MaterialTheme.typography.bodyMedium)
-            Text("$question", style = MaterialTheme.typography.bodySmall)
-            HorizontalDivider(modifier = Modifier.height(12.dp))
-            Text("내 답안", style = MaterialTheme.typography.bodyMedium, color = Color.Red.copy(alpha = 0.8f))
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .background(color = Color.Red.copy(alpha = 0.5f), RoundedCornerShape(5.dp))
-                    .border(width = 1.dp, color = Color.Red.copy(alpha = 0.8f),RoundedCornerShape(5.dp))
-                    .padding(12.dp),
-                contentAlignment = Alignment.CenterStart
-            ){
-                Text("$chosen",style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-            }
-            Text("정답", style = MaterialTheme.typography.bodyMedium, color = Color.Green.copy(alpha = 0.8f))
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
+            Text("문제", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(question, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-                    .background(color = Color.Green.copy(alpha = 0.5f), RoundedCornerShape(5.dp))
-                    .border(width = 1.dp, color = Color.Green.copy(alpha = 0.8f),RoundedCornerShape(5.dp))
-                    .padding(12.dp),
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+            Text("내 답안", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+            Box(
+                modifier = Modifier
+                    .padding(AppSpacing.xs)
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.error,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .padding(AppSpacing.md),
                 contentAlignment = Alignment.CenterStart
-            ){
-                Text("$answer",style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+            ) {
+                Text(chosen, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
             }
-            Text("해설",style = MaterialTheme.typography.bodyLarge)
-            Text("$description",style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+
+            Text("정답", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            Box(
+                modifier = Modifier
+                    .padding(AppSpacing.xs)
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .padding(AppSpacing.md),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(answer, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+
+            Text("해설", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-
     }
 }

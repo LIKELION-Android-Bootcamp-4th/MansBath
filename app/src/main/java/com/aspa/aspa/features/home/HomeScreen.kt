@@ -1,17 +1,14 @@
 package com.aspa.aspa.features.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.aspa.aspa.features.home.components.ChatContent
 import com.aspa.aspa.features.home.components.InitialContent
 import com.aspa.aspa.features.home.components.UserInput
+import com.aspa.aspa.ui.theme.AppSpacing
 
 data class HomeScreenState(
     val uiState: HomeUiState,
@@ -34,10 +31,8 @@ fun HomeScreen(
 ) {
     val chatStarted = state.uiState.messages.isNotEmpty()
 
-    /**
-     * 돌고돌아 원점. 스캐폴드 + 로드맵 생성 버튼 FAB.(튜닝의 최종 목적지~)
-     */
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             UserInput(
                 text = state.inputText,
@@ -54,27 +49,29 @@ fun HomeScreen(
                     if (roadmapId.isNullOrBlank()) {
                         FloatingActionButton(
                             onClick = { actions.onRoadmapCreateClicked(questionId) },
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             containerColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 16.dp)
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(end = AppSpacing.lg)
                         ) {
                             Text(
                                 text = "로드맵 생성",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = AppSpacing.lg)
                             )
                         }
                     } else {
                         FloatingActionButton(
                             onClick = { actions.onGoToRoadmapClicked(roadmapId) },
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             containerColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 16.dp)
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(end = AppSpacing.lg)
                         ) {
                             Text(
                                 text = "로드맵 이동",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = AppSpacing.lg)
                             )
                         }
                     }
@@ -87,20 +84,21 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
         ) {
             if (state.uiState.isLoading && !chatStarted) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             } else if (chatStarted) {
                 ChatContent(
                     messages = state.uiState.messages,
                     onOptionSelected = actions.onOptionSelected,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = AppSpacing.lg)
                 )
             } else {
                 InitialContent(

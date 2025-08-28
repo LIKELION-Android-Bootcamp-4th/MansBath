@@ -21,10 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import com.aspa.aspa.model.Quiz
 
@@ -41,36 +42,48 @@ fun QuestionCard(
             val q = questions[index]
             val isCorrect = q.chosen == q.answer
             val (icon, tint) = if (isCorrect) {
-                Icons.Default.CheckCircle to Color(0xFF4CAF50)
+                Icons.Default.CheckCircle to MaterialTheme.colorScheme.primary
             } else {
-                Icons.Default.Cancel to Color.Red
+                Icons.Default.Cancel to MaterialTheme.colorScheme.error
             }
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 6.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
                     // 문제 제목
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.Top) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
                             tint = tint,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp).padding(top = 4.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("${index + 1}. ${q.question}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight(weight = 500), fontSize = 14.sp)
+                        Text(
+                            "${index + 1}. ${q.question}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // 당신의 답
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("당신의 답: ", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                        Text(
+                            "당신의 답: ",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         Text(
                             text = q.chosen,
                             color = tint,
@@ -82,10 +95,15 @@ fun QuestionCard(
                     // 오답일 때만 정답 표시
                     if (!isCorrect) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("정답: ", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                            Text(
+                                "정답: ",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Text(
                                 text = q.answer,
-                                color = Color(0xFF4CAF50),
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 12.sp
                             )
@@ -96,8 +114,10 @@ fun QuestionCard(
 
                     // 설명
                     Card(
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFECEEF2))
+                        shape = MaterialTheme.shapes.small,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     ) {
                         Row(
                             modifier = Modifier.padding(8.dp),
@@ -105,12 +125,18 @@ fun QuestionCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lightbulb,
-                                tint = Color(0xFFFFCF00),
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = q.description, style = MaterialTheme.typography.bodyMedium, fontSize = 11.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = q.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
