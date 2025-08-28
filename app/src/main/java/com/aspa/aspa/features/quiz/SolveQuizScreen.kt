@@ -163,7 +163,6 @@ fun SolveQuizScreen(
                                         if (selectedOption == option) {
                                             Card(
                                                 modifier = Modifier
-                                                    .padding(start = 4.dp)
                                                     .fillMaxWidth()
                                                     .fillMaxHeight(),
                                                 colors = CardDefaults.cardColors(
@@ -173,12 +172,15 @@ fun SolveQuizScreen(
                                             ) {
                                                 Box(contentAlignment = Alignment.CenterStart,
                                                     modifier = Modifier.fillMaxSize()
+                                                        .padding(start = 6.dp)
                                                 ) {
                                                     optionText()
                                                 }
 
                                             }
                                         } else {
+                                            Spacer(modifier = Modifier.width(6.dp))
+
                                             optionText()
                                         }
 
