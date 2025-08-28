@@ -32,13 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.aspa.aspa.R
 import com.aspa.aspa.OnboardingDestinations
+import com.aspa.aspa.R
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
