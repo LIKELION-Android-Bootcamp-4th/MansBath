@@ -7,6 +7,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -14,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.core.constants.enums.RedirectType
 import com.aspa.aspa.features.home.HomeViewModel
 import com.aspa.aspa.features.home.components.HomeDrawerContent
 import com.aspa.aspa.features.home.navigation.HomeDestinations
@@ -25,9 +27,6 @@ import com.aspa.aspa.features.mypage.navigation.MypageDestination
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
-import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
-import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
-import com.aspa.aspa.ui.components.StudyNav.studyGraph
 import kotlinx.coroutines.launch
 
 @SuppressLint("RestrictedApi")
@@ -35,6 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     rootNavController: NavHostController,
+    redirect: String? = null,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val innerNavController: NavHostController = rememberNavController()
@@ -45,6 +45,22 @@ fun MainScreen(
     val uiState by homeViewModel.uiState.collectAsState()
 
     DoubleBackExitHandler()
+
+    LaunchedEffect(redirect) {
+        when (RedirectType.from(redirect)) {
+            RedirectType.ROADMAP -> {
+                innerNavController.navigate(RoadmapDestinations.roadmapList(fromWidget = false)) {
+                    popUpTo(0)
+                }
+            }
+            RedirectType.ROADMAP_STATUS -> {
+                innerNavController.navigate(RoadmapDestinations.roadmapList(fromWidget = true)) {
+                    popUpTo(0)
+                }
+            }
+            RedirectType.NONE -> {}
+        }
+    }
 
     val isHomeScreen = currentRoute == HomeDestinations.HOME
     // 회면 상태 추가로 @Composable 로 변경함.
@@ -94,6 +110,8 @@ fun MainScreen(
             )
         }
     }
+
+
     if (isHomeScreen) {
         ModalNavigationDrawer(
             drawerState = drawerState,

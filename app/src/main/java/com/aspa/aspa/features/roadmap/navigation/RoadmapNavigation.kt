@@ -45,6 +45,7 @@ fun NavGraphBuilder.roadmapGraph(navController: NavController) {
                 }
             ),
             deepLinks = listOf(
+                navDeepLink { uriPattern = "aspa://roadmap" },
                 navDeepLink { uriPattern = "aspa://roadmap?fromWidget={fromWidget}" }
             ),
         ) { backStackEntry ->

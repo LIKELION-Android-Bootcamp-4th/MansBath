@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.login.components.SocialButton
-import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.main.navigation.MainDestinations
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
@@ -60,9 +60,18 @@ fun LoginScreen(
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
-            navController.navigate(MainDestinations.MAIN) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
+
+            val redirect = navController.currentBackStackEntry
+                ?.arguments?.getString("redirect")
+            if (redirect == "roadmap") {
+                navController.navigate(RoadmapDestinations.roadmapList(fromWidget = true)) {
+                    popUpTo(0) { inclusive = true }
+                }
+            } else {
+                navController.navigate(MainDestinations.MAIN) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         }
     }
