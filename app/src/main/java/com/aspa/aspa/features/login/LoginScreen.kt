@@ -48,6 +48,7 @@ import com.aspa.aspa.R
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.main.navigation.MainDestinations
+import com.aspa.aspa.model.Provider
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
@@ -146,7 +147,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                SocialButton("Google로 계속하기") {
+                SocialButton(Provider.GOOGLE) {
                     authViewModel.signInWithGoogleCredential(
                         activity = navController.context as Activity,
                         onSuccess = {
@@ -156,11 +157,11 @@ fun LoginScreen(
                     ) // TODO : 구글 로그인 성공 응답 처리
                 }
 
-                SocialButton("카카오톡으로 계속하기") {
+                SocialButton(Provider.KAKAO) {
                     authViewModel.signInWithKakao(context)
                 }
 
-                SocialButton("네이버로 계속하기") {
+                SocialButton(Provider.NAVER) {
                     NaverIdLoginSDK.authenticate(
                         context = context,
                         launcher = naverLauncher
