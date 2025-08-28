@@ -36,13 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 
 
@@ -156,7 +153,7 @@ fun SolveQuizScreen(
                                             Text(
                                                 text = option,
                                                 modifier = Modifier
-                                                    .padding(horizontal = 6.dp)
+                                                    .padding(horizontal = 10.dp)
                                             )
                                         }
 
