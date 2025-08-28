@@ -92,8 +92,8 @@ class AuthViewModel @Inject constructor(
     private val _nicknameState = MutableStateFlow<String>("조회 중..")
     val nicknameState: StateFlow<String> = _nicknameState
 
-    private val _providerState = MutableStateFlow<String>("조회 중..")
-    val providerState: StateFlow<String> = _providerState
+    private val _providerState = MutableStateFlow<Provider?>(null)
+    val providerState: StateFlow<Provider?> = _providerState
 
     private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
     val permissionState = _permissionState.asStateFlow()
@@ -450,12 +450,10 @@ class AuthViewModel @Inject constructor(
     fun getProvider() {
         viewModelScope.launch {
             authRepository.fetchProvider()
-                .onSuccess { provider ->
-                    _providerState.value = when (provider) {
-                        Provider.GOOGLE -> "구글 계정으로 가입"
-                        Provider.KAKAO -> "카카오 계정으로 가입"
-                        Provider.NAVER -> "네이버 계정으로 가입"
-                    }
+                .onSuccess { provider -> _providerState.value = provider }
+                .onFailure {e ->
+                    _providerState.value = null
+                    Log.e("PROVIDER", "${e.message}")
                 }
         }
     }

@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
@@ -23,6 +22,7 @@ import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.mypage.components.ConfirmDialog
 import com.aspa.aspa.features.mypage.components.DialogType
+import com.aspa.aspa.model.Provider
 import com.aspa.aspa.ui.theme.AppSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +35,7 @@ fun MyPageScreen(
     val context = LocalContext.current
     var dialogType by remember { mutableStateOf(DialogType.NONE) }
     val nickname by authViewModel.nicknameState.collectAsState()
-    val provider by authViewModel.providerState.collectAsState()
+    val providerState by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
 
@@ -102,7 +102,12 @@ fun MyPageScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = provider,
+                        when(providerState) {
+                            Provider.GOOGLE -> "구글 계정으로 가입"
+                            Provider.KAKAO -> "카카오 계정으로 가입"
+                            Provider.NAVER -> "네이버 계정으로 가입"
+                            null ->"조회 중.."
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
