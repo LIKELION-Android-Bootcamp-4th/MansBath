@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -66,9 +66,8 @@ fun QuizScreen(
         lazyListState.animateScrollToItem(index = lazyListStateIndex)
     }
 
-
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -76,15 +75,17 @@ fun QuizScreen(
                     .padding(padding)
                     .padding(horizontal = 8.dp)
             ) {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    when(val state = permissionState) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    when (val state = permissionState) {
                         is PermissionState.Denied -> {
-                            if(state.shouldShowRationale) {
+                            if (state.shouldShowRationale) {
                                 RationaleDialog(
                                     onConfirm = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) },
                                     onDismiss = {
-                                        Toast.makeText(context,
-                                            "퀴즈 알림 권한이 거부되었습니다.", Toast.LENGTH_SHORT)
+                                        Toast.makeText(
+                                            context,
+                                            "퀴즈 알림 권한이 거부되었습니다.", Toast.LENGTH_SHORT
+                                        )
                                             .show()
                                     }
                                 )
@@ -97,16 +98,20 @@ fun QuizScreen(
                     }
                 }
 
-                when(val state = quizListState) {
+                when (val state = quizListState) {
                     QuizListState.Loading -> {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("퀴즈 조회 중..")
+                            Text(
+                                "퀴즈 조회 중..",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                             Spacer(Modifier.height(16.dp))
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     }
 
@@ -117,10 +122,13 @@ fun QuizScreen(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("생성된 퀴즈가 없습니다.")
+                                Text(
+                                    "생성된 퀴즈가 없습니다.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                        }
-                        else {
+                        } else {
                             LazyColumn(state = lazyListState) {
                                 itemsIndexed(state.quizzes) { index, item ->
                                     QuizListCard(
@@ -135,9 +143,13 @@ fun QuizScreen(
                             }
                         }
                     }
-                    is QuizListState.Error -> Text("에러 발생: ${state.error}")
-                }
 
+                    is QuizListState.Error -> Text(
+                        "에러 발생: ${state.error}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     )
@@ -147,8 +159,8 @@ fun QuizScreen(
 fun RationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("권한 필요") },
-        text = { Text("Aspa에서는 안 푼 퀴즈가 있다면 지속적으로 알림을 보내드립니다. 허용해주시겠어요?") },
+        title = { Text("권한 필요", color = MaterialTheme.colorScheme.onSurface) },
+        text = { Text("Aspa에서는 안 푼 퀴즈가 있다면 지속적으로 알림을 보내드립니다. 허용해주시겠어요?", color = MaterialTheme.colorScheme.onSurfaceVariant) },
         confirmButton = {
             Button(onClick = onConfirm) { Text("허용") }
         },

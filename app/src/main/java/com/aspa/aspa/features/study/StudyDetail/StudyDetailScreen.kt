@@ -41,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aspa.aspa.features.state.MakeQuizState
@@ -87,9 +86,9 @@ fun StudyDetailScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("퀴즈 생성 중..")
+                Text("퀴즈 생성 중..", color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(16.dp))
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -108,12 +107,12 @@ fun StudyDetailScreen(
                                 Text(
                                     text = study?.title.orEmpty(),
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
                     )
                 },
@@ -135,7 +134,10 @@ fun StudyDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(35.dp)
-                                .background(Blue, shape = RoundedCornerShape(12.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                                 .clickable { navigateRoadmap() },
                             contentAlignment = Alignment.Center
                         ) {
@@ -146,10 +148,14 @@ fun StudyDetailScreen(
                                     imageVector = Icons.Outlined.CheckCircle,
                                     contentDescription = "완료",
                                     modifier = Modifier.size(18.dp),
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("이 섹션 완료하기", color = Color.White)
+                                Text(
+                                    "이 섹션 완료하기",
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }
 
@@ -158,17 +164,27 @@ fun StudyDetailScreen(
                                 .fillMaxWidth()
                                 .height(35.dp)
                                 .border(
-                                    BorderStroke(1.dp, Gray10),
+                                    BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                    ),
                                     shape = RoundedCornerShape(12.dp)
                                 )
-                                .background(Color.White, shape = RoundedCornerShape(12.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.surface, // 클릭 전 하얀(서피스) 색
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                                 .clickable {
                                     viewModel.navigateOrMakeQuiz()
                                 }
                             ,
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("퀴즈 풀기", color = Color.Black)
+                            Text(
+                                "퀴즈 풀기",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 },
@@ -179,7 +195,7 @@ fun StudyDetailScreen(
                                 Modifier.padding(padding).fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                             }
                         }
 
@@ -189,7 +205,7 @@ fun StudyDetailScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(uiState.message ?: "오류가 발생했어요.")
+                                    Text(uiState.message ?: "오류가 발생했어요.", color = MaterialTheme.colorScheme.onBackground)
                                     Spacer(Modifier.height(12.dp))
                                     Button(onClick = onRetry) { Text("다시 시도") }
                                 }
@@ -202,7 +218,7 @@ fun StudyDetailScreen(
                                 modifier = Modifier
                                     .padding(padding)
                                     .fillMaxSize()
-                                    .background(Gray),
+                                    .background(MaterialTheme.colorScheme.background),
                                 contentPadding = PaddingValues(vertical = 8.dp)
                             ) {
                                 sections.forEachIndexed { sIdx, sec ->
@@ -233,7 +249,6 @@ fun StudyDetailScreen(
             )
         }
 
-        is UiState.Failure -> Text("에러발생")
+        is UiState.Failure -> Text("에러발생", color = MaterialTheme.colorScheme.error)
     }
 }
-
