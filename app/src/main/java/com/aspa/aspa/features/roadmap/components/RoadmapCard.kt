@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,21 +39,21 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
     val isCompleted = roadmap.completedSection == roadmap.allSection
     val progress = roadmap.completedSection.toFloat() / roadmap.allSection
 
-    val backgroundColor = if (isCompleted) Color(0xFFF0FDF4) else Color.White
-    val border = if (isCompleted) BorderStroke(1.dp, Color(0xFFB9F8CF)) else BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f))
+    val backgroundColor = if (isCompleted) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
+    val border = if (isCompleted) BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)) else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
     val icon = Icons.Default.CheckCircleOutline
-    val iconColor = Color(0xFF00A63E)
+    val iconColor = MaterialTheme.colorScheme.primary
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         border = border,
+        shape = MaterialTheme.shapes.medium,
         onClick = onClick,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isCompleted) {
@@ -61,7 +62,8 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
                     Text(
                         roadmap.title,
                         modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 } else {
                     Text(
@@ -69,19 +71,21 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Surface (
-                        color = Color(0xFFECEEF2),
-                        shape = RoundedCornerShape(6.75.dp)
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(6.dp)
                     ) {
                         Text(
                             text = "${roadmap.completedSection}/${roadmap.allSection}",
                             modifier = Modifier
                                 .padding(horizontal = 8.dp, vertical = 2.dp),
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -90,7 +94,7 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 roadmap.description,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -101,7 +105,7 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
             if (isCompleted) {
                 Box(
                     modifier = Modifier
-                        .background(color = Color(0xFFECEEF2), shape = RoundedCornerShape(6.75.dp))
+                        .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(6.dp))
                         .padding(horizontal = 12.dp, vertical = 2.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -112,10 +116,11 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
                         Icon(
                             imageVector = Icons.Default.CheckCircleOutline,
                             contentDescription = "완료",
-                            modifier = Modifier.size(13.dp)
+                            modifier = Modifier.size(13.dp),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("완료", fontSize = 13.sp)
+                        Text("완료", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             } else {
@@ -123,8 +128,8 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("전체 진도", fontSize = 12.sp, color = Color.Gray)
-                    Text("${progress.times(100).toInt()}%", fontSize = 12.sp)
+                    Text("전체 진도", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${progress.times(100).toInt()}%", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
 
                 LinearProgressIndicator(
@@ -133,8 +138,8 @@ fun RoadmapCard(roadmap: Roadmap, onClick: () -> Unit) {
                         .fillMaxWidth()
                         .height(6.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = Color.Black,
-                    trackColor = Color.LightGray,
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     strokeCap = StrokeCap.Round
                 )
 

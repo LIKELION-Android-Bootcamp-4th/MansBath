@@ -1,11 +1,6 @@
 package com.aspa.aspa.features.home.components
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,28 +8,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.*
 import com.aspa.aspa.R
-import kotlinx.coroutines.launch
+import com.aspa.aspa.ui.theme.AppSpacing
 
 @Composable
 fun ChatContent(
@@ -43,32 +29,25 @@ fun ChatContent(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(messages.size) {
+    LaunchedEffect(messages.lastOrNull()) {
         if (messages.isNotEmpty()) {
-            coroutineScope.launch {
-                listState.animateScrollToItem(index = messages.size - 1)
-            }
+            listState.animateScrollToItem(messages.lastIndex)
         }
     }
 
     LazyColumn(
         state = listState,
         modifier = modifier,
-        contentPadding = PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(vertical = AppSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.md)
     ) {
-        items(
-            items = messages,
-            key = { message -> message.id }
-        ) { message ->
+        items(items = messages, key = { it.id }) { message ->
             when (message) {
                 is UiUserMessage -> UserMessage(text = message.text)
                 is UiAssistantMessage -> {
                     AssistantMessage(text = message.text)
                     if (!message.options.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(Modifier.height(AppSpacing.sm))
                         OptionButtonList(
                             options = message.options,
                             onOptionSelected = onOptionSelected
@@ -91,27 +70,30 @@ fun UserMessage(text: String) {
         verticalAlignment = Alignment.Top
     ) {
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.weight(1f, fill = false)
         ) {
             Text(
                 text = text,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(
+                    horizontal = AppSpacing.lg,
+                    vertical = AppSpacing.md
+                )
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(AppSpacing.sm))
         Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "user Profile",
+            imageVector = Icons.Filled.Person,
+            contentDescription = "user profile",
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray.copy(alpha = 0.5f))
-                .padding(6.dp),
-            tint = Color.Gray
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(AppSpacing.sm),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -124,27 +106,29 @@ fun AssistantMessage(text: String) {
         verticalAlignment = Alignment.Bottom
     ) {
         Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Assistant Profile",
+            imageVector = Icons.Filled.Person,
+            contentDescription = "assistant profile",
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray.copy(alpha = 0.5f))
-                .padding(6.dp),
-            tint = Color.Gray
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(AppSpacing.sm),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(AppSpacing.sm))
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.secondaryContainer,
             modifier = Modifier.fillMaxWidth(0.8f)
         ) {
             Text(
                 text = text,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(
+                    horizontal = AppSpacing.lg,
+                    vertical = AppSpacing.md
+                )
             )
         }
     }
@@ -156,25 +140,34 @@ fun OptionButtonList(
     onOptionSelected: (String) -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.End,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 44.dp), // 아이콘 + 여백 만큼 들여쓰기
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(start = 44.dp), // 아바타 영역만큼 들여쓰기
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
     ) {
         options.forEachIndexed { index, option ->
+            // Secondary 톤의 칩처럼 보이는 버튼
             Button(
                 onClick = { onOptionSelected(option) },
-                modifier = Modifier,
-                border = BorderStroke(1.dp, Color(0xFFC0C7FF)),
-                shape = RoundedCornerShape(24.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF4F6FF),
-                    contentColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
-                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 16.dp)
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                ),
+                contentPadding = PaddingValues(
+                    vertical = AppSpacing.md,
+                    horizontal = AppSpacing.lg
+                )
             ) {
-                Text(text = "${index + 1}. $option")
+                Text(
+                    text = "${index + 1}. $option",
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     }
@@ -184,27 +177,34 @@ fun OptionButtonList(
 fun AnalysisReportCard(report: UiAnalysisReport) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+        ),
         color = MaterialTheme.colorScheme.surface
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
+            modifier = Modifier.padding(
+                horizontal = AppSpacing.lg,
+                vertical = AppSpacing.xl
+            )
         ) {
             Text(
                 text = report.title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(AppSpacing.lg))
             Divider()
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(Modifier.height(AppSpacing.xl))
 
             val reportItems = report.items.toList()
-            Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xl)) {
                 reportItems.forEach { (title, content) ->
                     AnalysisSection(title = title, content = content)
                 }
@@ -218,33 +218,28 @@ private fun AnalysisSection(title: String, content: String) {
     Column {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(AppSpacing.sm))
         Text(
             text = content,
-            style = MaterialTheme.typography.bodyLarge,
-            lineHeight = 24.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
-/**
- * 낙관적 UI 추가
- * - 로딩 메시지
- * - 타이핑 효과 Lottie
- */
+/** 낙관적 UI - 로딩 버블 */
 @Composable
 fun AssistantLoadingBubble() {
-    val infiniteTransition = rememberInfiniteTransition(label = "loading_bubble_transition")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
+    val infinite = rememberInfiniteTransition(label = "loading_bubble_transition")
+    val alpha by infinite.animateFloat(
+        initialValue = 0.55f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+            animation = tween(700, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ), label = "loading_alpha"
     )
@@ -255,18 +250,18 @@ fun AssistantLoadingBubble() {
         verticalAlignment = Alignment.Bottom
     ) {
         Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Assistant Profile",
+            imageVector = Icons.Filled.Person,
+            contentDescription = "assistant profile",
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray.copy(alpha = 0.5f))
-                .padding(6.dp),
-            tint = Color.Gray
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(AppSpacing.sm),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(AppSpacing.sm))
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = alpha),
             modifier = Modifier.width(120.dp)
         ) {
@@ -277,14 +272,12 @@ fun AssistantLoadingBubble() {
 
 @Composable
 fun TypingIndicator() {
-    val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.typing_indicator)
-    )
-
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.typing_indicator))
     LottieAnimation(
         composition = composition,
-        // 무한 반복
         iterations = LottieConstants.IterateForever,
-        modifier = Modifier.size(60.dp)
+        modifier = Modifier
+            .padding(AppSpacing.md)
+            .size(48.dp)
     )
 }
