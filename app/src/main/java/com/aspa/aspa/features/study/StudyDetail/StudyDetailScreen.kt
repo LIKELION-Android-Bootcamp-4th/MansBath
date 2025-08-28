@@ -90,7 +90,7 @@ fun StudyDetailScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("퀴즈 생성 중..", color = MaterialTheme.colorScheme.onBackground)
+                Text("생성 중..", color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(16.dp))
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
