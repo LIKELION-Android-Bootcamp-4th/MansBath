@@ -80,9 +80,13 @@ fun QuizListCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 if (completedSection != 0 && completedSection != allSection) {
                     Card(
