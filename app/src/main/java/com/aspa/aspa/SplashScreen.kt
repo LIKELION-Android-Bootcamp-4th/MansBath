@@ -2,6 +2,7 @@ package com.aspa.aspa
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,7 @@ import com.aspa.aspa.features.main.navigation.MainDestinations
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 
 
 object SplashDestinations {
@@ -61,7 +63,9 @@ fun SplashScreen (
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
         Image(
