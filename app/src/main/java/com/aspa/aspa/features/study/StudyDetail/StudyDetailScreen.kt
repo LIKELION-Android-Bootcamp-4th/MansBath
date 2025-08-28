@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aspa.aspa.features.state.MakeQuizState
@@ -65,11 +66,14 @@ fun StudyDetailScreen(
     val sections = study?.items ?: emptyList()
     val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.makeQuizFlow.collect { event ->
             when(event) {
                 MakeQuizState.Waiting -> {
-
+                    Toast.makeText(context, "퀴즈 생성 중입니다.. 잠시만 기다려주세요.", Toast.LENGTH_SHORT)
+                        .show()
                 }
                 is MakeQuizState.Navigate -> {
                     navigateToQuiz()

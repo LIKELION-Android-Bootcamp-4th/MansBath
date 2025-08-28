@@ -69,8 +69,9 @@ class StudyViewModel @Inject constructor(
                 .onSuccess {
                     if(it) _makeQuizFlow.emit(MakeQuizState.Navigate)
                     else {
-                        _uiState.value = UiState.Loading
+//                        _uiState.value = UiState.Loading
                         _makeQuizFlow.emit(MakeQuizState.Waiting)
+                        /***
                         quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId, sectionId)
                             .onSuccess {
                                 _makeQuizFlow.emit(MakeQuizState.Navigate)
@@ -79,6 +80,7 @@ class StudyViewModel @Inject constructor(
                                 android.util.Log.e("StudyVM", "makeQuiz failed", it)
                                 _uiState.value = UiState.Failure(it.message ?: "퀴즈 생성 중 에러 발생")
                             }
+                         ***/
                     }
                 }
                 .onFailure {

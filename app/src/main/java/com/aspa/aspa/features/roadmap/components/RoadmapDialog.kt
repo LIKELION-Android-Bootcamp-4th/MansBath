@@ -63,10 +63,12 @@ fun RoadmapDialog(
     viewModel: RoadmapViewModel = hiltViewModel()
 ) {
     val roadmapState by viewModel.roadmapState.collectAsState()
+    val studyExist by viewModel.studyExistState.collectAsState()
     val quizExist by viewModel.quizExistState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadRoadmap(roadmapId)
+        viewModel.isStudyExist(roadmapId, sectionId)
         viewModel.isQuizExist(roadmapId, sectionId)
     }
 
@@ -135,7 +137,10 @@ fun RoadmapDialog(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                border = BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                ),
                                 color = MaterialTheme.colorScheme.surface
                             ) {
                                 Row(
@@ -160,7 +165,9 @@ fun RoadmapDialog(
                             Spacer(modifier = Modifier.width(8.dp))
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = if (section.status) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant
+                                color = if (section.status) MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.1f
+                                ) else MaterialTheme.colorScheme.surfaceVariant
                             ) {
                                 Text(
                                     text = if (section.status) "완료" else "진행 예정",
@@ -202,14 +209,30 @@ fun RoadmapDialog(
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Button(  // 학습 버튼
                                 onClick = {
-                                    Log.d("MYTAG", "qid: ${roadmap.questionId}")
-                                    navController.navigate(
-                                        StudyScreenRoute.Study.study(
-                                            roadmapId,
-                                            sectionId,
-                                            roadmap.questionId
+                                    when (studyExist) {
+                                        true -> {
+                                            navController.navigate(
+                                                StudyScreenRoute.Study.study(
+                                                    roadmapId,
+                                                    sectionId,
+                                                    roadmap.questionId
+                                                )
+                                            )
+                                        }
+
+                                        false -> Toast.makeText(
+                                            context,
+                                            "학습 생성 중입니다.. 잠시만 기다려주세요.",
+                                            Toast.LENGTH_SHORT
                                         )
-                                    )
+                                            .show()
+
+                                        null -> Toast.makeText(
+                                            context,
+                                            "학습 탐색 중..",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
@@ -232,11 +255,13 @@ fun RoadmapDialog(
                                                 launchSingleTop = true
                                             }
                                         }
+
                                         false -> Toast.makeText(
                                             context,
                                             "퀴즈가 존재하지 않습니다.\n먼저 학습을 시작해주세요.",
                                             Toast.LENGTH_SHORT
                                         ).show()
+
                                         null -> Toast.makeText(
                                             context,
                                             "퀴즈 탐색 중..",
@@ -248,7 +273,10 @@ fun RoadmapDialog(
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = MaterialTheme.colorScheme.primary
                                 ),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                border = BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                ),
                                 shape = MaterialTheme.shapes.small
                             ) {
                                 Text("퀴즈 풀기", style = MaterialTheme.typography.bodySmall)
