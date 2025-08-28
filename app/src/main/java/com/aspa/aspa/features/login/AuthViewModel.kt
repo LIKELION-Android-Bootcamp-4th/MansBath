@@ -1,8 +1,12 @@
 package com.aspa.aspa.features.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -29,9 +33,11 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,6 +60,11 @@ sealed interface WithdrawState {
     data class Error(val message: String?) : WithdrawState
 }
 
+sealed class PermissionState {
+    object Idle : PermissionState() // 초기 상태
+    object Granted : PermissionState() // 권한 허용
+    data class Denied(val shouldShowRationale: Boolean) : PermissionState() // 권한 거부
+}
 
 @HiltViewModel //viewModel 등록 및 생성
 class AuthViewModel @Inject constructor(
@@ -62,6 +73,7 @@ class AuthViewModel @Inject constructor(
     private val getCredentialRequest: GetCredentialRequest,
     private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     companion object {
@@ -82,6 +94,25 @@ class AuthViewModel @Inject constructor(
 
     private val _providerState = MutableStateFlow<Provider?>(null)
     val providerState: StateFlow<Provider?> = _providerState
+
+    private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
+    val permissionState = _permissionState.asStateFlow()
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (isGranted) {
+                _permissionState.update { PermissionState.Granted }
+            } else {
+                // 아직 권한이 없다면 초기 상태(Idle)를 유지
+                _permissionState.update { PermissionState.Idle }
+            }
+        }
+    }
 
     fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
@@ -442,6 +473,14 @@ class AuthViewModel @Inject constructor(
             if (token != null) {
                 fcmRepository.updateFcmToken(auth.uid!!, token)
             }
+        }
+    }
+
+    fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
+        if (isGranted) {
+            _permissionState.update { PermissionState.Granted }
+        } else {
+            _permissionState.update { PermissionState.Denied(shouldShowRationale) }
         }
     }
 }
