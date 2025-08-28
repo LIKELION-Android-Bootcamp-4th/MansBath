@@ -1,11 +1,9 @@
-package com.aspa.aspa.features.roadmap.components
+package com.aspa.aspa.features.roadmap
 
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,8 +37,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,8 +46,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
-import com.aspa.aspa.features.roadmap.RoadmapState
-import com.aspa.aspa.features.roadmap.RoadmapViewModel
 import com.aspa.aspa.ui.components.StudyNav.StudyScreenRoute
 import com.aspa.aspa.ui.theme.AspaTheme
 

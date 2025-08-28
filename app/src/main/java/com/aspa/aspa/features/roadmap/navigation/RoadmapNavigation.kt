@@ -8,7 +8,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.aspa.aspa.features.roadmap.RoadmapDetailScreen
 import com.aspa.aspa.features.roadmap.RoadmapListScreen
-import com.aspa.aspa.features.roadmap.components.RoadmapDialog
+import com.aspa.aspa.features.roadmap.RoadmapDialog
 
 object RoadmapDestinations {
     const val ROADMAP_GRAPH_ROUTE = "roadmap_graph"
