@@ -5,12 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -40,51 +37,34 @@ fun OnboardingScreen(
     navController: NavHostController,
     dataStoreManager: DataStoreManager
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 }) // 총 3페이지
+    val pagerState = rememberPagerState(pageCount = { 4 })
     val scope = rememberCoroutineScope()
 
-    Column(
+
+    Box(
         modifier = Modifier
+            .background(Color.White)
             .fillMaxSize()
             .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.fillMaxSize()
         ) { page ->
             when (page) {
-                0 -> OnboardingPage(imageRes = R.drawable.onboarding1, text = "첫 번째 페이지")
-                1 -> OnboardingPage(imageRes = R.drawable.onboarding2, text = "두 번째 페이지")
-                2 -> OnboardingPage(imageRes = R.drawable.onboarding3, text = "세 번째 페이지")
-            }
-        }
-        // 👇 페이지 인디케이터
-        Row(
-            modifier = Modifier
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(3) { index ->
-                val isSelected = pagerState.currentPage == index
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(if (isSelected) 12.dp else 8.dp)
-                        .background(
-                            color = if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                            shape = CircleShape
-                        )
-                )
+                0 -> OnboardingPage(imageRes = R.drawable.onboarding1)
+                1 -> OnboardingPage(imageRes = R.drawable.onboarding2)
+                2 -> OnboardingPage(imageRes = R.drawable.onboarding3)
+                3 -> OnboardingPage(imageRes = R.drawable.onboarding4)
             }
         }
 
         if (pagerState.currentPage == pagerState.pageCount - 1) {
             Row(
                 modifier = Modifier
-                    .background(Color.DarkGray)
+                    .align(Alignment.BottomCenter)
+                    .background(MaterialTheme.colorScheme.primary)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -122,26 +102,41 @@ fun OnboardingScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        } else {
+            // 페이지 인디케이터
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(pagerState.pageCount) { index ->
+                    val isSelected = pagerState.currentPage == index
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(if (isSelected) 12.dp else 8.dp)
+                            .background(
+                                color = if (isSelected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
         }
     }
 }
 
+
 @Composable
-fun OnboardingPage(imageRes: Int, text: String) {
-    Column(
+fun OnboardingPage(imageRes: Int) {
+
+    Image(
+        painter = painterResource(id = imageRes),
+        contentDescription = "온보딩 화면",
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = text, style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(24.dp))
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-        )
-    }
+    )
 }

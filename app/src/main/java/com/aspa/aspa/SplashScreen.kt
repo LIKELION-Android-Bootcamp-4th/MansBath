@@ -34,7 +34,7 @@ fun SplashScreen (
     val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
 
     LaunchedEffect(Unit) {
-        delay(1500)
+        delay(1000)
 
         Log.i("ONBOARDING", "onboarding completed : $isOnboardingCompleted")
 
