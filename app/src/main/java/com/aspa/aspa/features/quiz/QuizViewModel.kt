@@ -240,6 +240,10 @@ class QuizViewModel @Inject constructor(
 
     }
 
+    fun clearChosen() {
+        _chosenAnswerList.value = List(10) { "" }
+    }
+
     fun syncChosenToQuestions() {
         val currentState = _quizState.value
         if (currentState is QuizState.Success) {
