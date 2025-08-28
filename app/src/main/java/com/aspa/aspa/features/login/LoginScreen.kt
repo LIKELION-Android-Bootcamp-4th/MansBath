@@ -1,8 +1,11 @@
 package com.aspa.aspa.features.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,12 +37,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.R
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
+import com.aspa.aspa.model.Provider
 import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
@@ -51,12 +58,27 @@ fun LoginScreen(
     val context = LocalContext.current
     val naverLauncher = rememberNaverLoginLauncher(
         onAccessToken = { token -> authViewModel.signInWithNaver(token) },
-        onSuccess = { navController.navigate(MainDestinations.MAIN) },
+        onSuccess = {},
     )
     val loginState by authViewModel.loginState.collectAsState()
     val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
+    val lastLoginProvider by dataStoreManager.lastLoginProvider.collectAsState(initial = null)
 
-    LaunchedEffect(loginState) {
+    val permissionState by authViewModel.permissionState.collectAsStateWithLifecycle()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            // shouldShowRationale 값을 얻기 위해 Activity context가 필요합니다.
+            val activity = context as? Activity
+            val shouldShowRationale = activity?.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) ?: false
+            authViewModel.onPermissionResult(
+                isGranted = isGranted,
+                shouldShowRationale = shouldShowRationale
+            )
+        }
+    )
+
+    LaunchedEffect(loginState, permissionState) {
         if (loginState is LoginState.Success) {
             if (isOnboardingCompleted) {
                 navController.navigate(MainDestinations.MAIN) {
@@ -69,6 +91,11 @@ fun LoginScreen(
                 }
             }
         }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(permissionState is PermissionState.Idle) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     DoubleBackExitHandler()
@@ -79,11 +106,23 @@ fun LoginScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(permissionState is PermissionState.Denied && (permissionState as PermissionState.Denied).shouldShowRationale) {
+                RationaleDialog(
+                    onConfirm = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) },
+                    onDismiss = {
+                        Toast.makeText(context,
+                            "퀴즈 알림 권한이 거부되었습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                )
+            }
+        }
+
         when (loginState) {
             LoginState.Loading -> {
                 CircularProgressIndicator()
             }
-
             else -> {
                 Card(
                     colors = CardDefaults.cardColors(
@@ -91,14 +130,12 @@ fun LoginScreen(
                     ),
                     shape = MaterialTheme.shapes.large,
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(0.85f)
+                    modifier = Modifier.fillMaxWidth(0.85f)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-                        modifier = Modifier
-                            .padding(AppSpacing.xl)
+                        modifier = Modifier.padding(AppSpacing.xl)
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.aspalogo),
@@ -106,7 +143,6 @@ fun LoginScreen(
                             modifier = Modifier.size(120.dp)
                         )
 
-                        // 부제
                         Text(
                             text = "AI와 함께하는 개인 맞춤 학습",
                             style = MaterialTheme.typography.bodyMedium,
@@ -115,26 +151,44 @@ fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(AppSpacing.sm))
 
-                        SocialButton("Google로 계속하기") {
-                            authViewModel.signInWithGoogleCredential(
-                                activity = navController.context as Activity,
-                                onSuccess = {
-                                    authViewModel.updateFcmToken()
-                                    navController.navigate("main")
-                                },
-                            )
+                        val buttons: List<Pair<Provider, @Composable (Boolean) -> Unit>> = listOf(
+                            Provider.GOOGLE to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.GOOGLE,
+                                    isLastLogin = isLastLogin
+                                ) {
+                                    authViewModel.signInWithGoogleCredential(
+                                        activity = navController.context as Activity,
+                                        onSuccess = {}
+                                    )
+                                }
+                            },
+                            Provider.KAKAO to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.KAKAO,
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    authViewModel.signInWithKakao(context)
+                                }
+                            },
+                            Provider.NAVER to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.NAVER,
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    NaverIdLoginSDK.authenticate(
+                                        context = context,
+                                        launcher = naverLauncher
+                                    )
+                                }
+                            }
+                        )
+
+                        buttons.forEach { (provider, buttonContent) ->
+                            buttonContent( lastLoginProvider == provider )
                         }
 
-                        SocialButton("카카오톡으로 계속하기") {
-                            authViewModel.signInWithKakao(context)
-                        }
-
-                        SocialButton("네이버로 계속하기") {
-                            NaverIdLoginSDK.authenticate(
-                                context = context,
-                                launcher = naverLauncher
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }
@@ -168,4 +222,19 @@ fun rememberNaverLoginLauncher(
             Log.e("NAVER_LOGIN", "Error Desc: $desc")
         }
     }
+}
+
+@Composable
+fun RationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("권한 필요") },
+        text = { Text("Aspa에서는 안 푼 퀴즈가 있다면 지속적으로 알림을 보내드립니다. 허용해주시겠어요?") },
+        confirmButton = {
+            Button(onClick = onConfirm) { Text("허용") }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) { Text("거부") }
+        }
+    )
 }

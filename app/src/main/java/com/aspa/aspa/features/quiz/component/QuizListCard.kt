@@ -80,9 +80,13 @@ fun QuizListCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 if (completedSection != 0 && completedSection != allSection) {
                     Card(
@@ -232,6 +236,7 @@ fun QuizListCard(
                                 if (it.status == true) {
                                     viewModel.getQuiz(roadmapId, it.quizTitle)
                                     viewModel.saveLazyListStateIndex(index)
+                                    viewModel.clearChosen()
                                     navController.navigate(QuizDestinations.QUIZ_RESULT)
                                 } else {
                                     viewModel.getQuiz(roadmapId, it.quizTitle)

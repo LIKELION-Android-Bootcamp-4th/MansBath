@@ -36,13 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 
 
@@ -156,14 +153,13 @@ fun SolveQuizScreen(
                                             Text(
                                                 text = option,
                                                 modifier = Modifier
-                                                    .padding(horizontal = 6.dp)
+                                                    .padding(horizontal = 10.dp)
                                             )
                                         }
 
                                         if (selectedOption == option) {
                                             Card(
                                                 modifier = Modifier
-                                                    .padding(start = 4.dp)
                                                     .fillMaxWidth()
                                                     .fillMaxHeight(),
                                                 colors = CardDefaults.cardColors(
@@ -173,12 +169,15 @@ fun SolveQuizScreen(
                                             ) {
                                                 Box(contentAlignment = Alignment.CenterStart,
                                                     modifier = Modifier.fillMaxSize()
+                                                        .padding(start = 6.dp)
                                                 ) {
                                                     optionText()
                                                 }
 
                                             }
                                         } else {
+                                            Spacer(modifier = Modifier.width(6.dp))
+
                                             optionText()
                                         }
 
