@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -65,12 +63,15 @@ fun SocialButton(provider: Provider, onclick: () -> Unit) {
                     Provider.NAVER -> "네이버 아이콘"
                 },
                 tint = Color.Unspecified,
-                modifier = Modifier.size(18.dp).padding(top = 2.dp)
+                modifier = when (provider) {
+                    Provider.NAVER -> Modifier.size(22.dp)
+                    else -> Modifier.size(18.dp)
+                }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = when (provider) {
-                    Provider.GOOGLE -> "구글로 로그인"
+                    Provider.GOOGLE -> "구글 로그인"
                     Provider.KAKAO -> "카카오 로그인"
                     Provider.NAVER -> "네이버 로그인"
                 },
