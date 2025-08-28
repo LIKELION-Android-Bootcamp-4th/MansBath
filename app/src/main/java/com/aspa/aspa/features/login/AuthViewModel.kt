@@ -360,6 +360,8 @@ class AuthViewModel @Inject constructor(
 
     fun withdraw(context: Context) {
         viewModelScope.launch {
+
+            dataStoreManager.setIsOnboardingCompleted(false)
             // 소셜 unlink
             authRepository.fetchProvider()
                 .onSuccess { provider ->
