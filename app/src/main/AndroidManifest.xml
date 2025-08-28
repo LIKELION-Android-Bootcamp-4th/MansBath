@@ -29,7 +29,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/roadmap_widget_info" />
         </receiver>
-<!--        스터디 위젯-->
+<!--        로드맵 상태 추적 위젯-->
         <receiver
             android:name=".features.widget.RoadmapStatusWidgetProvider"
             android:label="로드맵 상태 추적하기"
