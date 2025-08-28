@@ -26,7 +26,6 @@ fun RoadmapTopBar() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
             .statusBarsPadding()
             .padding(top = 16.dp)
     ) {

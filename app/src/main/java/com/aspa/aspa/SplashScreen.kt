@@ -1,8 +1,10 @@
 package com.aspa.aspa
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,6 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.navigation.LoginDestinations
@@ -60,6 +64,10 @@ fun SplashScreen (
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("Aspa", style = MaterialTheme.typography.headlineLarge)
+        Image(
+            painter = painterResource(id = R.drawable.aspalogo),
+            contentDescription = "Aspa",
+            modifier = Modifier.size(120.dp)
+        )
     }
 }

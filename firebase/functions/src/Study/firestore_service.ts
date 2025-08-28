@@ -83,14 +83,16 @@ export async function saveStudy(
  * @param {string} uid - 대상 사용자의 ID.
  * @param {string} docId - 조회할 문서의 ID.
  * @param {string} subCollection - 문서가 위치한 하위 컬렉션의 이름.
- * @param {string | undefined} fieldName - 조회할 특정 필드의 이름 (선택 사항).
+ * @param {string} fieldName - 조회할 특정 필드의 이름 (선택 사항).
+ * @param {number} index - 스테이지 넘버 확인
  * @return {Promise<string>} 필드 값 또는 문서 전체 데이터의 JSON 문자열.
  */
 export async function fetchGenericFirebaseData(
   uid: string,
   docId: string,
   subCollection: string,
-  fieldName?: string,
+  fieldName: string,
+  index?: number
 ): Promise<string> {
   const docRef = getFirestore().doc(`${USERS_COLLECTION}/${uid}/${subCollection}/${docId}`);
   const docSnap = await docRef.get();
@@ -100,12 +102,21 @@ export async function fetchGenericFirebaseData(
   const data = docSnap.data();
   if (!data) return "{}";
 
-  if (fieldName) {
+  if (index === undefined || index === null) {
     const result = data[fieldName];
     if (typeof result === "undefined") {
       throw new Error(`"${fieldName}" 필드를 찾을 수 없습니다.`);
     }
     return typeof result === "string" ? result : JSON.stringify(result);
+  } else {
+    if (fieldName === "allData") {
+      return typeof data === "string" ? data : JSON.stringify(data);
+    }
+    const result = data.roadmap[fieldName];
+    if (typeof result === "undefined") {
+      throw new Error(`"${fieldName}" 필드를 찾을 수 없습니다.`);
+    }
+    const stage = result[index];
+    return typeof stage === "string" ? stage : JSON.stringify(stage);
   }
-  return JSON.stringify(data);
 }

@@ -22,7 +22,8 @@ data class HomeScreenActions(
     val onInputTextChanged: (String) -> Unit,
     val onSendClicked: () -> Unit,
     val onOptionSelected: (String) -> Unit,
-    val onRoadmapCreateClicked: () -> Unit
+    val onRoadmapCreateClicked: (questinId: String) -> Unit,
+    val onGoToRoadmapClicked: (roadmapId: String) -> Unit
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,17 +47,37 @@ fun HomeScreen(
         },
         floatingActionButton = {
             if (state.uiState.isReportFinished) {
-                FloatingActionButton(
-                    onClick = actions.onRoadmapCreateClicked,
-                    shape = RoundedCornerShape(16.dp),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(end = 16.dp)
-                ) {
-                    Text(
-                        text = "로드맵 생성",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                val roadmapId = state.uiState.roadmapId
+                val questionId = state.uiState.questionId
+
+                if (questionId != null) {
+                    if (roadmapId.isNullOrBlank()) {
+                        FloatingActionButton(
+                            onClick = { actions.onRoadmapCreateClicked(questionId) },
+                            shape = RoundedCornerShape(16.dp),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 16.dp)
+                        ) {
+                            Text(
+                                text = "로드맵 생성",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    } else {
+                        FloatingActionButton(
+                            onClick = { actions.onGoToRoadmapClicked(roadmapId) },
+                            shape = RoundedCornerShape(16.dp),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 16.dp)
+                        ) {
+                            Text(
+                                text = "로드맵 이동",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
                 }
             }
         },

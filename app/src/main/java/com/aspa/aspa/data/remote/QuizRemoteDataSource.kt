@@ -1,12 +1,21 @@
 package com.aspa.aspa.data.remote
 
 import android.util.Log
+import com.aspa.aspa.data.dto.MistakeDetailDto
 import com.aspa.aspa.data.dto.QuizDto
 import com.aspa.aspa.data.dto.QuizzesDto
+import com.aspa.aspa.model.QuizInfo
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class QuizRemoteDataSource @Inject constructor(
@@ -14,16 +23,20 @@ class QuizRemoteDataSource @Inject constructor(
     private val functions: FirebaseFunctions
 ) {
 
-    suspend fun getQuizzes(uid: String): List<QuizzesDto> {
-        val resultList = mutableListOf<QuizzesDto>()
+    suspend fun getQuizzes(uid: String): List<QuizInfo> {
+        val resultList = mutableListOf<QuizInfo>()
 
         val quizzesSnapshot = firestore.collection("users")
             .document(uid)
             .collection("quizzes")
+            .orderBy("lastModified", Query.Direction.DESCENDING)
             .get()
             .await()
 
         for (quizDoc in quizzesSnapshot) {
+            val title = quizDoc.get("title") as String
+            val description = quizDoc.get("description") as String
+            val lastModified = quizDoc.get("lastModified") as Timestamp
             val quizSnapshot = quizDoc.reference
                 .collection("quiz")
                 .orderBy("createdAt")
@@ -32,7 +45,15 @@ class QuizRemoteDataSource @Inject constructor(
             Log.d("Quizzes", "quizSnapshot detected!!!!!!")
 
             val quizList = quizSnapshot.toObjects(QuizDto::class.java)
-            resultList.add(QuizzesDto(roadmapId = quizDoc.id, quiz = quizList))
+
+            resultList.add(
+                QuizInfo(
+                    title,
+                    description,
+                    lastModified,
+                    QuizzesDto(roadmapId = quizDoc.id, quiz = quizList)
+                )
+            )
         }
 
         return resultList
@@ -74,17 +95,29 @@ class QuizRemoteDataSource @Inject constructor(
 
     }
 
-    suspend fun sendToMakeQuiz(studyId: String) : QuizDto {
+    suspend fun sendToMakeQuiz(roadmapId: String, studyId: String, sectionId: Int) : QuizDto {
         val data = hashMapOf(
-            "studyId" to studyId
+            "roadmapId" to roadmapId,
+            "studyId" to studyId,
+            "sectionId" to sectionId
         )
         // 로컬 테스트 용
-//        functions.useEmulator("10.0.2.2", 5001)
+        // functions.useEmulator("10.0.2.2", 5001)
         val result = functions.getHttpsCallable("makeQuiz")
             .call(data).await()
 
         val gson = Gson()
         return gson.fromJson(gson.toJson(result.getData()), QuizDto::class.java)
+    }
+
+    suspend fun makeQuizFromRoadmap(uid: String, roadmapId: String, sectionId: Int): QuizDto {
+        val snapshot = firestore.collection("users/${uid}/studies")
+            .whereEqualTo("roadmapId", roadmapId)
+            .whereEqualTo("sectionId", sectionId)
+            .limit(1)
+            .get().await()
+        val studyId = snapshot.documents.first().id
+        return sendToMakeQuiz(roadmapId, studyId, sectionId)
     }
 
     suspend fun updateQuizSolveResult(uid: String, roadmapId: String, quizTitle: String, chosenList: List<String>): Boolean {
@@ -121,6 +154,51 @@ class QuizRemoteDataSource @Inject constructor(
             docRef.update("questions", newQuestions).await()
             docRef.update("status", true).await()
 
+            val mistakeAnswer = newQuestions.mapNotNull { q ->
+                val answer = (q["answer"] as? String).orEmpty()
+                val chosen = (q["chosen"] as? String).orEmpty()
+                if(chosen.isBlank()|| chosen == answer) return@mapNotNull null
+
+                MistakeDetailDto(
+                    question = (q["question"] as? String).orEmpty(),
+                    answer = answer,
+                    chosen = chosen,
+                    description = (q["description"]as? String).orEmpty(),
+                    options = (q["options"]as? List<String>) ?: emptyList(),
+                )
+            }
+            val mistakeCol = firestore
+                .collection("users/$uid/mistakeAnswer")
+
+
+            //다시풀기가 있어서 같은 오답지는 삭제 처리
+            val prev = mistakeCol
+                .whereEqualTo("roadmapId", roadmapId)
+                .whereEqualTo("quizTitle",quizTitle)
+                .get()
+                .await()
+
+            val batch = firestore.batch()
+            prev.documents.forEach{
+                batch.delete(it.reference)
+            }
+            val target = mistakeCol.document()
+            val KST = TimeZone.getTimeZone("Asia/Seoul")
+            val KST_FMT = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA).apply {
+                timeZone = KST
+            }
+
+            val currentAtText: String = KST_FMT.format(Date())
+
+            val data = hashMapOf(
+                "roadmapId" to roadmapId,
+                "quizTitle" to quizTitle,
+                "currentAt" to  currentAtText,
+                "items" to mistakeAnswer,
+            )
+
+            batch.set(target,data)
+            batch.commit().await()
             println("✅ Successfully updated chosen answers for quiz '$quizTitle'.")
             return true
         } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package com.aspa.aspa.features.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 
@@ -52,6 +54,7 @@ fun SolveQuizScreen(
     var selectedOption by remember { mutableStateOf("") }
     val quizState by viewModel.quizState.collectAsState()
     val solvingValue by viewModel.solvingValue.collectAsState()
+    val currentRoadmapId by viewModel.currentRoadmapId.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.solveQuizAgain()
@@ -62,11 +65,23 @@ fun SolveQuizScreen(
             Column (
                 modifier = Modifier.padding(14.dp)
             ) {
+                BackHandler {
+                    navController.navigate(QuizDestinations.QUIZ) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
+                }
+
                 Text(
                     text = "← 나가기",
                     modifier = Modifier
                         .clickable {
-                            navController.popBackStack()
+                            navController.navigate(QuizDestinations.QUIZ) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                            }
                         }
                         .padding(bottom = 16.dp)
                 )
@@ -197,8 +212,8 @@ fun SolveQuizScreen(
                                 onClick = {
                                     if(solvingNum == sizeNum) {
                                         viewModel.changeSolvingChosen(solvingValue, selectedOption)
-                                        viewModel.saveSolvedChosen("test-user-for-web",
-                                            state.quiz.roadmapId,
+                                        viewModel.saveSolvedChosen(
+                                            currentRoadmapId,
                                             state.quiz.quizTitle,
                                             viewModel.chosenAnswerList.value
                                         )
