@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.mypage.components
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,19 +20,39 @@ fun ConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(text) },
-        text = { Text("정말로 $text 하시겠습니까?") },
+        title = {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Text(
+                text = "정말로 $text 하시겠습니까?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
         confirmButton = {
             TextButton(onClick = {
                 onConfirm()
                 onDismiss()
             }) {
-                Text("예")
+                Text(
+                    text = "예",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = { onDismiss() }) {
-                Text("아니오")
+                Text(
+                    text = "아니오",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     )

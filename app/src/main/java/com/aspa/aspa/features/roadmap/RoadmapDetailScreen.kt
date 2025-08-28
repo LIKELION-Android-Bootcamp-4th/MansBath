@@ -19,6 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,8 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,7 +52,6 @@ fun RoadmapDetailScreen(
 ) {
     val roadmapState by viewModel.roadmapState.collectAsState()
 
-    // 최초 진입 시 로드
     LaunchedEffect(roadmapId) {
         viewModel.loadRoadmap(roadmapId)
     }
@@ -63,12 +61,12 @@ fun RoadmapDetailScreen(
     }
     val savedStateHandle = backStackEntry.savedStateHandle
     LaunchedEffect(savedStateHandle) {
-        savedStateHandle.getStateFlow("reload", false).collect { reload ->  // 플래그 가져오기
+        savedStateHandle.getStateFlow("reload", false).collect { reload ->
             if (reload) {
-                delay(1000) // 임시 조치 // todo: studyViewModel에서 상태 관리한 후 해당 코드 삭제할 것
+                delay(1000) // TODO: studyViewModel에서 상태 관리한 후 삭제
                 Log.d("DETAIL", "분기 진입 완료")
                 viewModel.loadRoadmap(roadmapId)
-                savedStateHandle.remove<Boolean>("reload") // flag 삭제
+                savedStateHandle.remove<Boolean>("reload")
             }
         }
     }
@@ -79,19 +77,22 @@ fun RoadmapDetailScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
+
         is RoadmapState.Success -> {
             val roadmap = state.roadmap
             val progress = roadmap.completedSection.toFloat() / roadmap.allSection
+
             Scaffold(
+                containerColor = MaterialTheme.colorScheme.background,
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 topBar = {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(MaterialTheme.colorScheme.background)
                             .padding(top = 12.dp)
                     ) {
                         Row(
@@ -102,28 +103,33 @@ fun RoadmapDetailScreen(
                                 roadmap.title,
                                 modifier = Modifier.weight(1f),
                                 fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Surface(
-                                color = Color(0xFFECEEF2),
-                                shape = RoundedCornerShape(6.75.dp)
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
                                     text = "${roadmap.completedSection}/${roadmap.allSection}",
                                     modifier = Modifier
                                         .padding(horizontal = 8.dp, vertical = 2.dp),
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-
                         }
+
                         Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
                             roadmap.description,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            style = MaterialTheme.typography.bodyMedium
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -134,8 +140,16 @@ fun RoadmapDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                         ) {
-                            Text("전체 진도", fontSize = 12.sp, color = Color.Gray)
-                            Text("${progress.times(100).toInt()}%", fontSize = 12.sp)
+                            Text(
+                                "전체 진도",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                "${progress.times(100).toInt()}%",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
 
                         LinearProgressIndicator(
@@ -145,21 +159,18 @@ fun RoadmapDetailScreen(
                                 .height(6.dp)
                                 .padding(horizontal = 16.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            color = Color.Black,
-                            trackColor = Color.LightGray,
-                            strokeCap = StrokeCap.Round
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         HorizontalDivider(
                             thickness = 1.dp,
-                            color = Color.Black.copy(alpha = 0.1f),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                             modifier = Modifier.fillMaxWidth()
                         )
-
                     }
-
                 }
             ) { innerPadding ->
                 Column(
@@ -184,11 +195,12 @@ fun RoadmapDetailScreen(
                     }
                 }
             }
-
-
         }
 
-        is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
+        is RoadmapState.Error -> Text(
+            "❌ 에러 발생: ${state.message}",
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }
 

@@ -13,13 +13,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aspa.aspa.features.quiz.component.QuizListCard
@@ -40,9 +40,8 @@ fun QuizScreen(
         lazyListState.animateScrollToItem(index = lazyListStateIndex)
     }
 
-
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -51,16 +50,20 @@ fun QuizScreen(
                     .padding(horizontal = 8.dp)
             ) {
 
-                when(val state = quizListState) {
+                when (val state = quizListState) {
                     QuizListState.Loading -> {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("퀴즈 조회 중..")
+                            Text(
+                                "퀴즈 조회 중..",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                             Spacer(Modifier.height(16.dp))
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     }
 
@@ -71,10 +74,13 @@ fun QuizScreen(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("생성된 퀴즈가 없습니다.")
+                                Text(
+                                    "생성된 퀴즈가 없습니다.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                        }
-                        else {
+                        } else {
                             LazyColumn(state = lazyListState) {
                                 itemsIndexed(state.quizzes) { index, item ->
                                     QuizListCard(
@@ -89,9 +95,13 @@ fun QuizScreen(
                             }
                         }
                     }
-                    is QuizListState.Error -> Text("에러 발생: ${state.error}")
-                }
 
+                    is QuizListState.Error -> Text(
+                        "에러 발생: ${state.error}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     )

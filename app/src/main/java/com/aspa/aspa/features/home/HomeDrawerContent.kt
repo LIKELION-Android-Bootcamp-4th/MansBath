@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
@@ -15,12 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.aspa.aspa.features.home.HomeUiState
 import com.aspa.aspa.features.home.QuestionHistory
+import com.aspa.aspa.ui.theme.AppSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,36 +38,63 @@ fun HomeDrawerContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onCloseClick) {
+                IconButton(
+                    onClick = onCloseClick,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Close Drawer")
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.lg))
                 Text(
                     text = "질문 내역",
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                OutlinedButton(onClick = onNewChatClick) {
-                    Icon(Icons.Default.Add, contentDescription = "새 질문", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("새 질문")
+                OutlinedButton(
+                    onClick = onNewChatClick,
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "새 질문",
+                        modifier = Modifier.size(AppSpacing.lg),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(AppSpacing.sm))
+                    Text(
+                        "새 질문",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
-            Divider()
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
             if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.padding(AppSpacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.md)
                 ) {
                     items(
                         items = uiState.questionHistories,
@@ -78,12 +102,8 @@ fun HomeDrawerContent(
                     ) { historyItem ->
                         QuestionHistoryItem(
                             history = historyItem,
-                            onDeleteClick = {
-                                onDeleteClick(historyItem.id)
-                            },
-                            onItemClick = {
-                                onHistoryItemSelected(historyItem.id)
-                            },
+                            onDeleteClick = { onDeleteClick(historyItem.id) },
+                            onItemClick = { onHistoryItemSelected(historyItem.id) },
                             onRenameClick = { newTitle ->
                                 onRenameClick(historyItem.id, newTitle)
                             }
@@ -117,16 +137,19 @@ private fun QuestionHistoryItem(
     }
 
     Surface(
-        shape = RoundedCornerShape(24.dp),
+        shape = MaterialTheme.shapes.large, // pill 느낌 통일
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, Color(0xFFF0F0F0)),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+        ),
         tonalElevation = 0.dp,
         onClick = onItemClick
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -141,16 +164,20 @@ private fun QuestionHistoryItem(
             }
             Text(
                 text = history.title,
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
             Box {
-                IconButton(onClick = { expanded = true }) {
+                IconButton(
+                    onClick = { expanded = true },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More Options",
-                        tint = Color.LightGray
+                        contentDescription = "More Options"
                     )
                 }
                 DropdownMenu(
@@ -158,14 +185,26 @@ private fun QuestionHistoryItem(
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("삭제") },
+                        text = {
+                            Text(
+                                "삭제",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
                         onClick = {
                             onDeleteClick()
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("이름 변경") },
+                        text = {
+                            Text(
+                                "이름 변경",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
                         onClick = {
                             showRenameDialog = true
                             expanded = false
