@@ -20,12 +20,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,36 +33,36 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.R
+import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
-import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.main.navigation.MainDestinations
-import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.model.Provider
+import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
 @Composable
 fun LoginScreen(
     navController: NavController,
+    dataStoreManager: DataStoreManager,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val naverLauncher = rememberNaverLoginLauncher(
         onAccessToken = { token -> authViewModel.signInWithNaver(token) },
-        onSuccess = { navController.navigate(MainDestinations.MAIN) },
+        onSuccess = {},
     )
     val loginState by authViewModel.loginState.collectAsState()
+    val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
+    val lastLoginProvider by dataStoreManager.lastLoginProvider.collectAsState(initial = null)
 
     val permissionState by authViewModel.permissionState.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -81,9 +80,15 @@ fun LoginScreen(
 
     LaunchedEffect(loginState, permissionState) {
         if (loginState is LoginState.Success) {
-            navController.navigate(MainDestinations.MAIN) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
+            if (isOnboardingCompleted) {
+                navController.navigate(MainDestinations.MAIN) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
+            } else {
+                navController.navigate(OnboardingDestinations.ONBOARDING) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -114,52 +119,77 @@ fun LoginScreen(
             }
         }
 
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = MaterialTheme.shapes.large,
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            modifier = Modifier.fillMaxWidth(0.85f)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-                modifier = Modifier.padding(AppSpacing.xl)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.aspalogo),
-                    contentDescription = "Aspa",
-                    modifier = Modifier.size(120.dp)
-                )
+        when (loginState) {
+            LoginState.Loading -> {
+                CircularProgressIndicator()
+            }
+            else -> {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = MaterialTheme.shapes.large,
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+                        modifier = Modifier.padding(AppSpacing.xl)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.aspalogo),
+                            contentDescription = "Aspa",
+                            modifier = Modifier.size(120.dp)
+                        )
 
-                Text(
-                    text = "AI와 함께하는 개인 맞춤 학습",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                        Text(
+                            text = "AI와 함께하는 개인 맞춤 학습",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
 
-                Spacer(modifier = Modifier.height(AppSpacing.sm))
+                        Spacer(modifier = Modifier.height(AppSpacing.sm))
 
-                SocialButton(Provider.GOOGLE) {
-                    authViewModel.signInWithGoogleCredential(
-                        activity = navController.context as Activity,
-                        onSuccess = {
-                            authViewModel.updateFcmToken()
-                            navController.navigate("main")
-                        },
-                    )
-                }
+                        val buttons: List<Pair<Provider, @Composable (Boolean) -> Unit>> = listOf(
+                            Provider.GOOGLE to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.GOOGLE,
+                                    isLastLogin = isLastLogin
+                                ) {
+                                    authViewModel.signInWithGoogleCredential(
+                                        activity = navController.context as Activity,
+                                        onSuccess = {}
+                                    )
+                                }
+                            },
+                            Provider.KAKAO to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.KAKAO,
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    authViewModel.signInWithKakao(context)
+                                }
+                            },
+                            Provider.NAVER to { isLastLogin ->
+                                SocialButton(
+                                    provider = Provider.NAVER,
+                                    isLastLogin = isLastLogin,
+                                ) {
+                                    NaverIdLoginSDK.authenticate(
+                                        context = context,
+                                        launcher = naverLauncher
+                                    )
+                                }
+                            }
+                        )
 
-                SocialButton(Provider.KAKAO) {
-                    authViewModel.signInWithKakao(context)
-                }
+                        buttons.forEach { (provider, buttonContent) ->
+                            buttonContent( lastLoginProvider == provider )
+                        }
 
-                SocialButton(Provider.NAVER) {
-                    NaverIdLoginSDK.authenticate(
-                        context = context,
-                        launcher = naverLauncher
-                    )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                 }
             }
         }
@@ -207,11 +237,4 @@ fun RationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             Button(onClick = onDismiss) { Text("거부") }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginScreenPreview() {
-    val nav = rememberNavController()
-    LoginScreen(navController = nav)
 }

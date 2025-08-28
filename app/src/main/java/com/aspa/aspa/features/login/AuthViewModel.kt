@@ -13,6 +13,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
+import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.data.repository.AuthRepository
 import com.aspa.aspa.data.repository.FcmRepository
 import com.aspa.aspa.model.Provider
@@ -73,6 +74,7 @@ class AuthViewModel @Inject constructor(
     private val getCredentialRequest: GetCredentialRequest,
     private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
+    private val dataStoreManager: DataStoreManager,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -155,6 +157,10 @@ class AuthViewModel @Inject constructor(
                     .onSuccess { dto ->
                         Log.d(TAG, "성공하였습니다.")
                         _loginState.value = LoginState.Success(dto)
+                        updateFcmToken()
+                        getProvider()
+                        dataStoreManager.setLastLoginProvider(Provider.GOOGLE)
+
                         onSuccess()
                     }
                     .onFailure { e ->
@@ -174,6 +180,8 @@ class AuthViewModel @Inject constructor(
             .onSuccess {
                 _loginState.value = LoginState.Success(null)
                 updateFcmToken()
+                getProvider()
+                dataStoreManager.setLastLoginProvider(Provider.NAVER)
             }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
@@ -255,6 +263,10 @@ class AuthViewModel @Inject constructor(
                                 .addOnSuccessListener {
                                     Log.d("Firestore", "최근 로그인 정보 갱신 성공")
                                     updateFcmToken()
+                                    viewModelScope.launch {
+                                        dataStoreManager.setLastLoginProvider(Provider.KAKAO)
+                                    }
+                                    getProvider()
                                     _loginState.value = LoginState.Success(null)
                                 }
                                 .addOnFailureListener { e ->
@@ -278,6 +290,10 @@ class AuthViewModel @Inject constructor(
                                         .addOnSuccessListener {
                                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
                                             updateFcmToken()
+                                            viewModelScope.launch {
+                                                dataStoreManager.setLastLoginProvider(Provider.KAKAO) // ✅ suspend 안전하게 실행
+                                            }
+                                            getProvider()
                                             _loginState.value = LoginState.Success(null)
                                         }
                                         .addOnFailureListener { e ->
@@ -386,6 +402,10 @@ class AuthViewModel @Inject constructor(
                         ?.addOnSuccessListener {
                             Log.i("WITHDRAW", "✅ 파이어베이스 계정 삭제 완료")
                             _withdrawState.value = WithdrawState.Success
+
+                            viewModelScope.launch {
+                                dataStoreManager.setLastLoginProvider(null)
+                            }
 
                         }
                         ?.addOnFailureListener { e ->
