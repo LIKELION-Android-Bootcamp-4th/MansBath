@@ -20,10 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,23 +33,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.aspa.aspa.OnboardingDestinations
-import com.aspa.aspa.data.local.datastore.DataStoreManager
-import androidx.navigation.compose.rememberNavController
 import com.aspa.aspa.R
+import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
 import com.aspa.aspa.model.Provider
 import com.aspa.aspa.ui.theme.AppSpacing
-import com.aspa.aspa.model.Provider
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
 
@@ -158,9 +152,9 @@ fun LoginScreen(
                         Spacer(modifier = Modifier.height(AppSpacing.sm))
 
                         val buttons: List<Pair<Provider, @Composable (Boolean) -> Unit>> = listOf(
-                            Provider.GOOGLE to {isLastLogin ->
+                            Provider.GOOGLE to { isLastLogin ->
                                 SocialButton(
-                                    text = "Google로 계속하기",
+                                    provider = Provider.GOOGLE,
                                     isLastLogin = isLastLogin
                                 ) {
                                     authViewModel.signInWithGoogleCredential(
@@ -171,7 +165,7 @@ fun LoginScreen(
                             },
                             Provider.KAKAO to { isLastLogin ->
                                 SocialButton(
-                                    text = "카카오톡으로 계속하기",
+                                    provider = Provider.KAKAO,
                                     isLastLogin = isLastLogin,
                                 ) {
                                     authViewModel.signInWithKakao(context)
@@ -179,7 +173,7 @@ fun LoginScreen(
                             },
                             Provider.NAVER to { isLastLogin ->
                                 SocialButton(
-                                    text = "네이버로 계속하기",
+                                    provider = Provider.NAVER,
                                     isLastLogin = isLastLogin,
                                 ) {
                                     NaverIdLoginSDK.authenticate(
@@ -243,11 +237,4 @@ fun RationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             Button(onClick = onDismiss) { Text("거부") }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginScreenPreview() {
-    val nav = rememberNavController()
-    LoginScreen(navController = nav)
 }

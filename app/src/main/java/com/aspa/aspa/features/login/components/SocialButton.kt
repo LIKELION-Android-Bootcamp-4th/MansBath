@@ -1,8 +1,10 @@
 package com.aspa.aspa.features.login.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,7 +36,7 @@ fun SocialButton(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
     ) {
-        OutlinedButton(
+        Button(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth().height(48.dp),
             shape = RoundedCornerShape(6.75.dp),
@@ -52,31 +55,37 @@ fun SocialButton(
             ),
             contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
-            Icon(
-                painter = when(provider) {
-                    Provider.GOOGLE -> painterResource(id = R.drawable.google_login_logo)
-                    Provider.KAKAO -> painterResource(id = R.drawable.kakao_login_logo)
-                    Provider.NAVER -> painterResource(id = R.drawable.naver_login_logo)
-                },
-                contentDescription = when(provider) {
-                    Provider.GOOGLE -> "구글 아이콘"
-                    Provider.KAKAO -> "카카오 아이콘"
-                    Provider.NAVER -> "네이버 아이콘"
-                },
-                tint = Color.Unspecified,
-                modifier = when (provider) {
-                    Provider.NAVER -> Modifier.size(22.dp)
-                    else -> Modifier.size(18.dp)
-                }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = when (provider) {
-                    Provider.GOOGLE -> "구글 로그인"
-                    Provider.KAKAO -> "카카오 로그인"
-                    Provider.NAVER -> "네이버 로그인"
-                },
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    painter = when(provider) {
+                        Provider.GOOGLE -> painterResource(id = R.drawable.google_login_logo)
+                        Provider.KAKAO -> painterResource(id = R.drawable.kakao_login_logo)
+                        Provider.NAVER -> painterResource(id = R.drawable.naver_login_logo)
+                    },
+                    contentDescription = when(provider) {
+                        Provider.GOOGLE -> "구글 아이콘"
+                        Provider.KAKAO -> "카카오 아이콘"
+                        Provider.NAVER -> "네이버 아이콘"
+                    },
+                    tint = Color.Unspecified,
+                    modifier = when (provider) {
+                        Provider.NAVER -> Modifier.size(22.dp)
+                        else -> Modifier.size(18.dp)
+                    }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (provider) {
+                        Provider.GOOGLE -> "구글로 계속하기"
+                        Provider.KAKAO -> "카카오로 계속하기"
+                        Provider.NAVER -> "네이버로 계속하기"
+                    },
+                )
+            }
         }
 
         if (isLastLogin) {
