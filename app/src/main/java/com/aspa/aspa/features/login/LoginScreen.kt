@@ -77,7 +77,15 @@ fun LoginScreen(
         }
     )
 
-    LaunchedEffect(loginState, permissionState) {
+    LaunchedEffect(permissionState) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(permissionState is PermissionState.Idle) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
             val redirect = navController.currentBackStackEntry
                 ?.arguments?.getString("redirect")
@@ -99,11 +107,6 @@ fun LoginScreen(
                         popUpTo(0) { inclusive = true }
                     }
                 }
-            }
-        }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if(permissionState is PermissionState.Idle) {
-                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
