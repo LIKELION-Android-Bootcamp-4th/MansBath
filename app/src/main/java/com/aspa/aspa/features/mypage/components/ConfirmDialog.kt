@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.aspa.aspa.ui.theme.withdraw
 
 enum class DialogType {
     LOGOUT,
@@ -43,7 +44,7 @@ fun ConfirmDialog(
                 Text(
                     text = "예",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.withdraw
                 )
             }
         },
