@@ -1,7 +1,6 @@
 package com.aspa.aspa.features.roadmap
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -61,6 +60,7 @@ fun RoadmapDialog(
     viewModel: RoadmapViewModel = hiltViewModel()
 ) {
     val roadmapState by viewModel.roadmapState.collectAsState()
+    val studyExist by viewModel.studyExistState.collectAsState()
     val quizExist by viewModel.quizExistState.collectAsState()
     val context = LocalContext.current
 
@@ -224,18 +224,34 @@ fun RoadmapDialog(
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Button(  // 학습 버튼
                                     onClick = {
-                                        openDialog = false
-                                        navigateAfterDismiss = true
+                                        when (studyExist) {
+                                            true -> {
+                                                openDialog = false
+                                                navigateAfterDismiss = true
 
-                                        navController.popBackStack()
-                                        Log.d("MYTAG", "qid: ${roadmap.questionId}")
-                                        navController.navigate(
-                                            StudyScreenRoute.Study.study(
-                                                roadmapId,
-                                                sectionId,
-                                                roadmap.questionId
+                                                navController.popBackStack()
+                                                navController.navigate(
+                                                    StudyScreenRoute.Study.study(
+                                                        roadmapId,
+                                                        sectionId,
+                                                        roadmap.questionId
+                                                    )
+                                                )
+                                            }
+
+                                            false -> Toast.makeText(
+                                                context,
+                                                "학습 생성 중입니다.. 잠시만 기다려주세요.",
+                                                Toast.LENGTH_SHORT
                                             )
-                                        )
+                                                .show()
+
+                                            null -> Toast.makeText(
+                                                context,
+                                                "학습 탐색 중..",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     },
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.buttonColors(
