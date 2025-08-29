@@ -41,10 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.R
-import com.aspa.aspa.data.local.datastore.DataStoreManager
+import com.aspa.aspa.core.constants.enums.Provider
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
-import com.aspa.aspa.model.Provider
+import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
 import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
@@ -52,7 +52,6 @@ import com.navercorp.nid.NaverIdLoginSDK
 @Composable
 fun LoginScreen(
     navController: NavController,
-    dataStoreManager: DataStoreManager,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -61,8 +60,8 @@ fun LoginScreen(
         onSuccess = {},
     )
     val loginState by authViewModel.loginState.collectAsState()
-    val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
-    val lastLoginProvider by dataStoreManager.lastLoginProvider.collectAsState(initial = null)
+    val isOnboardingCompleted by authViewModel.isOnboardingCompleted.collectAsState(initial = false)
+    val lastLoginProvider by authViewModel.lastLoginProvider.collectAsState(initial = null)
 
     val permissionState by authViewModel.permissionState.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -78,22 +77,36 @@ fun LoginScreen(
         }
     )
 
-    LaunchedEffect(loginState, permissionState) {
-        if (loginState is LoginState.Success) {
-            if (isOnboardingCompleted) {
-                navController.navigate(MainDestinations.MAIN) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
-            } else {
-                navController.navigate(OnboardingDestinations.ONBOARDING) {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
-        }
+    LaunchedEffect(permissionState) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(permissionState is PermissionState.Idle) {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            val redirect = navController.currentBackStackEntry
+                ?.arguments?.getString("redirect")
+
+            when {
+                redirect == "roadmap" -> {  // 위젯의 경우 바로 이동
+                    navController.navigate(RoadmapDestinations.roadmapList(fromWidget = true)) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                isOnboardingCompleted -> {  // 온보딩 검사
+                    navController.navigate(MainDestinations.MAIN) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+                else -> {  // 온보딩 검사
+                    navController.navigate(OnboardingDestinations.ONBOARDING) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             }
         }
     }

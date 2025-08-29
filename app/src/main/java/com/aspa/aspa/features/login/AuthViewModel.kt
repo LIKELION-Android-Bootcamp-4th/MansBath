@@ -12,11 +12,11 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aspa.aspa.core.constants.enums.Provider
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.data.repository.AuthRepository
 import com.aspa.aspa.data.repository.FcmRepository
-import com.aspa.aspa.model.Provider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -35,6 +35,7 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -94,8 +95,12 @@ class AuthViewModel @Inject constructor(
     private val _nicknameState = MutableStateFlow<String>("조회 중..")
     val nicknameState: StateFlow<String> = _nicknameState
 
+    val isOnboardingCompleted: Flow<Boolean> = dataStoreManager.isOnboardingCompleted
+
     private val _providerState = MutableStateFlow<Provider?>(null)
     val providerState: StateFlow<Provider?> = _providerState
+
+    val lastLoginProvider: Flow<Provider?> = dataStoreManager.lastLoginProvider
 
     private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
     val permissionState = _permissionState.asStateFlow()

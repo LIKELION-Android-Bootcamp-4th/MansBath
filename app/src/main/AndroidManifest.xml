@@ -17,14 +17,52 @@
         android:theme="@style/Theme.Aspa"
         tools:targetApi="31"
         >
+<!--        로드맵 위젯-->
+        <receiver
+            android:name=".features.widget.RoadmapWidgetProvider"
+            android:label="로드맵 바로가기"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/roadmap_widget_info" />
+        </receiver>
+<!--        로드맵 상태 추적 위젯-->
+        <receiver
+            android:name=".features.widget.RoadmapStatusWidgetProvider"
+            android:label="로드맵 상태 추적하기"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/roadmap_status_widget_info" />
+        </receiver>
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Aspa">
+            <!-- 앱 런처 전용 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- 딥링크 전용 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="aspa" android:host="roadmap" />
             </intent-filter>
         </activity>
         <activity

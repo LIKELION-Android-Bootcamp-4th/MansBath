@@ -14,7 +14,6 @@ object LoginDestinations {
 
 fun NavGraphBuilder.loginGraph(
     navController: NavController,
-    dataStoreManager: DataStoreManager
 ) {
     navigation(
         startDestination = LoginDestinations.LOGIN,
@@ -23,7 +22,6 @@ fun NavGraphBuilder.loginGraph(
         composable(LoginDestinations.LOGIN) {
             LoginScreen(
                 navController,
-                dataStoreManager
             )
         }
     }
