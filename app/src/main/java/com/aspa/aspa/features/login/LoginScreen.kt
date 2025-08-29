@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -147,9 +148,11 @@ fun LoginScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                         modifier = Modifier.padding(AppSpacing.xl)
                     ) {
+                        Spacer(modifier = Modifier.height(AppSpacing.xl))
+
                         Image(
                             painter = painterResource(id = R.drawable.aspalogo),
                             contentDescription = "Aspa",
@@ -162,7 +165,7 @@ fun LoginScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        Spacer(modifier = Modifier.height(AppSpacing.sm))
+                        Spacer(modifier = Modifier.height(AppSpacing.xl))
 
                         val buttons: List<Pair<Provider, @Composable (Boolean) -> Unit>> = listOf(
                             Provider.GOOGLE to { isLastLogin ->
@@ -198,7 +201,13 @@ fun LoginScreen(
                         )
 
                         buttons.forEach { (provider, buttonContent) ->
-                            buttonContent( lastLoginProvider == provider )
+                            Box(
+                                modifier = Modifier.zIndex(
+                                    if (lastLoginProvider == provider) 1f else 0f
+                                )
+                            ) {
+                                buttonContent(lastLoginProvider == provider)
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(4.dp))
