@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--updatePeriodMillis의 경우 0으로 고정-->
+<!--업데이트 필요 시 위젯매니저 사용할 것-->
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="72dp"
+    android:minHeight="72dp"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/roadmap_widget"
+    android:previewLayout="@layout/roadmap_widget"
+    android:resizeMode="horizontal|vertical" />
