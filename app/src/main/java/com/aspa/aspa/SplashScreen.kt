@@ -14,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aspa.aspa.core.constants.enums.RedirectType
-import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.main.navigation.MainDestinations
 import com.google.firebase.auth.FirebaseAuth
@@ -30,10 +30,10 @@ object SplashDestinations {
 @Composable
 fun SplashScreen (
     navController: NavHostController,
-    dataStoreManager: DataStoreManager
+    viewModel: DataStoreViewModel = hiltViewModel()
 ) {
-    val auth = FirebaseAuth.getInstance()
-    val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
+    val auth = FirebaseAuth.getInstance()  // todo: 뷰모델 사용
+    val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState(initial = false)
     val activity = LocalActivity.current
     val deepLinkData = activity?.intent?.data
     val deepLinkQueryParam = deepLinkData?.getQueryParameter("fromWidget")?.toBoolean() ?: false

@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.main.navigation.MainDestinations
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,7 @@ object OnboardingDestinations {
 @Composable
 fun OnboardingScreen(
     navController: NavHostController,
-    dataStoreManager: DataStoreManager
+    viewModel: DataStoreViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState(pageCount = { 4 })
     val scope = rememberCoroutineScope()
@@ -74,7 +74,7 @@ fun OnboardingScreen(
                     text = "다시 보지 않기",
                     modifier = Modifier.clickable {
                         scope.launch {
-                            dataStoreManager.setIsOnboardingCompleted(true)
+                            viewModel.setIsOnboardingCompleted(true)
                         }
 
                         navController.navigate(MainDestinations.MAIN) {
@@ -90,7 +90,7 @@ fun OnboardingScreen(
                     text = "닫기",
                     modifier = Modifier.clickable {
                         scope.launch {
-                            dataStoreManager.setIsOnboardingCompleted(false)
+                            viewModel.setIsOnboardingCompleted(false)
                         }
 
                         navController.navigate(MainDestinations.MAIN) {
