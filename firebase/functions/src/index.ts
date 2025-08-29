@@ -1,0 +1,22 @@
+import * as admin from "firebase-admin";
+import {setGlobalOptions} from "firebase-functions/v2";
+
+// Initialization
+setGlobalOptions(
+  {
+    region: "asia-northeast3",
+    invoker: "public",
+  }
+);
+
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
+// Functions
+export * from "./question/question";
+export * from "./roadmap/roadmap";
+export * from "./quiz/quiz";
+export * from "./auth/naver";
+export * from "./auth/withdraw";
+export * from "./Study/study";
