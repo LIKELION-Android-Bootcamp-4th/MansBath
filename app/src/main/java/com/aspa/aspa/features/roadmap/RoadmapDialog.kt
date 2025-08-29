@@ -69,6 +69,7 @@ fun RoadmapDialog(
 
     LaunchedEffect(Unit) {
         viewModel.loadRoadmap(roadmapId)
+        viewModel.isStudyExist(roadmapId, sectionId)
         viewModel.isQuizExist(roadmapId, sectionId)
     }
 
