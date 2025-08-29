@@ -56,6 +56,19 @@ class RoadmapRemoteDataSource @Inject constructor(
         return roadmapId
     }
 
+    suspend fun isStudyExist(roadmapId: String, sectionId: Int): Boolean {
+        val snapshot = firestore.collection("users")
+            .document(auth.currentUser!!.uid)
+            .collection("studies")
+            .whereEqualTo("roadmapId", roadmapId)
+            .whereEqualTo("sectionId", sectionId)
+            .get()
+            .await()
+
+        return !snapshot.isEmpty
+        // return snapshot.exists()
+    }
+
     suspend fun isQuizExist(roadmapId: String, sectionId: Int): Boolean {
         val snapshot = firestore.collection("users")
             .document(auth.currentUser!!.uid)
