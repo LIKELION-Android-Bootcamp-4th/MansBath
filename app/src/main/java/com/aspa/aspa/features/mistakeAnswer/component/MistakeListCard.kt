@@ -55,14 +55,14 @@ fun MistakeListCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "날짜:",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(Modifier.width(AppSpacing.sm))
                 Text(
                     text = currentAt,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -74,14 +74,14 @@ fun MistakeListCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "틀린문제:",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(Modifier.width(AppSpacing.sm))
                 Text(
                     text = "${index}개",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold
                 )

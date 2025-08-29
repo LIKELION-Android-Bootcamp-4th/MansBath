@@ -125,7 +125,7 @@ fun QuestionCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lightbulb,
-                                tint = MaterialTheme.colorScheme.tertiary,
+                                tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )

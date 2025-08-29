@@ -7,6 +7,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import com.aspa.aspa.ui.theme.withdraw
 
+
 enum class DialogType {
     LOGOUT,
     WITHDRAW,

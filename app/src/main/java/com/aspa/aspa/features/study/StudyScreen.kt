@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -86,7 +87,7 @@ fun StudyScreen(
                 content = { padding ->
                     Column(
                         modifier = Modifier
-                            .padding(padding)
+                            .padding(top = padding.calculateTopPadding())
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.background)
                     ) {
@@ -130,10 +131,12 @@ fun StudyScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         LazyColumn(
-                            contentPadding = PaddingValues(bottom = 24.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 10.dp),
+
+
                         ) {
                             itemsIndexed(contentList) { index, detail ->
                                 ContentCard(
@@ -148,7 +151,7 @@ fun StudyScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(44.dp)
+                                        .height(30.dp)
                                         .background(
                                             MaterialTheme.colorScheme.primary,
                                             shape = MaterialTheme.shapes.large

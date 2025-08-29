@@ -128,9 +128,6 @@ fun StudyDetailScreen(
                                 start = 16.dp,
                                 end = 16.dp,
                                 top = 12.dp,
-                                bottom = WindowInsets.navigationBars
-                                    .asPaddingValues()
-                                    .calculateBottomPadding()
                             ),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
