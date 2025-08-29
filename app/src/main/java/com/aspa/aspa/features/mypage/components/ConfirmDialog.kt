@@ -20,6 +20,7 @@ fun ConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
+        containerColor = MaterialTheme.colorScheme.background,
         title = {
             Text(
                 text = text,
@@ -42,7 +43,7 @@ fun ConfirmDialog(
                 Text(
                     text = "예",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },
