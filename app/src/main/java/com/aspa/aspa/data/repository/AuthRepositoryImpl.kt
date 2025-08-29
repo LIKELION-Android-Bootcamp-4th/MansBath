@@ -68,7 +68,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun fetchProvider(): Result<Provider> = runCatching {
         val provider = userDs.fecthProvider()
-        Log.d("LOGOUT", "provider: $provider")
+        Log.d("PROVIDER", "provider: $provider")
         when (provider) {
             "google" -> Provider.GOOGLE
             "kakao" -> Provider.KAKAO
@@ -76,6 +76,15 @@ class AuthRepositoryImpl @Inject constructor(
             else -> throw IllegalStateException("❌ Unknown provider")
         }
     }.onFailure { e ->
-        Log.e("LOGOUT", "❌ fetchProvider FAILED: ${e.javaClass.simpleName} ${e.message}", e)
+        Log.e("PROVIDER", "❌ fetchProvider FAILED: ${e.javaClass.simpleName} ${e.message}", e)
+    }
+
+    override suspend fun fetchNickname(): Result<String> = runCatching {
+        val nickname = userDs.fetchNickname()
+        Log.d("NICKNAME", "nickname: $nickname")
+
+        nickname
+    }.onFailure { e ->
+        Log.e("NICKNAME", "❌ fetchNickname FAILED: ${e.javaClass.simpleName} ${e.message}", e)
     }
 }

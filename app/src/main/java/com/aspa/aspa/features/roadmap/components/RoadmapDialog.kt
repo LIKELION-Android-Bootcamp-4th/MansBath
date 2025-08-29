@@ -67,7 +67,7 @@ fun RoadmapDialog(
 
     LaunchedEffect(Unit) {
         viewModel.loadRoadmap(roadmapId)
-        viewModel.isQuizExist(roadmapId)
+        viewModel.isQuizExist(roadmapId, sectionId)
     }
 
     val context = LocalContext.current
@@ -78,7 +78,7 @@ fun RoadmapDialog(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -88,11 +88,11 @@ fun RoadmapDialog(
 
             Dialog(onDismissRequest = { navController.popBackStack() }) {
                 Surface(
-                    shape = RoundedCornerShape(8.75.dp),
-                    color = Color.White,
-                    tonalElevation = 8.dp,
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 4.dp,
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         // 제목 & 닫기 버튼
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -101,83 +101,72 @@ fun RoadmapDialog(
                             Icon(
                                 imageVector = Icons.Default.Computer,
                                 contentDescription = null,
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = section.title,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            Box(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .padding(top = 0.dp),
-                                contentAlignment = Alignment.TopEnd
+                            IconButton(
+                                onClick = { navController.popBackStack() },
+                                modifier = Modifier.size(24.dp)
                             ) {
-                                IconButton(
-                                    onClick = { navController.popBackStack() },
-                                    modifier = Modifier
-                                        .size(12.dp) // 충분한 터치 영역 확보
-                                        .padding(0.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "닫기",
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "닫기",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = section.concept,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // 기간 + 상태
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.75.dp))
-                                    .background(Color.White, RoundedCornerShape(6.75.dp))
-                                    .border(
-                                        BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f)),
-                                        RoundedCornerShape(6.75.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                color = MaterialTheme.colorScheme.surface
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center,
-                                    modifier = Modifier.align(Alignment.Center)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Schedule,
                                         contentDescription = null,
-                                        modifier = Modifier.size(12.dp)
+                                        modifier = Modifier.size(14.dp),
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = section.duration,
                                         style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Normal
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .background(Color(0xFFECEEF2), RoundedCornerShape(6.75.dp))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = if (section.status) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant
                             ) {
                                 Text(
                                     text = if (section.status) "완료" else "진행 예정",
                                     style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Normal
+                                    color = if (section.status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
                             }
                         }
@@ -186,20 +175,25 @@ fun RoadmapDialog(
 
                         // 학습 개념 (description 사용)
                         Row(verticalAlignment = Alignment.Top) {
-                            Icon(Icons.Outlined.Lightbulb, contentDescription = null)
+                            Icon(
+                                Icons.Outlined.Lightbulb,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "학습 개념",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        Spacer(modifier = Modifier.height(7.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
                             modifier = Modifier.padding(horizontal = 12.dp),
                             text = section.description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF717182)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -209,15 +203,20 @@ fun RoadmapDialog(
                             Button(  // 학습 버튼
                                 onClick = {
                                     Log.d("MYTAG", "qid: ${roadmap.questionId}")
-                                    navController.navigate(StudyScreenRoute.Study.study(roadmapId, sectionId, roadmap.questionId))
+                                    navController.navigate(
+                                        StudyScreenRoute.Study.study(
+                                            roadmapId,
+                                            sectionId,
+                                            roadmap.questionId
+                                        )
+                                    )
                                 },
-                                modifier = Modifier
-                                    .weight(1f),
+                                modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF030213),
-                                    contentColor = Color.White
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
-                                shape = RoundedCornerShape(6.75.dp)
+                                shape = MaterialTheme.shapes.small
                             ) {
                                 Text("학습 시작하기", style = MaterialTheme.typography.bodySmall)
                             }
@@ -233,21 +232,24 @@ fun RoadmapDialog(
                                                 launchSingleTop = true
                                             }
                                         }
-                                        false -> Toast.makeText(context, "퀴즈가 존재하지 않습니다.\n먼저 학습을 시작해주세요.", Toast.LENGTH_SHORT).show()
-                                        null -> Toast.makeText(context, "퀴즈 탐색 중..", Toast.LENGTH_SHORT).show()
+                                        false -> Toast.makeText(
+                                            context,
+                                            "퀴즈가 존재하지 않습니다.\n먼저 학습을 시작해주세요.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        null -> Toast.makeText(
+                                            context,
+                                            "퀴즈 탐색 중..",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 },
-                                modifier = Modifier
-                                    .weight(1f),
+                                modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.Black,
-                                    containerColor = Color.White
+                                    contentColor = MaterialTheme.colorScheme.primary
                                 ),
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = Color.Black.copy(alpha = 0.1f)
-                                ),
-                                shape = RoundedCornerShape(6.75.dp)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                shape = MaterialTheme.shapes.small
                             ) {
                                 Text("퀴즈 풀기", style = MaterialTheme.typography.bodySmall)
                             }
@@ -257,10 +259,11 @@ fun RoadmapDialog(
             }
         }
 
-        is RoadmapState.Error -> Text("❌ 에러 발생: ${state.message}")
+        is RoadmapState.Error -> Text(
+            "❌ 에러 발생: ${state.message}",
+            color = MaterialTheme.colorScheme.error
+        )
     }
-
-
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

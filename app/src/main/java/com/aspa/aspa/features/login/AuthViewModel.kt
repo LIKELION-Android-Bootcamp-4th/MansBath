@@ -1,16 +1,22 @@
 package com.aspa.aspa.features.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspa.aspa.data.dto.UserProfileDto
+import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.data.repository.AuthRepository
-import com.aspa.aspa.core.constants.enums.Provider
+import com.aspa.aspa.data.repository.FcmRepository
+import com.aspa.aspa.model.Provider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -28,8 +34,11 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,13 +61,21 @@ sealed interface WithdrawState {
     data class Error(val message: String?) : WithdrawState
 }
 
+sealed class PermissionState {
+    object Idle : PermissionState() // 초기 상태
+    object Granted : PermissionState() // 권한 허용
+    data class Denied(val shouldShowRationale: Boolean) : PermissionState() // 권한 거부
+}
 
 @HiltViewModel //viewModel 등록 및 생성
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val credentialManager: CredentialManager,
     private val getCredentialRequest: GetCredentialRequest,
+    private val fcmRepository: FcmRepository,
     private val auth: FirebaseAuth,
+    private val dataStoreManager: DataStoreManager,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     companion object {
@@ -73,6 +90,31 @@ class AuthViewModel @Inject constructor(
 
     private val _withdrawState = MutableStateFlow<WithdrawState>(WithdrawState.Idle)
     val withdrawState = _withdrawState.asStateFlow()
+
+    private val _nicknameState = MutableStateFlow<String>("조회 중..")
+    val nicknameState: StateFlow<String> = _nicknameState
+
+    private val _providerState = MutableStateFlow<Provider?>(null)
+    val providerState: StateFlow<Provider?> = _providerState
+
+    private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
+    val permissionState = _permissionState.asStateFlow()
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (isGranted) {
+                _permissionState.update { PermissionState.Granted }
+            } else {
+                // 아직 권한이 없다면 초기 상태(Idle)를 유지
+                _permissionState.update { PermissionState.Idle }
+            }
+        }
+    }
 
     fun signInWithGoogleCredential(activity: Activity, onSuccess: () -> Unit) {
 
@@ -115,6 +157,10 @@ class AuthViewModel @Inject constructor(
                     .onSuccess { dto ->
                         Log.d(TAG, "성공하였습니다.")
                         _loginState.value = LoginState.Success(dto)
+                        updateFcmToken()
+                        getProvider()
+                        dataStoreManager.setLastLoginProvider(Provider.GOOGLE)
+
                         onSuccess()
                     }
                     .onFailure { e ->
@@ -131,7 +177,12 @@ class AuthViewModel @Inject constructor(
     fun signInWithNaver(accessToken: String?) = viewModelScope.launch {
         _loginState.value = LoginState.Loading
         authRepository.signInWithNaver(accessToken)
-            .onSuccess { _loginState.value = LoginState.Success(null) }
+            .onSuccess {
+                _loginState.value = LoginState.Success(null)
+                updateFcmToken()
+                getProvider()
+                dataStoreManager.setLastLoginProvider(Provider.NAVER)
+            }
             .onFailure { e ->
                 _loginState.value = LoginState.Error(e.message ?: "❌ 네이버 로그인 실패")
             }
@@ -211,6 +262,11 @@ class AuthViewModel @Inject constructor(
                             userDoc.update("lastLogin", FieldValue.serverTimestamp())
                                 .addOnSuccessListener {
                                     Log.d("Firestore", "최근 로그인 정보 갱신 성공")
+                                    updateFcmToken()
+                                    viewModelScope.launch {
+                                        dataStoreManager.setLastLoginProvider(Provider.KAKAO)
+                                    }
+                                    getProvider()
                                     _loginState.value = LoginState.Success(null)
                                 }
                                 .addOnFailureListener { e ->
@@ -233,6 +289,11 @@ class AuthViewModel @Inject constructor(
                                         .set(userProfile)
                                         .addOnSuccessListener {
                                             Log.d("Firestore", "Firestore에 사용자 프로필 저장 성공!")
+                                            updateFcmToken()
+                                            viewModelScope.launch {
+                                                dataStoreManager.setLastLoginProvider(Provider.KAKAO) // ✅ suspend 안전하게 실행
+                                            }
+                                            getProvider()
                                             _loginState.value = LoginState.Success(null)
                                         }
                                         .addOnFailureListener { e ->
@@ -264,6 +325,8 @@ class AuthViewModel @Inject constructor(
 
     fun signOut(context: Context) {
         viewModelScope.launch {
+            // fcm 토큰 삭제
+            deleteFcmToken()
             // 소셜 로그아웃
             authRepository.fetchProvider()
                 .onSuccess { provider ->
@@ -328,6 +391,8 @@ class AuthViewModel @Inject constructor(
 
     fun withdraw(context: Context) {
         viewModelScope.launch {
+
+            dataStoreManager.setIsOnboardingCompleted(false)
             // 소셜 unlink
             authRepository.fetchProvider()
                 .onSuccess { provider ->
@@ -341,6 +406,10 @@ class AuthViewModel @Inject constructor(
                         ?.addOnSuccessListener {
                             Log.i("WITHDRAW", "✅ 파이어베이스 계정 삭제 완료")
                             _withdrawState.value = WithdrawState.Success
+
+                            viewModelScope.launch {
+                                dataStoreManager.setLastLoginProvider(null)
+                            }
 
                         }
                         ?.addOnFailureListener { e ->
@@ -380,7 +449,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun withdrawNaver() {
-        NidOAuthLogin().callDeleteTokenApi(object: OAuthLoginCallback {
+        NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
             }
@@ -400,4 +469,48 @@ class AuthViewModel @Inject constructor(
         _withdrawState.value = WithdrawState.Idle
     }
 
+    // =================================================================================
+
+    fun getProvider() {
+        viewModelScope.launch {
+            authRepository.fetchProvider()
+                .onSuccess { provider -> _providerState.value = provider }
+                .onFailure {e ->
+                    _providerState.value = null
+                    Log.e("PROVIDER", "${e.message}")
+                }
+        }
+    }
+
+    fun getNickname() {
+        viewModelScope.launch {
+            authRepository.fetchNickname()
+                .onSuccess { nickname ->
+                    _nicknameState.value = nickname
+                }
+        }
+    }
+
+    fun updateFcmToken() {
+        viewModelScope.launch {
+            val token = fcmRepository.getToken()
+            if (token != null) {
+                fcmRepository.updateFcmToken(auth.uid!!, token)
+            }
+        }
+    }
+    
+    fun deleteFcmToken() {
+        viewModelScope.launch {
+            fcmRepository.deleteFcmToken(auth.uid!!)
+        }
+    }
+    
+    fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
+        if (isGranted) {
+            _permissionState.update { PermissionState.Granted }
+        } else {
+            _permissionState.update { PermissionState.Denied(shouldShowRationale) }
+        }
+    }
 }

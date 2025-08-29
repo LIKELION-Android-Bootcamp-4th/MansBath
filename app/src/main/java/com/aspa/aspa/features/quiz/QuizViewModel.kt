@@ -39,7 +39,7 @@ enum class SolvingState {
 class QuizViewModel @Inject constructor(
     private val repository: QuizRepository,
     private val auth: FirebaseAuth,
-    private val roadmapRepository: RoadmapRepository
+    private val roadmapRepository: RoadmapRepository,
 ) : ViewModel() {
 
     private val _quizListState = MutableStateFlow<QuizListState>(QuizListState.Loading)
@@ -54,8 +54,14 @@ class QuizViewModel @Inject constructor(
     private val _chosenAnswerList = MutableStateFlow(List(10) { "" })
     val chosenAnswerList: StateFlow<List<String>> = _chosenAnswerList
 
+    private val _expandedIndex = MutableStateFlow<Int>(-1)
+    val expandedIndex: StateFlow<Int> = _expandedIndex
+
     private val _currentRoadmapId = MutableStateFlow<String>("")
     val currentRoadmapId: StateFlow<String> = _currentRoadmapId
+
+    private val _lazyListStateIndex = MutableStateFlow<Int>(0)
+    val lazyListStateIndex: StateFlow<Int> = _lazyListStateIndex
 
     private val userUid = auth.currentUser!!.uid
 
@@ -96,22 +102,13 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    /*fun getRoadmap(roadmapId: String) {
-        viewModelScope.launch {
-            roadmapRepository.fetchRoadmap(roadmapId)
-                .onSuccess {
-                    if(it != null) {
-                        it.title
-                    }
-                    else
+    fun changeExpandedIndex(index: Int) {
+        _expandedIndex.value = index
+    }
 
-                }
-                .onFailure { e ->
-
-                }
-        }
-    }*/
-
+    fun saveLazyListStateIndex(index: Int) {
+        _lazyListStateIndex.value = index
+    }
 
     fun deleteQuiz(roadmapId: String, quizTitle: String) {
         viewModelScope.launch {
@@ -146,27 +143,6 @@ class QuizViewModel @Inject constructor(
                     Log.e("QuizViewModel", "퀴즈 생성 실패", e)
                     _quizState.value = QuizState.Error(e.message ?: "알 수 없는 오륲")
                 }
-        }
-    }
-
-    fun requestQuizFromRoadmap(roadmapId: String, sectionId: Int) {
-        viewModelScope.launch {
-            _quizListState.value = QuizListState.Loading
-            Log.d("QuizViewModel", "로드맵을 통한 퀴즈 생성 중: $roadmapId")
-            repository.makeQuizFromRoadmap(userUid, roadmapId, sectionId)
-                .onSuccess { quiz ->
-                    Log.d("QuizViewModel", "퀴즈 생성 성공")
-                    if (quiz.quizTitle != "") {
-                        getQuizzes()
-                    } else {
-                        _quizListState.value = QuizListState.Error("요청한 스터디 데이터가 잘못되었습니다.")
-                    }
-                }
-                .onFailure { e ->
-                    Log.e("QuizViewModel", "퀴즈 생성 실패", e)
-                    _quizListState.value = QuizListState.Error(e.message ?: "알 수 없는 오륲")
-                }
-
         }
     }
 
@@ -208,6 +184,10 @@ class QuizViewModel @Inject constructor(
         _solvingValue.value = 0
         _chosenAnswerList.value = List(10) { "" }
 
+    }
+
+    fun clearChosen() {
+        _chosenAnswerList.value = List(10) { "" }
     }
 
     fun syncChosenToQuestions() {

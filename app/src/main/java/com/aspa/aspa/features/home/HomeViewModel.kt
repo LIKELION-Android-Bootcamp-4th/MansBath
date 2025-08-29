@@ -24,7 +24,8 @@ import javax.inject.Inject
 
 data class QuestionHistory(
     val id: String,
-    val title: String
+    val title: String,
+    val hasRoadmap: Boolean
 )
 
 data class HomeUiState(
@@ -93,7 +94,13 @@ class HomeViewModel @Inject constructor(
                     return@addSnapshotListener
                 }
                 val histories = snapshots?.map { doc ->
-                    QuestionHistory(id = doc.id, title = doc.getString("title") ?: "제목 없음")
+                    val hasRoadmap = doc.getString("roadmapId") != null
+
+                    QuestionHistory(
+                        id = doc.id,
+                        title = doc.getString("title") ?: "제목 없음",
+                        hasRoadmap = hasRoadmap
+                    )
                 } ?: emptyList()
                 _uiState.update { it.copy(isLoading = false, questionHistories = histories) }
             }

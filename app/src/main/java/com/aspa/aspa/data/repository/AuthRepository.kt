@@ -10,4 +10,5 @@ interface AuthRepository {
     suspend fun signInWithNaver(accessToken: String?): Result<Any>
 
     suspend fun fetchProvider(): Result<Provider>
+    suspend fun fetchNickname(): Result<String>
 }

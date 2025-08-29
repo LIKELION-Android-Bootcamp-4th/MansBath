@@ -61,18 +61,32 @@ class StudyViewModel @Inject constructor(
         }
     }
 
+
     // TODO: 트랜잭션 처리시 제거..
-    fun makeQuiz() {
+    fun navigateOrMakeQuiz() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId, sectionId)
+            repository.quizExists(roadmapId, sectionId)
                 .onSuccess {
-                    _makeQuizFlow.emit(MakeQuizState.Navigate)
+                    if(it) _makeQuizFlow.emit(MakeQuizState.Navigate)
+                    else {
+                        _uiState.value = UiState.Loading
+                        _makeQuizFlow.emit(MakeQuizState.Waiting)
+                        quizRepository.makeQuizFromRoadmap(auth.currentUser!!.uid, roadmapId, sectionId)
+                            .onSuccess {
+                                _makeQuizFlow.emit(MakeQuizState.Navigate)
+                            }
+                            .onFailure {
+                                android.util.Log.e("StudyVM", "makeQuiz failed", it)
+                                _uiState.value = UiState.Failure(it.message ?: "퀴즈 생성 중 에러 발생")
+                            }
+                    }
                 }
                 .onFailure {
-                    android.util.Log.e("StudyVM", "makeQuiz failed", it)
-                    _uiState.value = UiState.Failure(it.message ?: "퀴즈 생성 중 에러 발생")
+                    android.util.Log.e("StudyVM", "quizExists failed", it)
+                    _uiState.value = UiState.Failure(it.message ?: "퀴즈 검색 중 에러 발생")
                 }
+
+
         }
     }
 

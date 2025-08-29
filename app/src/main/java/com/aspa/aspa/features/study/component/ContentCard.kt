@@ -28,14 +28,18 @@ import com.aspa.aspa.ui.theme.Blue
 import com.aspa.aspa.ui.theme.Gray10
 
 @Composable
-fun ContentCard(number : Int, title : String,description : List<String>){
+fun ContentCard(
+    number: Int,
+    title: String,
+    description: List<String>
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Gray10),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -45,14 +49,14 @@ fun ContentCard(number : Int, title : String,description : List<String>){
             ) {
                 Box(
                     modifier = Modifier
-                        .size(20.dp)
-                        .background(Blue, shape = CircleShape),
+                        .size(22.dp)
+                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     Text(
                         text = number.toString(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -60,25 +64,30 @@ fun ContentCard(number : Int, title : String,description : List<String>){
                 Text(
                     text = title,
                     fontWeight = FontWeight.SemiBold,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                description.forEach{
-                    Row(verticalAlignment = Alignment.CenterVertically){
+                description.forEach {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(5.dp)
-                                .background(Blue, shape = CircleShape)
+                                .size(6.dp)
+                                .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(it, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
         }
     }
-
 }

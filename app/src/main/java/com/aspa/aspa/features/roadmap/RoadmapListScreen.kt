@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +78,11 @@ private fun GenerateRoadmapSection(generateState: Boolean?) {
     when (generateState) {
         null -> LoadingContent("로드맵 생성 중..")
         true -> Unit // 성공 시 바로 Detail로 이동되므로 UI 없음
-        false -> Text("❌ 로드맵 생성 실패")
+        false -> Text(
+            "❌ 로드맵 생성 실패",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }
 
@@ -91,7 +96,11 @@ private fun RoadmapListSection(
 
     when (state) {
         is RoadmapListState.Loading -> LoadingContent("로드맵 조회 중..")
-        is RoadmapListState.Empty -> Text("로드맵이 존재하지 않습니다.")
+        is RoadmapListState.Empty -> Text(
+            "로드맵이 존재하지 않습니다.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         is RoadmapListState.Success -> {
             LazyColumn {
                 items(state.roadmaps.size) { index ->
@@ -122,10 +131,13 @@ private fun RoadmapListSection(
                 }
             }
         }
-        is RoadmapListState.Error -> Text("❌ 에러 발생: ${state.message}")
+        is RoadmapListState.Error -> Text(
+            "❌ 에러 발생: ${state.message}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }
-
 
 @Composable
 private fun LoadingContent(message: String) {
@@ -134,15 +146,17 @@ private fun LoadingContent(message: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(message)
+        Text(
+            message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(Modifier.height(16.dp))
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }
 
-
-
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun RoadmapListScreenPreview() {
@@ -158,4 +172,4 @@ fun RoadmapListScreenPreview() {
             fromWidget = false,
         )
     }
-}
+}*/

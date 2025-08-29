@@ -1,6 +1,7 @@
 package com.aspa.aspa.features.main
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
@@ -26,6 +27,7 @@ import com.aspa.aspa.features.main.navigation.MainNavigation
 import com.aspa.aspa.features.mypage.navigation.MypageDestination
 import com.aspa.aspa.features.quiz.navigation.QuizDestinations
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
+import com.aspa.aspa.ui.components.MistakeNav.MistakeDestinations
 import com.aspa.aspa.util.DoubleBackExitHandler
 import kotlinx.coroutines.launch
 
@@ -75,6 +77,7 @@ fun MainScreen(
                     RoadmapDestinations.ROADMAP_LIST -> CommonTopBar("학습 로드맵", "단계별로 체계적인 학습을 진행하세요")
                     QuizDestinations.QUIZ -> CommonTopBar("퀴즈", "학습한 내용을 확인해 보세요")
                     MypageDestination.MYPAGE -> CommonTopBar("마이페이지", "프로필과 활동 내역을 관리하세요")
+                    MistakeDestinations.MISTAKE_ANSWER -> CommonTopBar("오답노트","틀린문제를 다시 확인하고 학습하세요.")
                     else -> {}
                 }
             },
@@ -83,6 +86,7 @@ fun MainScreen(
                     HomeDestinations.HOME,
                     RoadmapDestinations.ROADMAP_LIST,
                     QuizDestinations.QUIZ,
+                    MistakeDestinations.MISTAKE_ANSWER,
                     MypageDestination.MYPAGE
                 )
                 val shouldShowBottomBar = currentRoute in bottomNavScreenRoutes
@@ -111,8 +115,11 @@ fun MainScreen(
         }
     }
 
-
     if (isHomeScreen) {
+        BackHandler(enabled = drawerState.isOpen) {
+            scope.launch { drawerState.close() }
+        }
+
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {

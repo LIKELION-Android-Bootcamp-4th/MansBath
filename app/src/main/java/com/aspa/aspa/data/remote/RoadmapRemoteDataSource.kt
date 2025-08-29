@@ -56,14 +56,17 @@ class RoadmapRemoteDataSource @Inject constructor(
         return roadmapId
     }
 
-    suspend fun isQuizExist(roadmapId: String): Boolean {
+    suspend fun isQuizExist(roadmapId: String, sectionId: Int): Boolean {
         val snapshot = firestore.collection("users")
             .document(auth.currentUser!!.uid)
             .collection("quizzes")
             .document(roadmapId)
+            .collection("quiz")
+            .whereEqualTo("sectionId", sectionId)
             .get()
             .await()
 
-        return snapshot.exists()
+        return !snapshot.isEmpty
+        // return snapshot.exists()
     }
 }

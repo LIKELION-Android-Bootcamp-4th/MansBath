@@ -12,6 +12,7 @@ import com.aspa.aspa.features.home.navigation.homeGraph
 import com.aspa.aspa.features.mypage.navigation.mypageGraph
 import com.aspa.aspa.features.quiz.navigation.quizGraph
 import com.aspa.aspa.features.roadmap.navigation.roadmapGraph
+import com.aspa.aspa.ui.components.MistakeNav.mistakeGraph
 import com.aspa.aspa.ui.components.StudyNav.studyGraph
 
 object MainDestinations { const val MAIN = "main" }
@@ -33,6 +34,7 @@ fun MainNavigation(
         homeGraph(navController = innerNavController, homeViewModel = homeViewModel)
         roadmapGraph(navController = innerNavController)
         quizGraph(navController = innerNavController)
+        mistakeGraph(navController = innerNavController)
         mypageGraph(rootNavController = rootNavController,innerNavController = innerNavController)
         studyGraph(navController = innerNavController)
     }

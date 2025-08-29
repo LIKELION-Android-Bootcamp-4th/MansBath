@@ -1,39 +1,48 @@
 package com.aspa.aspa.features.study.StudyDetail
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.MenuBook
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.aspa.aspa.features.state.MakeQuizState
 import com.aspa.aspa.features.state.UiState
 import com.aspa.aspa.features.study.StudyViewModel
@@ -55,15 +64,14 @@ fun StudyDetailScreen(
     val study = (uiState as? UiState.Success<Study>)?.data
     val sections = study?.items ?: emptyList()
     val expanded = remember { mutableStateOf<Pair<Int, Int>?>(0 to 0) }
-    val context= LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.makeQuizFlow.collect { event ->
             when(event) {
-                MakeQuizState.Idle -> {}
+                MakeQuizState.Waiting -> {
+
+                }
                 is MakeQuizState.Navigate -> {
-                    Toast.makeText(context,
-                        "퀴즈 생성이 완료되어 퀴즈 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                     navigateToQuiz()
                 }
             }
@@ -73,8 +81,14 @@ fun StudyDetailScreen(
     when (uiState) {
         is UiState.Loading, UiState.Idle -> {
             // 로딩 상태일 때 로딩 인디케이터 표시
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("퀴즈 생성 중..", color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(16.dp))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -93,12 +107,12 @@ fun StudyDetailScreen(
                                 Text(
                                     text = study?.title.orEmpty(),
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
                     )
                 },
@@ -120,7 +134,10 @@ fun StudyDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(35.dp)
-                                .background(Blue, shape = RoundedCornerShape(12.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                                 .clickable { navigateRoadmap() },
                             contentAlignment = Alignment.Center
                         ) {
@@ -131,10 +148,14 @@ fun StudyDetailScreen(
                                     imageVector = Icons.Outlined.CheckCircle,
                                     contentDescription = "완료",
                                     modifier = Modifier.size(18.dp),
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("이 섹션 완료하기", color = Color.White)
+                                Text(
+                                    "이 섹션 완료하기",
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }
 
@@ -143,20 +164,27 @@ fun StudyDetailScreen(
                                 .fillMaxWidth()
                                 .height(35.dp)
                                 .border(
-                                    BorderStroke(1.dp, Gray10),
+                                    BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                    ),
                                     shape = RoundedCornerShape(12.dp)
                                 )
-                                .background(Color.White, shape = RoundedCornerShape(12.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.surface, // 클릭 전 하얀(서피스) 색
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                                 .clickable {
-                                    viewModel.makeQuiz()
-                                    Toast.makeText(context,
-                                        "서버에 퀴즈 생성 요청을 보냈습니다.",
-                                        Toast.LENGTH_SHORT).show()
+                                    viewModel.navigateOrMakeQuiz()
                                 }
                             ,
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("퀴즈 풀기", color = Color.Black)
+                            Text(
+                                "퀴즈 풀기",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 },
@@ -167,7 +195,7 @@ fun StudyDetailScreen(
                                 Modifier.padding(padding).fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                             }
                         }
 
@@ -177,7 +205,7 @@ fun StudyDetailScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(uiState.message ?: "오류가 발생했어요.")
+                                    Text(uiState.message ?: "오류가 발생했어요.", color = MaterialTheme.colorScheme.onBackground)
                                     Spacer(Modifier.height(12.dp))
                                     Button(onClick = onRetry) { Text("다시 시도") }
                                 }
@@ -190,7 +218,7 @@ fun StudyDetailScreen(
                                 modifier = Modifier
                                     .padding(padding)
                                     .fillMaxSize()
-                                    .background(Gray),
+                                    .background(MaterialTheme.colorScheme.background),
                                 contentPadding = PaddingValues(vertical = 8.dp)
                             ) {
                                 sections.forEachIndexed { sIdx, sec ->
@@ -221,7 +249,6 @@ fun StudyDetailScreen(
             )
         }
 
-        is UiState.Failure -> Text("에러발생")
+        is UiState.Failure -> Text("에러발생", color = MaterialTheme.colorScheme.error)
     }
 }
-
