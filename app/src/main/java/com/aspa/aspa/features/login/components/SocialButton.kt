@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.aspa.aspa.R
-import com.aspa.aspa.model.Provider
+import com.aspa.aspa.core.constants.enums.Provider
 import com.aspa.aspa.ui.components.SpeechBubble
 
 @Composable

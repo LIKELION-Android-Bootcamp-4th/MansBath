@@ -16,13 +16,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.aspa.aspa.core.constants.enums.Provider
 import com.aspa.aspa.features.login.AuthViewModel
 import com.aspa.aspa.features.login.LogoutState
 import com.aspa.aspa.features.login.WithdrawState
 import com.aspa.aspa.features.login.navigation.LoginDestinations
 import com.aspa.aspa.features.mypage.components.ConfirmDialog
 import com.aspa.aspa.features.mypage.components.DialogType
-import com.aspa.aspa.model.Provider
 import com.aspa.aspa.ui.theme.AppSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)

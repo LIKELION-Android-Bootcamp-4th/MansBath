@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.aspa.aspa.model.Provider
+import com.aspa.aspa.core.constants.enums.Provider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

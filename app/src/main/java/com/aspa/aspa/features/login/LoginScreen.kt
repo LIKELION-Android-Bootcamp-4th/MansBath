@@ -41,11 +41,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.R
+import com.aspa.aspa.core.constants.enums.Provider
 import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
-import com.aspa.aspa.model.Provider
 import com.aspa.aspa.ui.theme.AppSpacing
 import com.aspa.aspa.util.DoubleBackExitHandler
 import com.navercorp.nid.NaverIdLoginSDK
