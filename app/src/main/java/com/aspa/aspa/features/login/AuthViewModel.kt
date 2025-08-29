@@ -35,6 +35,7 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -94,8 +95,12 @@ class AuthViewModel @Inject constructor(
     private val _nicknameState = MutableStateFlow<String>("조회 중..")
     val nicknameState: StateFlow<String> = _nicknameState
 
+    val isOnboardingCompleted: Flow<Boolean> = dataStoreManager.isOnboardingCompleted
+
     private val _providerState = MutableStateFlow<Provider?>(null)
     val providerState: StateFlow<Provider?> = _providerState
+
+    val lastLoginProvider: Flow<Provider?> = dataStoreManager.lastLoginProvider
 
     private val _permissionState = MutableStateFlow<PermissionState>(PermissionState.Idle)
     val permissionState = _permissionState.asStateFlow()

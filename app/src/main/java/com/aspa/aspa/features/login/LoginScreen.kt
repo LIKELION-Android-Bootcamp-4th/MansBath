@@ -42,7 +42,6 @@ import androidx.navigation.NavController
 import com.aspa.aspa.OnboardingDestinations
 import com.aspa.aspa.R
 import com.aspa.aspa.core.constants.enums.Provider
-import com.aspa.aspa.data.local.datastore.DataStoreManager
 import com.aspa.aspa.features.login.components.SocialButton
 import com.aspa.aspa.features.main.navigation.MainDestinations
 import com.aspa.aspa.features.roadmap.navigation.RoadmapDestinations
@@ -53,7 +52,6 @@ import com.navercorp.nid.NaverIdLoginSDK
 @Composable
 fun LoginScreen(
     navController: NavController,
-    dataStoreManager: DataStoreManager,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -62,8 +60,8 @@ fun LoginScreen(
         onSuccess = {},
     )
     val loginState by authViewModel.loginState.collectAsState()
-    val isOnboardingCompleted by dataStoreManager.isOnboardingCompleted.collectAsState(initial = false)
-    val lastLoginProvider by dataStoreManager.lastLoginProvider.collectAsState(initial = null)
+    val isOnboardingCompleted by authViewModel.isOnboardingCompleted.collectAsState(initial = false)
+    val lastLoginProvider by authViewModel.lastLoginProvider.collectAsState(initial = null)
 
     val permissionState by authViewModel.permissionState.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
