@@ -4,7 +4,7 @@ import android.util.Log
 import com.aspa.aspa.data.dto.UserProfileDto
 import com.aspa.aspa.data.remote.GoogleRemoteDataSource
 import com.aspa.aspa.data.remote.UserRemoteDataSource
-import com.aspa.aspa.model.Provider
+import com.aspa.aspa.core.constants.enums.Provider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.functions.FirebaseFunctions
