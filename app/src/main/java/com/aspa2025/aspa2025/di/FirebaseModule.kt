@@ -1,0 +1,38 @@
+package com.aspa2025.aspa2025.di
+
+import android.app.NotificationManager
+import android.content.Context
+import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module //의존성 생성
+@InstallIn(SingletonComponent::class) // 어떤 컴포넌트 사용할지 결정
+object FirebaseModule {
+
+    @Provides // 직접 인스턴스 생성해서 반환
+    @Singleton // 앱 전역에서 하나만 유지할 것. 인스턴스가 재사용됨
+    fun provideAuth() : FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFireStore() : FirebaseFirestore  = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFunctions() : FirebaseFunctions = FirebaseFunctions.getInstance("asia-northeast3")
+
+    @Singleton
+    @Provides
+    fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
+        return ContextCompat.getSystemService(context, NotificationManager::class.java)
+                as NotificationManager
+    }
+}
