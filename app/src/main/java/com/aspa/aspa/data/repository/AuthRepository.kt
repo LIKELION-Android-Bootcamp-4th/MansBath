@@ -1,7 +1,7 @@
 package com.aspa.aspa.data.repository
 
 import com.aspa.aspa.data.dto.UserProfileDto
-import com.aspa.aspa.model.Provider
+import com.aspa.aspa.core.constants.enums.Provider
 
 interface AuthRepository {
 
@@ -10,4 +10,5 @@ interface AuthRepository {
     suspend fun signInWithNaver(accessToken: String?): Result<Any>
 
     suspend fun fetchProvider(): Result<Provider>
+    suspend fun fetchNickname(): Result<String>
 }

@@ -92,6 +92,7 @@ fun NavGraphBuilder.studyGraph(navController: NavController) {
                 },
                 navigateToQuiz = {
                     navController.navigate("quiz") {
+                        popUpTo(0)
                         launchSingleTop = true
                         restoreState = true
                     }

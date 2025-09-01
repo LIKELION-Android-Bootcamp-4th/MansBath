@@ -18,6 +18,9 @@ class RoadmapRepository @Inject constructor(
     suspend fun generateRoadmap(questionId: String): Result<String> =
         runCatching { remote.generateRoadmap(questionId) }
 
-    suspend fun isQuizExist(roadmapId: String): Result<Boolean> =
-        runCatching { remote.isQuizExist(roadmapId) }
+    suspend fun isStudyExist(roadmapId: String, sectionId: Int): Result<Boolean> =
+        runCatching { remote.isStudyExist(roadmapId, sectionId) }
+
+    suspend fun isQuizExist(roadmapId: String, sectionId: Int): Result<Boolean> =
+        runCatching { remote.isQuizExist(roadmapId, sectionId) }
 }

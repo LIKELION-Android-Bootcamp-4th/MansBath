@@ -38,6 +38,9 @@ class RoadmapViewModel @Inject constructor(
     private val _generateState = MutableStateFlow<Boolean?>(null)
     val generateState: StateFlow<Boolean?> = _generateState
 
+    private val _studyExistState = MutableStateFlow<Boolean?>(null)
+    val studyExistState: StateFlow<Boolean?> = _studyExistState
+
     private val _quizExistState = MutableStateFlow<Boolean?>(null)
     val quizExistState: StateFlow<Boolean?> = _quizExistState
 
@@ -83,9 +86,22 @@ class RoadmapViewModel @Inject constructor(
         }
     }
 
-    fun isQuizExist(roadmapId: String) {
+    fun isStudyExist(roadmapId: String, sectionId: Int) {
         viewModelScope.launch {
-            repository.isQuizExist(roadmapId)
+            repository.isStudyExist(roadmapId, sectionId)
+                .onSuccess { exists ->
+                    _studyExistState.value = exists
+                }
+                .onFailure { e ->
+                    e.printStackTrace()
+                    _studyExistState.value = false
+                }
+        }
+    }
+
+    fun isQuizExist(roadmapId: String, sectionId: Int) {
+        viewModelScope.launch {
+            repository.isQuizExist(roadmapId, sectionId)
                 .onSuccess { exists ->
                     _quizExistState.value = exists
                 }

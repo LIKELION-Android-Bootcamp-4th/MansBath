@@ -50,7 +50,7 @@ class StudyFireStoreDataSource @Inject constructor(
                     .call(sendData)
                     .await()
                 Log.d("Data", "생성 성공")
-                val responseData = functions.getData() as? Map<*, *> 
+                val responseData = functions.getData() as? Map<*, *>
                     ?: error("Cloud Functions 응답 데이터가 없습니다.")
                 val studyDataMap = responseData["study"] as? Map<*, *>
                     ?: error("Cloud Functions 응답에 'study' 데이터가 없습니다.")
@@ -95,5 +95,16 @@ class StudyFireStoreDataSource @Inject constructor(
         }catch (e : Exception){
             Log.e("FireStore","에러발생: $e")
         }
+    }
+
+    suspend fun quizExists(roadmapId: String, sectionId: Int): Boolean {
+        val doc = fireStore.collection("users")
+            .document(uid)
+            .collection("quizzes")
+            .document(roadmapId)
+            .collection("quiz")
+            .whereEqualTo("sectionId", sectionId)
+            .get().await()
+        return !doc.isEmpty
     }
 }
