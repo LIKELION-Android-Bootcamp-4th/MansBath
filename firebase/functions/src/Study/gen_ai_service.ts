@@ -29,9 +29,13 @@ export async function generateStudyContent(
     roadmapData,
   );
 
-  const model = getAiModel();
-  const result = await model.generateContent([prompt], {timeout: 480000});
-  const parts = result?.response?.candidates?.[0]?.content?.parts ?? [];
+  const ai = getAiModel();
+  const result = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{role: "user", parts: [{text: prompt}]}],
+    config: {httpOptions: {timeout: 480000}},
+  });
+  const parts = result.candidates?.[0]?.content?.parts ?? [];
   const full = parts
     .map((p: { text?: string } | null | undefined) => (typeof p?.text === "string" ? p.text : ""))
     .join("");
