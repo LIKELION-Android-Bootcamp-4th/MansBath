@@ -65,4 +65,10 @@ class UserRemoteDataSource @Inject constructor(
 
         return snapshot.getString("name") ?: return ""
     }
+
+    suspend fun fetchEmail(): String {
+        val snapshot = firestore.collection("users").document(auth.uid!!).get().await()
+
+        return snapshot.getString("email") ?: return ""
+    }
 }

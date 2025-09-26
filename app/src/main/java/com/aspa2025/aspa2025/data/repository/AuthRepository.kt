@@ -11,4 +11,5 @@ interface AuthRepository {
 
     suspend fun fetchProvider(): Result<Provider>
     suspend fun fetchNickname(): Result<String>
+    suspend fun fetchEmail(): Result<String>
 }
