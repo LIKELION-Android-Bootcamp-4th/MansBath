@@ -1,7 +1,6 @@
 package com.aspa2025.aspa2025.features.mypage
 
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -16,10 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.NoAccounts
-import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,8 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aspa2025.aspa2025.core.constants.enums.Provider
@@ -48,8 +48,6 @@ import com.aspa2025.aspa2025.features.login.navigation.LoginDestinations
 import com.aspa2025.aspa2025.features.mypage.components.ConfirmDialog
 import com.aspa2025.aspa2025.features.mypage.components.DialogType
 import com.aspa2025.aspa2025.ui.theme.AppSpacing
-import com.aspa2025.aspa2025.ui.theme.logout
-import com.aspa2025.aspa2025.ui.theme.withdraw
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,6 +146,39 @@ fun MyPageScreen(
                 .fillMaxWidth()
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md)
         ) {
+
+            // 개인정보 처리 방침
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_VIEW,
+                            "https://branch-run-aae.notion.site/Aspa-25e987807fdd8001aa75fc9d1c4cc77a".toUri())
+                        context.startActivity(intent)
+                    }
+                    .padding(vertical = AppSpacing.md),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                    contentDescription = "개인정보 처리 방침",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(AppSpacing.md))
+                Text(
+                    text = "개인정보 처리 방침",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = "이동",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             // 로그아웃
             Row(
@@ -289,6 +320,34 @@ fun MyPageScreenPreview() {
                     .fillMaxWidth()
                     .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md)
             ) {
+
+                // 개인정보 처리 방침
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = AppSpacing.md),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                        contentDescription = "개인정보 처리 방침",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
+                    Text(
+                        text = "개인정보 처리 방침",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = "이동",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 // 로그아웃
                 Row(
