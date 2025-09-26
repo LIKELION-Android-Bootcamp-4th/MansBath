@@ -1,8 +1,11 @@
 package com.aspa2025.aspa2025.features.mypage
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,9 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.NoAccounts
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aspa2025.aspa2025.core.constants.enums.Provider
@@ -137,59 +141,73 @@ fun MyPageScreen(
                 }
             }
         }
-        // 로그아웃 버튼
-        Button(
-            onClick = {
-                dialogType = DialogType.LOGOUT
-            },
+        
+        // 메뉴 항목들
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.logout,
-                contentColor = MaterialTheme.colorScheme.onError
-            ),
-            shape = MaterialTheme.shapes.medium
+                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+
+            // 로그아웃
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        dialogType = DialogType.LOGOUT
+                    }
+                    .padding(vertical = AppSpacing.md),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.Logout,
                     contentDescription = "로그아웃",
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onError
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.width(AppSpacing.sm))
+                Spacer(modifier = Modifier.width(AppSpacing.md))
                 Text(
                     text = "로그아웃",
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = "이동",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        }
-        // 회원탈퇴 버튼
-        Button(
-            onClick = {
-                dialogType = DialogType.WITHDRAW
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.withdraw,
-                contentColor = MaterialTheme.colorScheme.onError
-            ),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            
+            // 회원탈퇴
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        dialogType = DialogType.WITHDRAW
+                    }
+                    .padding(vertical = AppSpacing.md),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.NoAccounts,
                     contentDescription = "회원탈퇴",
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onError
+                    tint = MaterialTheme.colorScheme.error
                 )
-                Spacer(modifier = Modifier.width(AppSpacing.sm))
+                Spacer(modifier = Modifier.width(AppSpacing.md))
                 Text(
                     text = "회원탈퇴",
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = "이동",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
@@ -219,5 +237,115 @@ fun MyPageScreen(
         }
 
         DialogType.NONE -> {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MyPageScreenPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        ) {
+            //프로필 설정
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = AppSpacing.md, horizontal = AppSpacing.md),
+                shape = MaterialTheme.shapes.large,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = AppSpacing.lg, vertical = AppSpacing.lg),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = "프로필",
+                        modifier = Modifier.size(60.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Column(modifier = Modifier.padding(horizontal = AppSpacing.md)) {
+                        Text(
+                            text = "사용자 닉네임",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "구글 계정으로 가입",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            
+            // 메뉴 항목들
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md)
+            ) {
+
+                // 로그아웃
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = AppSpacing.md),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Logout,
+                        contentDescription = "로그아웃",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
+                    Text(
+                        text = "로그아웃",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = "이동",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                // 회원탈퇴
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = AppSpacing.md),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.NoAccounts,
+                        contentDescription = "회원탈퇴",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
+                    Text(
+                        text = "회원탈퇴",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = "이동",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        }
     }
 }
