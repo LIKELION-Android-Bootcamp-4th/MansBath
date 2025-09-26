@@ -1,3 +1,18 @@
+<div align="center">
+<img height="500" alt="1" src="https://github.com/user-attachments/assets/e81b307f-e62b-4044-8148-17432389e238" />
+<img height="500" alt="2" src="https://github.com/user-attachments/assets/a3be085a-ec11-4696-a81c-7bcb7c235d03" />
+</div>
+
+<br>
+
+<div align="center">
+<img height="420" alt="3" src="https://github.com/user-attachments/assets/4b34052c-22bb-4ed3-985a-5a3d5f5839cf" />
+<img height="420" alt="4" src="https://github.com/user-attachments/assets/f50e9877-af58-4baa-a9f6-4a3ac9cf1771" />
+<img height="420" alt="5" src="https://github.com/user-attachments/assets/6349f015-6105-4b56-b465-d486ab14c053" />
+<img height="420" alt="6" src="https://github.com/user-attachments/assets/61db446e-ed88-4ea9-89aa-74cae1f75602" />
+<img height="420" alt="7" src="https://github.com/user-attachments/assets/4119cef9-9442-4467-8b95-cb13b20a3ebf" />
+</div>
+
 # Aspa
 
 AI 기반 개인 맞춤 학습 도우미 Android 애플리케이션입니다. 사용자의 질문과 학습 기록을 바탕으로 AI가 내용을 분석하고, 로드맵·학습 콘텐츠·퀴즈를 자동으로 생성하여 효율적인 자기주도 학습을 돕습니다. Firebase(인증/데이터/함수)와 Google Gemini를 활용해 안정적인 백엔드와 빠른 AI 응답을 제공합니다.
