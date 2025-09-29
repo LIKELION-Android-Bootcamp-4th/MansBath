@@ -4,6 +4,7 @@ import {SYSTEM_PROMPT} from "../ai/quiz_prompt";
 import {ConceptDetail, Quiz} from "../type/quiz_types";
 import {FieldValue} from "firebase-admin/firestore";
 import {HttpsError} from "firebase-functions/v2/https";
+import {quizResponseSchema} from "../ai/quiz_schema";
 
 /**
  * Gemini AI에게 퀴즈 생성을 요청하고 결과를 파싱합니다.
@@ -24,6 +25,10 @@ export async function getQuiz(
   const prompt = SYSTEM_PROMPT + JSON.stringify(conceptDetail);
   const result = await chat.sendMessage({
     message: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: quizResponseSchema,
+    },
   });
   const responseText = result.text ?? "";
 
