@@ -1,4 +1,3 @@
-import {EXTRA_INSTRUCTION} from "./common_prompt";
 
 /**
  * 로드맵 생성을 위한 전체 프롬프트 문자열을 구성합니다.
@@ -16,7 +15,6 @@ export function buildRoadmapPrompt(userQuestionReport: string): string {
 ${ROADMAP_SYSTEM_PROMPT}
 [ 사용자 질문 분석서 ] 는 아래와 같아.
 ${userQuestionReport}
-${EXTRA_INSTRUCTION}
 `.trim();
 }
 
@@ -50,30 +48,5 @@ export const ROADMAP_SYSTEM_PROMPT = `
  2. 하단에 단계별로 배워야 하는 제목과 학습 기간(Learning Curve), 학습 개념(concept)을 포함
  
  
-응답 결과 예시는 아래와 같아. 각 stage 객체의 status는 항상 false(문자열이 아니라 boolean literal)로 응답해줘.
-{
-  "roadmap": {
-    "title": "React 완전 정복",
-    "description": "React의 기초부터 고급 개념까지 체계적으로 학습하여 실제 서비스를 개발하고 배포하는 것을 목표로 합니다.",
-    "stages": [
-      {
-        "id": 0,
-        "title": "JavaScript 기초",
-        "description": "React 학습을 위한 JavaScript 핵심 개념",
-        "learning_curve": "1-2 주",
-        "concept": "React 개발에 필수적인 모던 JavaScript 문법(ES6+)을 학습합니다. let/const, 화살표 함수, 비구조화 할당, 클래스, 모듈 시스템(import/export) 및 주요 배열 메서드(map, filter, reduce) 사용법을 익힙니다.",
-        "status": false
-      },
-      {
-        "id": 1,
-        "title": "React 기초",
-        "description": "컴포넌트, JSX, Props의 기본 개념",
-        "learning_curve": "1-2 주",
-        "concept": "React의 핵심 사상인 컴포넌트 기반 아키텍처를 이해합니다. JavaScript를 확장한 문법인 JSX를 사용하여 UI를 선언적으로 작성하고, 부모 컴포넌트에서 자식 컴포넌트로 데이터를 전달하는 Props의 개념을 학습합니다.",
-        "status": false  
-      }
-      ...
-    ]
-  }
-}
+응답 결과 중 각 stage 객체의 status는 항상 false로 응답해줘.
 `;

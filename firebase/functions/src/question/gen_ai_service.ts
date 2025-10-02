@@ -36,11 +36,13 @@ export async function getAiResponse(
   userQuestion: string,
 ): Promise<AiResponse> {
   const fullHistoryForAI = buildChatHistory(history);
-  const model = getAiModel();
-
-  const chat = model.startChat({history: fullHistoryForAI});
-  const result = await chat.sendMessage(userQuestion);
-  const responseText = result.response.text();
+  const ai = getAiModel();
+  const chat = ai.chats.create({
+    model: "gemini-2.5-flash",
+    history: fullHistoryForAI,
+  });
+  const result = await chat.sendMessage({message: userQuestion});
+  const responseText = result.text ?? "";
 
   try {
     // 응답에서 JSON 객체만 추출

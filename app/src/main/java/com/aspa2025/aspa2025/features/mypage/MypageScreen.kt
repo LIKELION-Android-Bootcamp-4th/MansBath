@@ -3,8 +3,10 @@ package com.aspa2025.aspa2025.features.mypage
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,11 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.aspa2025.aspa2025.R
 import com.aspa2025.aspa2025.core.constants.enums.Provider
 import com.aspa2025.aspa2025.features.login.AuthViewModel
 import com.aspa2025.aspa2025.features.login.LogoutState
@@ -59,12 +63,14 @@ fun MyPageScreen(
     val context = LocalContext.current
     var dialogType by remember { mutableStateOf(DialogType.NONE) }
     val nickname by authViewModel.nicknameState.collectAsState()
+    val email by authViewModel.emailState.collectAsState()
     val providerState by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
 
     LaunchedEffect(Unit) {
         authViewModel.getNickname()
+        authViewModel.getEmail()
         authViewModel.getProvider()
     }
 
@@ -112,7 +118,8 @@ fun MyPageScreen(
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = AppSpacing.lg, vertical = AppSpacing.lg),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
@@ -120,26 +127,63 @@ fun MyPageScreen(
                     modifier = Modifier.size(60.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Column(modifier = Modifier.padding(horizontal = AppSpacing.md)) {
+                Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
                     Text(
-                        text = nickname,
+                        text = "$nickname 님",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        when(providerState) {
-                            Provider.GOOGLE -> "구글 계정으로 가입"
-                            Provider.KAKAO -> "카카오 계정으로 가입"
-                            Provider.NAVER -> "네이버 계정으로 가입"
-                            null ->"조회 중.."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+                    ) {
+                        when (providerState) {
+                            Provider.GOOGLE -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_google),
+                                    contentDescription = "구글 로그인",
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+
+                            Provider.KAKAO -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_kakao),
+                                    contentDescription = "카카오 로그인",
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+
+                            Provider.NAVER -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_naver),
+                                    contentDescription = "네이버 로그인",
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+
+                            null -> {
+                                Text(
+                                    text = "조회 중..",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        // Provider가 null이 아닐 때만 email 표시
+                        if (providerState != null) {
+                            Text(
+                                text = email,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
         }
-        
+
         // 메뉴 항목들
         Column(
             modifier = Modifier
@@ -210,7 +254,7 @@ fun MyPageScreen(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             // 회원탈퇴
             Row(
                 modifier = Modifier
@@ -313,7 +357,7 @@ fun MyPageScreenPreview() {
                     }
                 }
             }
-            
+
             // 메뉴 항목들
             Column(
                 modifier = Modifier
@@ -376,7 +420,7 @@ fun MyPageScreenPreview() {
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 // 회원탈퇴
                 Row(
                     modifier = Modifier
