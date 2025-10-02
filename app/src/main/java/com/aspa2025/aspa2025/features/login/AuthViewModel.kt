@@ -95,6 +95,9 @@ class AuthViewModel @Inject constructor(
     private val _nicknameState = MutableStateFlow<String>("조회 중..")
     val nicknameState: StateFlow<String> = _nicknameState
 
+    private val _emailState = MutableStateFlow<String>("조회 중..")
+    val emailState: StateFlow<String> = _emailState
+
     val isOnboardingCompleted: Flow<Boolean> = dataStoreManager.isOnboardingCompleted
 
     private val _providerState = MutableStateFlow<Provider?>(null)
@@ -492,6 +495,15 @@ class AuthViewModel @Inject constructor(
             authRepository.fetchNickname()
                 .onSuccess { nickname ->
                     _nicknameState.value = nickname
+                }
+        }
+    }
+
+    fun getEmail() {
+        viewModelScope.launch {
+            authRepository.fetchEmail()
+                .onSuccess { email ->
+                    _emailState.value = email
                 }
         }
     }
