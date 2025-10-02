@@ -18,9 +18,13 @@ export async function aiResponseData(uid : string, docId : string)
 
   const prompt = SYSTEM_PROMPT.replace("{USER_DATA}", JSON.stringify(data));
 
-  const model = getAiModel();
-  const result = await model.generateContent([prompt], {timeout: 480000});
-  const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text;
+  const ai = getAiModel();
+  const result = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{role: "user", parts: [{text: prompt}]}],
+    config: {httpOptions: {timeout: 480000}},
+  });
+  const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
   try {
     const jsonStr = (text ?? "").trim();
     // 응답이 순수 객체(JSON)로 오는 상황

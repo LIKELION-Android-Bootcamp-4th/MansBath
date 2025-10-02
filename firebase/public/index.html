@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aspa - 회원탈퇴</title>
+
+
+  <style media="screen">
+    body {
+      background: #ECEFF1;
+      color: rgba(0, 0, 0, 0.87);
+      font-family: Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    #message {
+      background: white;
+      max-width: 400px;
+      margin: 100px auto 16px;
+      padding: 32px 24px;
+      border-radius: 3px;
+    }
+
+    #message h2 {
+      color: #ffa100;
+      font-weight: bold;
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    #message h1 {
+      font-size: 22px;
+      font-weight: 300;
+      color: rgba(0, 0, 0, 0.6);
+      margin: 0 0 16px;
+    }
+
+    #message p {
+      line-height: 140%;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+
+    #message {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    #load {
+      color: rgba(0, 0, 0, 0.4);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin: 24px 0;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      width: 100%;
+      text-align: center;
+      background: #D32F2F;
+      color: white;
+      padding: 16px;
+      margin-top: 24px;
+      text-transform: uppercase;
+    }
+
+    .btn-secondary {
+      border: 1px solid #ddd;
+      background: white;
+      color: #666;
+    }
+
+    .btn-confirm {
+      background: #D32F2F;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Dialog Styles */
+    .dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dialog-content {
+      background: white;
+      padding: 32px;
+      border-radius: 8px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .dialog-title {
+      margin: 0 0 16px 0;
+      color: #D32F2F;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .dialog-text {
+      margin: 0 0 24px 0;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    .dialog-spacer {
+      height: 60px;
+    }
+
+    .dialog-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 600px) {
+      body,
+      #message {
+        margin-top: 0;
+        background: white;
+        box-shadow: none;
+      }
+
+      body {
+        border-top: 16px solid #ffa100;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="message">
+    <h2>어서오세요!</h2>
+    <h1>Aspa 회원탈퇴 사이트입니다.</h1>
+    <p style="margin-bottom: 60px;">
+      안드로이드 앱으로 제공되는 Aspa의 회원탈퇴를 웹에서 진행할 수 있습니다.
+      <br>
+      아래에 회원가입 / 로그인 시 사용한 SNS 제공자와 해당 SNS 계정의 이메일 주소를 입력해주세요.
+    </p>
+
+    <!-- SNS 제공자 선택 -->
+    <div class="form-group">
+      <label for="sns-provider" class="form-label">SNS 제공자 선택:</label>
+      <select id="sns-provider" class="form-input">
+        <option value="">SNS 제공자를 선택해주세요</option>
+        <option value="kakao">카카오</option>
+        <option value="google">구글</option>
+        <option value="naver">네이버</option>
+      </select>
+    </div>
+
+    <!-- 이메일 입력 -->
+    <div class="form-group">
+      <label for="email-input" class="form-label">이메일 주소:</label>
+      <input 
+        type="email" 
+        id="email-input" 
+        placeholder="example@email.com"
+        class="form-input"
+      />
+    </div>
+
+    <!-- 회원탈퇴 버튼 (메일 전송 기능 포함) -->
+    <button id="withdraw-button" class="btn btn-primary">
+      회원탈퇴
+    </button>
+  </div>
+
+  <!-- 확인 다이얼로그 -->
+  <div id="confirm-dialog" class="dialog">
+    <div class="dialog-content">
+      <h3 class="dialog-title">한 번 더 확인해주세요!</h3>
+      
+      <p class="dialog-text">메일 전송 버튼을 클릭 후 그대로 메일을 전송하시면<br>개발자가 메일 확인 후 신속히 회원탈퇴 처리를 진행하도록 하겠습니다.</p>
+      
+      <div class="dialog-spacer"></div>
+      
+      <div class="dialog-buttons">
+        <button id="cancel-button" class="btn btn-secondary">취소</button>
+        <button id="confirm-send-button" class="btn btn-confirm">메일 전송</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Constants
+    const CONFIG = {
+      SUPPORT_EMAIL: 'hyunje4312@gmail.com',
+      EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      SNSPROVIDERS: {
+        KAKAO: 'kakao',
+        GOOGLE: 'google',
+        NAVER: 'naver'
+      }
+    };
+
+    const MESSAGES = {
+      SELECT_PROVIDER: 'SNS 제공자를 선택해주세요.',
+      ENTER_EMAIL: '이메일 주소를 입력해주세요.',
+      INVALID_EMAIL: '올바른 이메일 형식을 입력해주세요.'
+    };
+
+    // DOM Elements
+    const elements = {
+      withdrawButton: document.querySelector('#withdraw-button'),
+      snsProviderSelect: document.querySelector('#sns-provider'),
+      emailInput: document.querySelector('#email-input'),
+      confirmDialog: document.querySelector('#confirm-dialog'),
+      cancelButton: document.querySelector('#cancel-button'),
+      confirmSendButton: document.querySelector('#confirm-send-button')
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // Validation functions
+      function validateForm() {
+        const selectedProvider = elements.snsProviderSelect.value;
+        const email = elements.emailInput.value.trim();
+        
+        if (!selectedProvider) {
+          alert(MESSAGES.SELECT_PROVIDER);
+          return false;
+        }
+        
+        if (!email) {
+          alert(MESSAGES.ENTER_EMAIL);
+          return false;
+        }
+        
+        if (!CONFIG.EMAIL_REGEX.test(email)) {
+          alert(MESSAGES.INVALID_EMAIL);
+          return false;
+        }
+        
+        return { selectedProvider, email };
+      }
+
+      // Email functions
+      function createEmailContent(provider, email) {
+        const subject = `Aspa 회원탈퇴 요청 - ${provider} 계정`;
+        const body = `안녕하세요.
+
+${provider} 계정으로 가입된 Aspa 서비스의 회원탈퇴를 요청합니다.
+
+계정 정보:
+- SNS 제공자: ${provider}
+- 이메일: ${email}
+
+회원탈퇴 처리 후에는 모든 데이터가 삭제되며, 복구가 불가능합니다.
+
+감사합니다.`;
+
+        return { subject, body };
+      }
+
+      function sendWithdrawEmail() {
+        const validation = validateForm();
+        if (!validation) return;
+
+        const { subject, body } = createEmailContent(validation.selectedProvider, validation.email);
+        const mailtoLink = `mailto:${CONFIG.SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+      }
+
+      // Dialog functions
+      function showDialog() {
+        elements.confirmDialog.style.display = 'flex';
+      }
+
+      function hideDialog() {
+        elements.confirmDialog.style.display = 'none';
+      }
+
+      // Event listeners
+      elements.withdrawButton.addEventListener('click', function() {
+        const validation = validateForm();
+        if (validation) {
+          showDialog();
+        }
+      });
+
+      elements.cancelButton.addEventListener('click', hideDialog);
+
+      elements.confirmSendButton.addEventListener('click', function() {
+        hideDialog();
+        sendWithdrawEmail();
+      });
+
+      elements.confirmDialog.addEventListener('click', function(e) {
+        if (e.target === elements.confirmDialog) {
+          hideDialog();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
