@@ -17,11 +17,15 @@ export async function getQuiz(
   studyId: string,
   sectionId: number
 ): Promise<Quiz> {
-  const model = getAiModel();
-  const chat = model.startChat();
+  const ai = getAiModel();
+  const chat = ai.chats.create({
+    model: "gemini-2.5-flash",
+  });
   const prompt = SYSTEM_PROMPT + JSON.stringify(conceptDetail);
-  const result = await chat.sendMessage(prompt);
-  const responseText = result.response.text();
+  const result = await chat.sendMessage({
+    message: prompt,
+  });
+  const responseText = result.text ?? "";
 
   try {
     // 응답에서 JSON 객체만 추출
