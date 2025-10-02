@@ -22,11 +22,11 @@ plugins {
 }
 
 android {
-    namespace = "com.aspa.aspa"
+    namespace = "com.aspa2025.aspa2025"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.aspa.aspa"
+        applicationId = "com.aspa2025.aspa2025"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
