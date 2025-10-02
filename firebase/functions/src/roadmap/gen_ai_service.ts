@@ -4,6 +4,7 @@ import {Roadmap} from "../type/roadmap_types";
 import {formatFirestoreMapToString} from "../util/formatter";
 import {cleanAndParseAiResponse} from "../util/parser";
 import {getQuestionResult} from "./firestore_service";
+import {roadmapResponseSchema} from "../ai/roadmap_schema";
 
 /**
  * 사용자 질문 분석서를 토대로 AI를 통해 로드맵을 생성합니다.
@@ -29,6 +30,10 @@ export async function generateRoadmapWithAI(
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{role: "user", parts: [{text: fullPrompt}]}],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: roadmapResponseSchema,
+      },
     });
 
     // 응답에서 텍스트 추출

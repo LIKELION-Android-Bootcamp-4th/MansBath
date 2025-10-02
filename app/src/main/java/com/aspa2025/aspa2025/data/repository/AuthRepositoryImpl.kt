@@ -87,4 +87,13 @@ class AuthRepositoryImpl @Inject constructor(
     }.onFailure { e ->
         Log.e("NICKNAME", "❌ fetchNickname FAILED: ${e.javaClass.simpleName} ${e.message}", e)
     }
+
+    override suspend fun fetchEmail(): Result<String> = runCatching {
+        val email = userDs.fetchEmail()
+        Log.d("EMAIL", "email: $email")
+
+        email
+    }.onFailure { e ->
+        Log.e("EMAIL", "❌ fetchEmail FAILED: ${e.javaClass.simpleName} ${e.message}", e)
+    }
 }
