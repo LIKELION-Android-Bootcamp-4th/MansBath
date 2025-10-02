@@ -49,4 +49,5 @@ export const ROADMAP_SYSTEM_PROMPT = `
  
  
 응답 결과 중 각 stage 객체의 status는 항상 false로 응답해줘.
+응답 결과 중 stage의 id는 0부터 시작하는 연속된 숫자로 응답해줘.
 `;
