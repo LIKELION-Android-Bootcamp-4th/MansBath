@@ -15,6 +15,7 @@ class DataStoreManager(private val context: Context) {
     companion object {
         private val ONBOARDING_KEY = booleanPreferencesKey("isOnboardingCompleted")
         private val PROVIDER_KEY = stringPreferencesKey("lastLoginProvider")
+        private val NOTIFICATION_ENABLED_KEY = booleanPreferencesKey("isNotificationEnabled")
     }
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data
@@ -27,6 +28,8 @@ class DataStoreManager(private val context: Context) {
             }
         }
 
+    val notificationEnabled: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[NOTIFICATION_ENABLED_KEY] == true }
 
     suspend fun setIsOnboardingCompleted(completed: Boolean) {
         context.dataStore.edit { prefs ->
@@ -41,6 +44,12 @@ class DataStoreManager(private val context: Context) {
             } else {
                 prefs[PROVIDER_KEY] = provider.name
             }
+        }
+    }
+
+    suspend fun setNotificationEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[NOTIFICATION_ENABLED_KEY] = enabled
         }
     }
 }

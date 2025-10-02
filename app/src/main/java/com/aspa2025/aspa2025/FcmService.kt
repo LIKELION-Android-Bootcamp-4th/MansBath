@@ -10,6 +10,9 @@ import javax.inject.Inject
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.aspa2025.aspa2025.data.local.datastore.DataStoreManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 @AndroidEntryPoint
@@ -44,8 +47,19 @@ class FcmService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         Log.d("FCM", "OnMessageReceived called")
 
-        remoteMessage.notification?.let {
-            sendNotification(it.title, it.body)
+        val dataStoreManager = DataStoreManager(applicationContext)
+
+        runBlocking {
+            val enabled = dataStoreManager.notificationEnabled.first()
+            if (!enabled) {
+                // 알림 끄기 → 그냥 무시
+                return@runBlocking
+            } else {
+                // 실제 알림 표시
+                remoteMessage.notification?.let {
+                    sendNotification(it.title, it.body)
+                }
+            }
         }
     }
 

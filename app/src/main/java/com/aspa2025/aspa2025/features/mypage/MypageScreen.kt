@@ -1,10 +1,15 @@
 package com.aspa2025.aspa2025.features.mypage
 
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +29,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,9 +41,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -54,7 +65,8 @@ import com.aspa2025.aspa2025.ui.theme.AppSpacing
 fun MyPageScreen(
     rootNavController: NavHostController,
     innerNavController: NavHostController,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    myPageViewModel: MyPageViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var dialogType by remember { mutableStateOf(DialogType.NONE) }
@@ -62,10 +74,14 @@ fun MyPageScreen(
     val providerState by authViewModel.providerState.collectAsState()
     val logoutState by authViewModel.logoutState.collectAsState()
     val withdrawState by authViewModel.withdrawState.collectAsState()
+    val notificationEnabled by myPageViewModel.notificationEnabled.collectAsState(initial = false)
 
     LaunchedEffect(Unit) {
         authViewModel.getNickname()
         authViewModel.getProvider()
+        myPageViewModel.toastEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     LaunchedEffect(logoutState, withdrawState) {
@@ -146,6 +162,67 @@ fun MyPageScreen(
                 .fillMaxWidth()
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md)
         ) {
+            // 알림 끄기 설정
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = AppSpacing.md),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column/*(
+                    modifier = Modifier.weight(1f) // 텍스트 영역이 남는 공간을 차지
+                )*/ {
+                    Text(
+                        text = "퀴즈 알림",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = "안푼 퀴즈가 있으면 매일 11시 알림으로 알려드려요.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+
+                Switch(
+                    checked = /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        // 권한 여부를 기준으로 표시
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    } else notificationEnabled,*/
+                        notificationEnabled,
+                    onCheckedChange = { checked ->
+                        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (checked) {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                                    != PackageManager.PERMISSION_GRANTED) {
+
+                                    ActivityCompat.requestPermissions(
+                                        context as Activity,
+                                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                                        1001
+                                    )
+                                }
+                            } else {
+                                // 시스템적으로 알림 권한을 강제로 해제할 수는 없음 → 안내 다이얼로그 표시
+                                Toast.makeText(context, "시스템 설정에서 알림을 끌 수 있습니다.", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            // DataStore에 저장
+                            myPageViewModel.changeNotificationEnabled(checked)
+                        }*/
+                        myPageViewModel.changeNotificationEnabled(checked)
+                        myPageViewModel.showToast(checked)
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = Color.LightGray
+                    )
+                )
+            }
 
             // 개인정보 처리 방침
             Row(

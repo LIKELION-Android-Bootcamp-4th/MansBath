@@ -514,6 +514,9 @@ class AuthViewModel @Inject constructor(
     fun onPermissionResult(isGranted: Boolean, shouldShowRationale: Boolean) {
         if (isGranted) {
             _permissionState.update { PermissionState.Granted }
+            viewModelScope.launch {
+                dataStoreManager.setNotificationEnabled(true)
+            }
         } else {
             _permissionState.update { PermissionState.Denied(shouldShowRationale) }
         }
