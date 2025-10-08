@@ -6,8 +6,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.aspa2025.aspa2025.core.constants.enums.RedirectType
 import com.aspa2025.aspa2025.features.login.navigation.LoginDestinations
 import com.aspa2025.aspa2025.features.main.navigation.MainDestinations
+import com.aspa2025.aspa2025.ui.theme.AppSpacing
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -42,7 +46,7 @@ fun SplashScreen (
     val redirectType = if (deepLinkQueryParam) RedirectType.ROADMAP_STATUS else RedirectType.ROADMAP
 
     LaunchedEffect(Unit) {
-        delay(1000)
+        delay(5000)
 
         Log.i("ONBOARDING", "onboarding completed : $isOnboardingCompleted")
 
@@ -89,6 +93,15 @@ fun SplashScreen (
             painter = painterResource(id = R.drawable.aspalogo),
             contentDescription = "Aspa",
             modifier = Modifier.size(120.dp)
+        )
+        Text(
+            text = "version ${BuildConfig.VERSION_NAME}",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(AppSpacing.md),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
         )
     }
 }
