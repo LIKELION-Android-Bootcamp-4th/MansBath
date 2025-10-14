@@ -46,7 +46,7 @@ fun SplashScreen (
     val redirectType = if (deepLinkQueryParam) RedirectType.ROADMAP_STATUS else RedirectType.ROADMAP
 
     LaunchedEffect(Unit) {
-        delay(1000)
+        delay(5000)
 
         Log.i("ONBOARDING", "onboarding completed : $isOnboardingCompleted")
 
